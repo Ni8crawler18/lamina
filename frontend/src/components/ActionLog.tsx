@@ -1,7 +1,6 @@
 "use client";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
 
 interface LogEntry {
   sequence_number?: number;
@@ -12,7 +11,6 @@ interface LogEntry {
     details?: Record<string, unknown>;
     timestamp?: string;
   };
-  // Local log fields
   action?: string;
   agent?: string;
   details?: string;
@@ -20,24 +18,24 @@ interface LogEntry {
 }
 
 const agentColors: Record<string, string> = {
-  lifecycle: "bg-blue-500/10 text-blue-500 border-blue-500/20",
-  compliance: "bg-amber-500/10 text-amber-500 border-amber-500/20",
-  reporting: "bg-purple-500/10 text-purple-500 border-purple-500/20",
-  chat: "bg-green-500/10 text-green-500 border-green-500/20",
+  lifecycle: "text-blue-400 bg-blue-400/10",
+  compliance: "text-amber-400 bg-amber-400/10",
+  reporting: "text-purple-400 bg-purple-400/10",
+  chat: "text-emerald-400 bg-emerald-400/10",
 };
 
 export default function ActionLog({ entries }: { entries: LogEntry[] }) {
   if (!entries || entries.length === 0) {
     return (
-      <div className="text-sm text-muted-foreground text-center py-8">
+      <p className="text-sm text-muted-foreground text-center py-12">
         No actions logged yet
-      </div>
+      </p>
     );
   }
 
   return (
-    <ScrollArea className="h-[400px]">
-      <div className="space-y-2">
+    <ScrollArea className="h-[420px]">
+      <div className="space-y-px">
         {entries.map((entry, i) => {
           const agent = entry.content?.agent || entry.agent || "unknown";
           const action = entry.content?.action || entry.action || "unknown";
@@ -45,25 +43,25 @@ export default function ActionLog({ entries }: { entries: LogEntry[] }) {
           const details = entry.content?.details || (entry.details ? JSON.parse(entry.details) : {});
 
           return (
-            <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 text-sm">
-              <div className="flex-shrink-0 mt-0.5">
-                <Badge variant="outline" className={agentColors[agent] || "bg-muted text-muted-foreground"}>
-                  {agent}
-                </Badge>
-              </div>
+            <div key={i} className="flex items-start gap-3 px-4 py-3 rounded-lg hover:bg-card/50 transition-colors">
+              <span className={`text-[10px] font-mono font-medium px-1.5 py-0.5 rounded ${agentColors[agent] || "text-muted-foreground bg-muted"}`}>
+                {agent}
+              </span>
               <div className="flex-1 min-w-0">
-                <p className="font-medium">{action.replace(/_/g, " ")}</p>
+                <p className="text-sm">{action.replace(/_/g, " ")}</p>
                 {Object.keys(details).length > 0 && (
-                  <p className="text-xs text-muted-foreground mt-1 truncate">
-                    {JSON.stringify(details).slice(0, 120)}
+                  <p className="font-mono text-[11px] text-muted-foreground/60 mt-0.5 truncate">
+                    {JSON.stringify(details).slice(0, 100)}
                   </p>
                 )}
               </div>
-              <div className="flex-shrink-0 text-xs text-muted-foreground">
-                {timestamp ? new Date(timestamp).toLocaleTimeString() : ""}
+              <div className="flex items-center gap-2 flex-shrink-0">
                 {entry.sequence_number != null && (
-                  <span className="ml-1 font-mono">#{entry.sequence_number}</span>
+                  <span className="font-mono text-[10px] text-primary/60">#{entry.sequence_number}</span>
                 )}
+                <span className="text-[10px] text-muted-foreground/50">
+                  {timestamp ? new Date(timestamp).toLocaleTimeString() : ""}
+                </span>
               </div>
             </div>
           );

@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 interface Asset {
   id: number;
@@ -22,58 +20,51 @@ interface Asset {
 
 export default function AssetCard({ asset }: { asset: Asset }) {
   const statusColor = {
-    active: "bg-green-500/10 text-green-500 border-green-500/20",
-    matured: "bg-blue-500/10 text-blue-500 border-blue-500/20",
-    cancelled: "bg-red-500/10 text-red-500 border-red-500/20",
+    active: "bg-emerald-500/10 text-emerald-400",
+    matured: "bg-blue-500/10 text-blue-400",
+    cancelled: "bg-red-500/10 text-red-400",
   }[asset.status] || "bg-muted text-muted-foreground";
 
   const faceValue = asset.total_supply / Math.pow(10, asset.decimals);
 
   return (
     <Link href={`/asset/${asset.id}`}>
-      <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div>
-              <CardTitle className="text-base">{asset.name}</CardTitle>
-              <p className="text-sm text-muted-foreground font-mono">{asset.symbol}</p>
-            </div>
-            <Badge variant="outline" className={statusColor}>
-              {asset.status}
-            </Badge>
+      <div className="group rounded-xl border border-border/50 bg-card/30 p-5 hover:border-primary/30 hover:bg-card/50 transition-all duration-200 cursor-pointer">
+        {/* Top row: name + status */}
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <p className="text-sm font-medium">{asset.name}</p>
+            <p className="font-mono text-xs text-muted-foreground mt-0.5">{asset.symbol}</p>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div>
-              <p className="text-muted-foreground">Face Value</p>
-              <p className="font-semibold">${faceValue.toLocaleString()}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">NAV</p>
-              <p className="font-semibold">${asset.nav.toLocaleString()}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Coupon</p>
-              <p className="font-semibold">{(asset.coupon_rate * 100).toFixed(1)}%</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Jurisdiction</p>
-              <p className="font-semibold">{asset.jurisdiction}</p>
-            </div>
-          </div>
-          {asset.token_id && (
-            <p className="text-xs text-muted-foreground font-mono truncate">
-              Token: {asset.token_id}
-            </p>
-          )}
-          {asset.maturity_date && (
-            <p className="text-xs text-muted-foreground">
-              Matures: {new Date(asset.maturity_date).toLocaleDateString()}
-            </p>
-          )}
-        </CardContent>
-      </Card>
+          <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${statusColor}`}>
+            {asset.status}
+          </span>
+        </div>
+
+        {/* Metrics grid */}
+        <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+          <Metric label="Face Value" value={`$${faceValue.toLocaleString()}`} />
+          <Metric label="NAV" value={`$${asset.nav.toLocaleString()}`} />
+          <Metric label="Coupon" value={`${(asset.coupon_rate * 100).toFixed(2)}%`} />
+          <Metric label="Jurisdiction" value={asset.jurisdiction} />
+        </div>
+
+        {/* Footer: token ID */}
+        {asset.token_id && (
+          <p className="font-mono text-[10px] text-muted-foreground/60 mt-4 pt-3 border-t border-border/30">
+            {asset.token_id}
+          </p>
+        )}
+      </div>
     </Link>
+  );
+}
+
+function Metric({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</p>
+      <p className="font-medium text-sm mt-0.5">{value}</p>
+    </div>
   );
 }

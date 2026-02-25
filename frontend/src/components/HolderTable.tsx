@@ -1,15 +1,5 @@
 "use client";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-
 interface Holder {
   id: number;
   account_id: string;
@@ -23,55 +13,62 @@ interface Holder {
 export default function HolderTable({ holders, decimals = 2 }: { holders: Holder[]; decimals?: number }) {
   if (!holders || holders.length === 0) {
     return (
-      <div className="text-sm text-muted-foreground text-center py-8">
+      <p className="text-sm text-muted-foreground text-center py-12">
         No holders registered
-      </div>
+      </p>
     );
   }
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Account</TableHead>
-          <TableHead className="text-right">Balance</TableHead>
-          <TableHead>KYC</TableHead>
-          <TableHead>Jurisdiction</TableHead>
-          <TableHead>Type</TableHead>
-          <TableHead>Whitelisted</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {holders.map((h) => (
-          <TableRow key={h.id}>
-            <TableCell className="font-mono text-xs">{h.account_id}</TableCell>
-            <TableCell className="text-right font-semibold">
-              {(h.balance / Math.pow(10, decimals)).toLocaleString()}
-            </TableCell>
-            <TableCell>
-              <Badge
-                variant="outline"
-                className={
+    <div className="overflow-hidden">
+      <table className="w-full">
+        <thead>
+          <tr className="text-[11px] text-muted-foreground uppercase tracking-wider">
+            <th className="text-left font-medium pb-3 pl-4">Account</th>
+            <th className="text-right font-medium pb-3">Balance</th>
+            <th className="text-left font-medium pb-3 pl-6">KYC</th>
+            <th className="text-left font-medium pb-3">Jurisdiction</th>
+            <th className="text-left font-medium pb-3">Type</th>
+            <th className="text-center font-medium pb-3 pr-4">Whitelisted</th>
+          </tr>
+        </thead>
+        <tbody>
+          {holders.map((h) => (
+            <tr key={h.id} className="border-t border-border/30 hover:bg-card/50 transition-colors">
+              <td className="py-3 pl-4">
+                <span className="font-mono text-xs">{h.account_id}</span>
+              </td>
+              <td className="py-3 text-right">
+                <span className="font-mono text-sm font-medium">
+                  {(h.balance / Math.pow(10, decimals)).toLocaleString()}
+                </span>
+              </td>
+              <td className="py-3 pl-6">
+                <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
                   h.kyc_status === "approved"
-                    ? "bg-green-500/10 text-green-500 border-green-500/20"
-                    : "bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
-                }
-              >
-                {h.kyc_status}
-              </Badge>
-            </TableCell>
-            <TableCell>{h.jurisdiction}</TableCell>
-            <TableCell className="text-xs">{h.investor_type}</TableCell>
-            <TableCell>
-              {h.whitelisted ? (
-                <span className="text-green-500">Yes</span>
-              ) : (
-                <span className="text-red-500">No</span>
-              )}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+                    ? "bg-emerald-500/10 text-emerald-400"
+                    : "bg-amber-500/10 text-amber-400"
+                }`}>
+                  {h.kyc_status}
+                </span>
+              </td>
+              <td className="py-3 text-xs text-muted-foreground">{h.jurisdiction}</td>
+              <td className="py-3 text-xs text-muted-foreground">{h.investor_type}</td>
+              <td className="py-3 text-center pr-4">
+                {h.whitelisted ? (
+                  <svg className="w-4 h-4 text-emerald-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4 text-red-400 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
