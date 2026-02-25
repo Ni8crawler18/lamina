@@ -1,0 +1,58 @@
+{
+  "bond": {
+    "name": "Bond",
+    "description": "Fixed-income debt instrument",
+    "has_coupon": true,
+    "has_maturity": true,
+    "coupon_frequency": "semi_annual",
+    "default_decimals": 2,
+    "nav_update_frequency": "daily",
+    "subtypes": {
+      "treasury": {
+        "name": "US Treasury Bond",
+        "coupon_frequency": "semi_annual",
+        "risk_rating": "AAA"
+      },
+      "corporate": {
+        "name": "Corporate Bond",
+        "coupon_frequency": "semi_annual",
+        "risk_rating": "varies"
+      },
+      "municipal": {
+        "name": "Municipal Bond",
+        "coupon_frequency": "semi_annual",
+        "risk_rating": "varies"
+      }
+    }
+  },
+  "equity": {
+    "name": "Equity",
+    "description": "Ownership stake in a company or fund",
+    "has_coupon": false,
+    "has_maturity": false,
+    "has_dividends": true,
+    "dividend_frequency": "quarterly",
+    "default_decimals": 0,
+    "nav_update_frequency": "daily"
+  },
+  "fund": {
+    "name": "Fund",
+    "description": "Investment fund (ETF, mutual fund, REIT)",
+    "has_coupon": false,
+    "has_maturity": false,
+    "has_dividends": true,
+    "dividend_frequency": "quarterly",
+    "default_decimals": 4,
+    "nav_update_frequency": "daily"
+  },
+  "real_estate": {
+    "name": "Real Estate",
+    "description": "Tokenized real estate asset",
+    "has_coupon": false,
+    "has_maturity": false,
+    "has_dividends": true,
+    "dividend_frequency": "monthly",
+    "default_decimals": 2,
+    "nav_update_frequency": "monthly"
+  }
+}

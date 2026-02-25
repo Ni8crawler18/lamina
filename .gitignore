@@ -1,2 +1,48 @@
-CLAUDE.md
+# Environment & Secrets
 .env
+.env.local
+.env.production
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+venv/
+.venv/
+*.egg
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Node
+node_modules/
+.next/
+out/
+.turbo/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Reports
+backend/data/reports/*.pdf
+
+# Vercel
+.vercel
+
+# Claude Code
+CLAUDE.md
+.claude/

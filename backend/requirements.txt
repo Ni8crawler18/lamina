@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+aiosqlite
+aiohttp
+apscheduler
+anthropic
+reportlab
+python-dotenv
+python-multipart
+hiero-sdk-python

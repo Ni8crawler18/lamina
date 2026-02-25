@@ -1,0 +1,75 @@
+{
+  "US": {
+    "name": "United States",
+    "regulations": {
+      "reg_d": {
+        "name": "SEC Regulation D",
+        "description": "Private placement exemption for accredited investors",
+        "max_holders": 2000,
+        "investor_types": ["accredited"],
+        "lockup_period_days": 365,
+        "requires_kyc": true,
+        "requires_accreditation": true
+      },
+      "reg_s": {
+        "name": "SEC Regulation S",
+        "description": "Offshore transactions exemption",
+        "max_holders": null,
+        "investor_types": ["non_us"],
+        "lockup_period_days": 40,
+        "requires_kyc": true,
+        "requires_accreditation": false
+      }
+    },
+    "blocked_jurisdictions": ["IR", "KP", "CU", "SY", "RU"],
+    "reporting_frequency": "quarterly"
+  },
+  "EU": {
+    "name": "European Union",
+    "regulations": {
+      "mifid_ii": {
+        "name": "MiFID II",
+        "description": "Markets in Financial Instruments Directive",
+        "max_holders": null,
+        "investor_types": ["qualified", "professional"],
+        "lockup_period_days": 0,
+        "requires_kyc": true,
+        "requires_accreditation": false
+      }
+    },
+    "blocked_jurisdictions": ["IR", "KP", "CU", "SY", "RU"],
+    "reporting_frequency": "quarterly"
+  },
+  "UK": {
+    "name": "United Kingdom",
+    "regulations": {
+      "fca": {
+        "name": "FCA Regulations",
+        "description": "Financial Conduct Authority requirements",
+        "max_holders": null,
+        "investor_types": ["professional", "qualified"],
+        "lockup_period_days": 0,
+        "requires_kyc": true,
+        "requires_accreditation": false
+      }
+    },
+    "blocked_jurisdictions": ["IR", "KP", "CU", "SY", "RU"],
+    "reporting_frequency": "quarterly"
+  },
+  "SG": {
+    "name": "Singapore",
+    "regulations": {
+      "mas": {
+        "name": "MAS Regulations",
+        "description": "Monetary Authority of Singapore",
+        "max_holders": null,
+        "investor_types": ["accredited", "institutional"],
+        "lockup_period_days": 0,
+        "requires_kyc": true,
+        "requires_accreditation": true
+      }
+    },
+    "blocked_jurisdictions": ["IR", "KP", "CU", "SY"],
+    "reporting_frequency": "semi_annual"
+  }
+}
