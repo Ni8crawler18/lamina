@@ -101,6 +101,11 @@ async def _generate_report_narrative(asset, holders, events, audit_entries, peri
         import anthropic
         client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
 
+        # Ensure all rows are dicts (sqlite3.Row doesn't support .get())
+        holders = [dict(h) if not isinstance(h, dict) else h for h in holders]
+        events = [dict(e) if not isinstance(e, dict) else e for e in events]
+        audit_entries = [dict(a) if not isinstance(a, dict) else a for a in audit_entries]
+
         holder_summary = f"{len(holders)} total holders, {sum(1 for h in holders if h['whitelisted'])} whitelisted"
         event_summary = f"{len(events)} scheduled events, {sum(1 for e in events if e['status'] == 'completed')} completed"
 

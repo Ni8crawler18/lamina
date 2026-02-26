@@ -22,7 +22,6 @@ export default function WhitelistForm({ assets }: { assets: Asset[] }) {
     setResult(null);
     try {
       const res = await addToWhitelist(assetId, {
-        asset_id: assetId,
         account_id: accountId || undefined,
         jurisdiction,
         investor_type: investorType,
@@ -92,6 +91,8 @@ export default function WhitelistForm({ assets }: { assets: Asset[] }) {
           >
             <option value="accredited">Accredited</option>
             <option value="institutional">Institutional</option>
+            <option value="qualified">Qualified</option>
+            <option value="professional">Professional</option>
             <option value="retail">Retail</option>
           </select>
         </div>

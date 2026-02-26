@@ -15,13 +15,13 @@ export default function CreateAssetForm({ onSuccess, onClose }: CreateAssetFormP
   const defaultMaturity = new Date(Date.now() + 5 * 365.25 * 86400000).toISOString().split("T")[0];
 
   const [form, setForm] = useState({
-    name: "US Treasury Bond 5-Year",
-    symbol: "UST5Y",
+    name: "",
+    symbol: "",
     asset_type: "bond",
-    total_supply: 10000000,
+    total_supply: "",
     decimals: 2,
-    coupon_rate: 0.0425,
-    maturity_date: defaultMaturity,
+    coupon_rate: "",
+    maturity_date: "",
     jurisdiction: "US",
     investor_type: "accredited",
   });
@@ -37,7 +37,8 @@ export default function CreateAssetForm({ onSuccess, onClose }: CreateAssetFormP
     try {
       await createAsset({
         ...form,
-        total_supply: form.total_supply * Math.pow(10, form.decimals),
+        total_supply: Number(form.total_supply) * Math.pow(10, form.decimals),
+        coupon_rate: Number(form.coupon_rate) / 100,
         maturity_date: form.maturity_date || null,
       });
       onSuccess();
@@ -92,7 +93,7 @@ export default function CreateAssetForm({ onSuccess, onClose }: CreateAssetFormP
             type="number"
             required
             value={form.total_supply}
-            onChange={(e) => update("total_supply", Number(e.target.value))}
+            onChange={(e) => update("total_supply", e.target.value)}
             className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/40"
           />
         </div>
@@ -115,8 +116,8 @@ export default function CreateAssetForm({ onSuccess, onClose }: CreateAssetFormP
           <input
             type="number"
             step="0.01"
-            value={(form.coupon_rate * 100).toFixed(2)}
-            onChange={(e) => update("coupon_rate", Number(e.target.value) / 100)}
+            value={form.coupon_rate}
+            onChange={(e) => update("coupon_rate", e.target.value)}
             className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/40"
           />
         </div>

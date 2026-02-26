@@ -6,7 +6,6 @@ from typing import Optional
 
 class HolderCreate(BaseModel):
     account_id: Optional[str] = None  # If None, a new Hedera account is created
-    asset_id: int
     jurisdiction: str = "US"
     investor_type: str = "accredited"
 

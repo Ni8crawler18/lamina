@@ -23,12 +23,15 @@ async def list_holders(asset_id: int):
 @router.post("/whitelist")
 async def add_to_whitelist(asset_id: int, holder: HolderCreate):
     from server.agents.compliance import add_to_whitelist
-    return await add_to_whitelist(
-        asset_id=asset_id,
-        account_id=holder.account_id,
-        jurisdiction=holder.jurisdiction,
-        investor_type=holder.investor_type,
-    )
+    try:
+        return await add_to_whitelist(
+            asset_id=asset_id,
+            account_id=holder.account_id,
+            jurisdiction=holder.jurisdiction,
+            investor_type=holder.investor_type,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.post("/validate-transfer")
