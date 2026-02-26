@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 258 83% 64%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 258 83% 64%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 228 27% 4%;
+    --foreground: 0 0% 93%;
+    --card: 226 20% 7%;
+    --card-foreground: 0 0% 93%;
+    --popover: 226 20% 7%;
+    --popover-foreground: 0 0% 93%;
+    --primary: 258 83% 64%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 226 15% 12%;
+    --secondary-foreground: 0 0% 93%;
+    --muted: 226 15% 12%;
+    --muted-foreground: 0 0% 55%;
+    --accent: 226 15% 12%;
+    --accent-foreground: 0 0% 93%;
+    --destructive: 0 62.8% 50.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 226 15% 13%;
+    --input: 226 15% 13%;
+    --ring: 258 83% 64%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+/* Minimal scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(226 15% 18%);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(226 15% 25%);
+}
+
+/* Gradient text */
+.text-gradient {
+  background: linear-gradient(135deg, #8259ef 0%, #b47aff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Subtle dot grid */
+.bg-dots {
+  background-image: radial-gradient(circle, hsl(258 83% 64% / 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Landing page animations */
+.gradient-orb {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, hsl(258 83% 64% / 0.15) 0%, hsl(258 83% 64% / 0.05) 40%, transparent 70%);
+  filter: blur(60px);
+  animation: orb-float 8s ease-in-out infinite;
+}
+
+@keyframes orb-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.05); }
+  66% { transform: translate(-20px, 15px) scale(0.95); }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-up-delay-1 {
+  animation: fade-in-up 0.6s ease-out 0.1s forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-up-delay-2 {
+  animation: fade-in-up 0.6s ease-out 0.2s forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-up-delay-3 {
+  animation: fade-in-up 0.6s ease-out 0.3s forwards;
+  opacity: 0;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.glow-purple {
+  box-shadow: 0 0 20px hsl(258 83% 64% / 0.15), 0 0 60px hsl(258 83% 64% / 0.05);
+}

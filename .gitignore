@@ -38,7 +38,7 @@ out/
 Thumbs.db
 
 # Reports
-backend/data/reports/*.pdf
+server/data/reports/*.pdf
 
 # Vercel
 .vercel
