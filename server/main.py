@@ -9,7 +9,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from server.config import get_settings
 from server.database import init_db
-from server.scheduler.jobs import run_coupon_payments, run_nav_updates, check_maturities
+from server.scheduler.jobs import run_coupon_payments, run_nav_updates, check_maturities, refresh_ofac_data
 
 # Routes
 from server.routes.assets import router as assets_router
@@ -18,6 +18,7 @@ from server.routes.lifecycle import router as lifecycle_router
 from server.routes.events import router as events_router
 from server.routes.reports import router as reports_router
 from server.routes.chat import router as chat_router
+from server.routes.ofac import router as ofac_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
@@ -40,9 +41,18 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning(f"Hedera client init failed (will retry on first use): {e}")
 
+    # Load OFAC SDN list
+    try:
+        from server.ofac.sdn import OFACScreener
+        screener = OFACScreener.get_instance()
+        await screener.load()
+    except Exception as e:
+        logger.warning(f"OFAC screener init failed (will retry on refresh): {e}")
+
     scheduler.add_job(run_coupon_payments, "interval", hours=1, id="coupon_payments")
     scheduler.add_job(run_nav_updates, "interval", hours=24, id="nav_updates")
     scheduler.add_job(check_maturities, "interval", hours=6, id="maturity_checks")
+    scheduler.add_job(refresh_ofac_data, "interval", hours=24, id="ofac_refresh")
     scheduler.start()
     logger.info("Scheduler started")
 
@@ -80,6 +90,7 @@ app.include_router(lifecycle_router)
 app.include_router(events_router)
 app.include_router(reports_router)
 app.include_router(chat_router)
+app.include_router(ofac_router)
 
 
 @app.get("/health")

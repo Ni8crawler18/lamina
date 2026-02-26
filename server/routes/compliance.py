@@ -29,6 +29,7 @@ async def add_to_whitelist(asset_id: int, holder: HolderCreate):
             account_id=holder.account_id,
             jurisdiction=holder.jurisdiction,
             investor_type=holder.investor_type,
+            name=holder.name,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

@@ -105,6 +105,20 @@ async def validate_transfer(asset_id: int, from_id: str, to_id: str, amount: int
             await _log_blocked_transfer(db, asset, from_id, to_id, amount, reason)
             return False, reason
 
+        # OFAC screening on receiver
+        from server.ofac.sdn import OFACScreener
+        screener = OFACScreener.get_instance()
+        if screener.loaded:
+            recv_screening = screener.screen(
+                name=receiver["name"] if receiver["name"] else None,
+                address=to_id,
+            )
+            if recv_screening["is_match"]:
+                matched = recv_screening["details"]["name"] if recv_screening["details"] else "unknown"
+                reason = f"OFAC screening blocked receiver: matched '{matched}' (score: {recv_screening['score']}%)"
+                await _log_blocked_transfer(db, asset, from_id, to_id, amount, reason)
+                return False, reason
+
         # Check receiver jurisdiction not blocked
         if receiver["jurisdiction"] in BLOCKED_COUNTRIES:
             reason = f"Receiver jurisdiction {receiver['jurisdiction']} is sanctioned"
@@ -175,6 +189,7 @@ async def add_to_whitelist(
     jurisdiction: str = "US",
     investor_type: str = "accredited",
     create_account: bool = True,
+    name: str | None = None,
 ) -> dict:
     """Add an investor to the whitelist. Creates real Hedera account, associates token, grants on-chain KYC."""
     from server.hedera.token import (
@@ -204,6 +219,69 @@ async def add_to_whitelist(
             allowed_types.update(reg.get("investor_types", []))
         if investor_type not in allowed_types and allowed_types:
             raise ValueError(f"Investor type '{investor_type}' not allowed. Allowed: {allowed_types}")
+
+        # OFAC sanctions screening
+        ofac_status = "pending"
+        ofac_screened_at = None
+        from server.ofac.sdn import OFACScreener
+        screener = OFACScreener.get_instance()
+        if screener.loaded:
+            screening = screener.screen(name=name, address=account_id)
+            ofac_screened_at = datetime.utcnow().isoformat()
+
+            # Log screening result to DB
+            await db.execute(
+                """INSERT INTO screening_results
+                   (holder_account_id, holder_name, asset_id, is_match, score,
+                    match_type, matched_name, matched_program, action_taken)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (
+                    account_id or "pending-creation",
+                    name,
+                    asset_id,
+                    int(screening["is_match"]),
+                    screening.get("score", 0),
+                    screening.get("match_type"),
+                    screening["details"]["name"] if screening["details"] else None,
+                    screening["details"]["program"] if screening["details"] else None,
+                    "blocked" if screening["is_match"] else "clear",
+                ),
+            )
+            await db.commit()
+
+            if screening["is_match"]:
+                ofac_status = "flagged"
+                matched = screening["details"]["name"] if screening["details"] else "unknown"
+                score = screening.get("score", 0)
+
+                # Log to HCS
+                if asset["topic_id"]:
+                    log_agent_action(
+                        asset["topic_id"],
+                        agent="compliance",
+                        action="ofac_screening_blocked",
+                        details={
+                            "name": name,
+                            "account_id": account_id,
+                            "matched_name": matched,
+                            "score": score,
+                        },
+                    )
+
+                raise ValueError(
+                    f"OFAC screening blocked: '{name or account_id}' matched sanctioned entity "
+                    f"'{matched}' (score: {score}%)"
+                )
+
+            # Clear — log to HCS
+            ofac_status = "clear"
+            if asset["topic_id"]:
+                log_agent_action(
+                    asset["topic_id"],
+                    agent="compliance",
+                    action="ofac_screening_clear",
+                    details={"name": name, "account_id": account_id},
+                )
 
         private_key_hex = None
         token_associated = False
@@ -248,17 +326,20 @@ async def add_to_whitelist(
         if existing:
             await db.execute(
                 """UPDATE holders SET whitelisted=1, kyc_status='approved',
-                   jurisdiction=?, investor_type=?, token_associated=?, kyc_granted=?
+                   jurisdiction=?, investor_type=?, token_associated=?, kyc_granted=?,
+                   name=?, ofac_status=?, ofac_screened_at=?
                    WHERE id=?""",
-                (jurisdiction, investor_type, int(token_associated), int(kyc_granted), existing["id"])
+                (jurisdiction, investor_type, int(token_associated), int(kyc_granted),
+                 name, ofac_status, ofac_screened_at, existing["id"])
             )
         else:
             await db.execute(
                 """INSERT INTO holders (account_id, private_key, asset_id, balance, kyc_status,
-                   jurisdiction, investor_type, whitelisted, token_associated, kyc_granted)
-                   VALUES (?, ?, ?, 0, 'approved', ?, ?, 1, ?, ?)""",
+                   jurisdiction, investor_type, whitelisted, token_associated, kyc_granted,
+                   name, ofac_status, ofac_screened_at)
+                   VALUES (?, ?, ?, 0, 'approved', ?, ?, 1, ?, ?, ?, ?, ?)""",
                 (account_id, private_key_hex, asset_id, jurisdiction, investor_type,
-                 int(token_associated), int(kyc_granted))
+                 int(token_associated), int(kyc_granted), name, ofac_status, ofac_screened_at)
             )
         await db.commit()
 
@@ -342,6 +423,16 @@ async def get_compliance_status(asset_id: int) -> dict:
             (asset_id,)
         )
 
+        # OFAC screening stats
+        ofac_screened = await db.execute_fetchone(
+            "SELECT COUNT(*) as cnt FROM screening_results WHERE asset_id = ?",
+            (asset_id,)
+        )
+        ofac_flagged = await db.execute_fetchone(
+            "SELECT COUNT(*) as cnt FROM screening_results WHERE asset_id = ? AND is_match = 1",
+            (asset_id,)
+        )
+
         return {
             "asset_id": asset_id,
             "jurisdiction": asset["jurisdiction"],
@@ -349,6 +440,8 @@ async def get_compliance_status(asset_id: int) -> dict:
             "total_holders": total_holders["cnt"] if total_holders else 0,
             "whitelisted_holders": whitelisted["cnt"] if whitelisted else 0,
             "blocked_transfers": blocked_transfers["cnt"] if blocked_transfers else 0,
+            "ofac_screenings": ofac_screened["cnt"] if ofac_screened else 0,
+            "ofac_flags": ofac_flagged["cnt"] if ofac_flagged else 0,
             "jurisdiction_breakdown": {row["jurisdiction"]: row["cnt"] for row in jurisdictions},
             "status": "compliant",
         }

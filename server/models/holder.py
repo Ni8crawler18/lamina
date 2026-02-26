@@ -6,6 +6,7 @@ from typing import Optional
 
 class HolderCreate(BaseModel):
     account_id: Optional[str] = None  # If None, a new Hedera account is created
+    name: Optional[str] = None
     jurisdiction: str = "US"
     investor_type: str = "accredited"
 
@@ -21,6 +22,9 @@ class HolderResponse(BaseModel):
     whitelisted: bool
     token_associated: Optional[bool] = False
     kyc_granted: Optional[bool] = False
+    name: Optional[str] = None
+    ofac_status: Optional[str] = None
+    ofac_screened_at: Optional[str] = None
     created_at: str
 
 

@@ -40,6 +40,10 @@ Thumbs.db
 # Reports
 server/data/reports/*.pdf
 
+# OFAC SDN cache
+server/data/sdn_cache.csv
+server/data/add_cache.csv
+
 # Vercel
 .vercel
 

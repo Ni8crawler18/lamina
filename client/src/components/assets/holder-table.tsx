@@ -8,6 +8,8 @@ interface Holder {
   jurisdiction: string;
   investor_type: string;
   whitelisted: boolean | number;
+  name?: string;
+  ofac_status?: string;
 }
 
 export default function HolderTable({ holders, decimals = 2 }: { holders: Holder[]; decimals?: number }) {
@@ -25,8 +27,10 @@ export default function HolderTable({ holders, decimals = 2 }: { holders: Holder
         <thead>
           <tr className="text-[11px] text-muted-foreground uppercase tracking-wider">
             <th className="text-left font-medium pb-3 pl-4">Account</th>
+            <th className="text-left font-medium pb-3">Name</th>
             <th className="text-right font-medium pb-3">Balance</th>
             <th className="text-left font-medium pb-3 pl-6">KYC</th>
+            <th className="text-left font-medium pb-3">OFAC</th>
             <th className="text-left font-medium pb-3">Jurisdiction</th>
             <th className="text-left font-medium pb-3">Type</th>
             <th className="text-center font-medium pb-3 pr-4">Whitelisted</th>
@@ -38,6 +42,7 @@ export default function HolderTable({ holders, decimals = 2 }: { holders: Holder
               <td className="py-3 pl-4">
                 <span className="font-mono text-xs">{h.account_id}</span>
               </td>
+              <td className="py-3 text-xs text-muted-foreground">{h.name || "—"}</td>
               <td className="py-3 text-right">
                 <span className="font-mono text-sm font-medium">
                   {(h.balance / Math.pow(10, decimals)).toLocaleString()}
@@ -50,6 +55,17 @@ export default function HolderTable({ holders, decimals = 2 }: { holders: Holder
                     : "bg-amber-500/10 text-amber-400"
                 }`}>
                   {h.kyc_status}
+                </span>
+              </td>
+              <td className="py-3">
+                <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                  h.ofac_status === "clear"
+                    ? "bg-emerald-500/10 text-emerald-400"
+                    : h.ofac_status === "flagged"
+                    ? "bg-red-500/10 text-red-400"
+                    : "bg-zinc-500/10 text-zinc-400"
+                }`}>
+                  {h.ofac_status || "pending"}
                 </span>
               </td>
               <td className="py-3 text-xs text-muted-foreground">{h.jurisdiction}</td>

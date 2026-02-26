@@ -9,4 +9,5 @@ anthropic
 reportlab
 python-dotenv
 python-multipart
+rapidfuzz
 hiero-sdk-python

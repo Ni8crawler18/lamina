@@ -72,5 +72,12 @@ export const purchaseTokens = (assetId: number, accountId: string, amount: numbe
 export const sendChat = (message: string) =>
   fetchAPI("/api/chat", { method: "POST", body: JSON.stringify({ message }) });
 
+// OFAC
+export const screenOFAC = (data: { name?: string; address?: string }) =>
+  fetchAPI("/api/ofac/screen", { method: "POST", body: JSON.stringify(data) });
+export const getOFACStatus = () => fetchAPI("/api/ofac/status");
+export const refreshOFACData = () =>
+  fetchAPI("/api/ofac/refresh", { method: "POST" });
+
 // Health
 export const checkHealth = () => fetchAPI("/health");

@@ -12,6 +12,7 @@ interface Asset {
 export default function WhitelistForm({ assets }: { assets: Asset[] }) {
   const [assetId, setAssetId] = useState<number>(assets[0]?.id || 0);
   const [accountId, setAccountId] = useState("");
+  const [investorName, setInvestorName] = useState("");
   const [jurisdiction, setJurisdiction] = useState("US");
   const [investorType, setInvestorType] = useState("accredited");
   const [loading, setLoading] = useState(false);
@@ -23,6 +24,7 @@ export default function WhitelistForm({ assets }: { assets: Asset[] }) {
     try {
       const res = await addToWhitelist(assetId, {
         account_id: accountId || undefined,
+        name: investorName || undefined,
         jurisdiction,
         investor_type: investorType,
       });
@@ -33,6 +35,7 @@ export default function WhitelistForm({ assets }: { assets: Asset[] }) {
         message: `Whitelisted: ${acct} — KYC ${kyc}`,
       });
       setAccountId("");
+      setInvestorName("");
     } catch (err) {
       setResult({ type: "error", message: err instanceof Error ? err.message : "Whitelist failed" });
     } finally {
@@ -64,6 +67,18 @@ export default function WhitelistForm({ assets }: { assets: Asset[] }) {
           onChange={(e) => setAccountId(e.target.value)}
           placeholder="0.0.12345 or leave blank"
           className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:border-primary/40"
+        />
+      </div>
+
+      <div>
+        <label className="text-[11px] text-muted-foreground uppercase tracking-wider block mb-1.5">
+          Investor Name <span className="normal-case text-muted-foreground/50">(for OFAC screening)</span>
+        </label>
+        <input
+          value={investorName}
+          onChange={(e) => setInvestorName(e.target.value)}
+          placeholder="Full legal name"
+          className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/40"
         />
       </div>
 

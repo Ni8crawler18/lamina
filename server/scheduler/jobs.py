@@ -56,6 +56,17 @@ async def run_nav_updates():
         await db.close()
 
 
+async def refresh_ofac_data():
+    """Daily refresh of the OFAC SDN list."""
+    from server.ofac.sdn import OFACScreener
+    try:
+        screener = OFACScreener.get_instance()
+        await screener.load()
+        logger.info("OFAC SDN data refreshed")
+    except Exception as e:
+        logger.error(f"OFAC refresh failed: {e}")
+
+
 async def check_maturities():
     """Check for assets reaching maturity and execute settlement."""
     from server.agents.lifecycle import execute_maturity

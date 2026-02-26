@@ -31,12 +31,13 @@ TOOLS = [
     },
     {
         "name": "add_to_whitelist",
-        "description": "Add an investor to the KYC whitelist for a specific asset. Required before they can receive tokens. If no account_id is provided, a new Hedera account will be created automatically.",
+        "description": "Add an investor to the KYC whitelist for a specific asset. Required before they can receive tokens. If no account_id is provided, a new Hedera account will be created automatically. OFAC sanctions screening is performed automatically.",
         "input_schema": {
             "type": "object",
             "properties": {
                 "asset_id": {"type": "integer", "description": "Asset ID"},
                 "account_id": {"type": "string", "description": "Hedera account ID (e.g. '0.0.1234'). Leave empty to auto-create a new account."},
+                "name": {"type": "string", "description": "Investor's full legal name (used for OFAC sanctions screening)"},
                 "jurisdiction": {"type": "string", "description": "Investor's jurisdiction: US, EU, UK, SG"},
                 "investor_type": {"type": "string", "description": "Investor type: accredited, qualified, professional"},
             },
@@ -146,13 +147,24 @@ TOOLS = [
             "required": ["asset_id", "nav"],
         },
     },
+    {
+        "name": "screen_ofac",
+        "description": "Screen a name or crypto address against the OFAC SDN (Specially Designated Nationals) sanctions list. Returns whether there's a match and the match score.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "name": {"type": "string", "description": "Full name to screen against the SDN list"},
+                "address": {"type": "string", "description": "Crypto address or Hedera account ID to screen"},
+            },
+        },
+    },
 ]
 
 SYSTEM_PROMPT = """You are Lamina, an autonomous RWA (Real-World Asset) lifecycle management agent on Hedera.
 
 You help fund managers tokenize and manage real-world assets like bonds, equities, and funds. You can:
 1. Tokenize new assets (create HTS tokens with compliance)
-2. Manage KYC whitelists (add/remove investors)
+2. Manage KYC whitelists (add/remove investors, with OFAC sanctions screening)
 3. Distribute coupon payments to holders
 4. Generate compliance reports
 5. Execute maturity settlement
@@ -160,6 +172,9 @@ You help fund managers tokenize and manage real-world assets like bonds, equitie
 7. Purchase/transfer tokens to investor accounts
 8. Validate transfers for compliance
 9. Update asset NAV (Net Asset Value)
+10. Screen names/addresses against the OFAC SDN sanctions list
+
+When adding investors to a whitelist, always ask for their full legal name so OFAC screening can be performed. OFAC screening is automatic during whitelisting.
 
 When a user asks to tokenize an asset, extract the details and use the issue_asset tool. For example:
 - "$10M 5-year US Treasury bond" → total_supply=1000000000 (with 2 decimals), maturity in 5 years, asset_type=bond
@@ -277,6 +292,7 @@ async def _execute_tool(tool_name: str, tool_input: dict) -> dict:
             jurisdiction=tool_input.get("jurisdiction", "US"),
             investor_type=tool_input.get("investor_type", "accredited"),
             create_account=not tool_input.get("account_id"),
+            name=tool_input.get("name"),
         )
 
     elif tool_name == "show_holders":
@@ -381,6 +397,23 @@ async def _execute_tool(tool_name: str, tool_input: dict) -> dict:
     elif tool_name == "update_nav":
         from server.agents.lifecycle import update_nav
         return await update_nav(tool_input["asset_id"], tool_input["nav"])
+
+    elif tool_name == "screen_ofac":
+        from server.ofac.sdn import OFACScreener
+        screener = OFACScreener.get_instance()
+        if not screener.loaded:
+            return {"error": "OFAC screener not loaded"}
+        result = screener.screen(
+            name=tool_input.get("name"),
+            address=tool_input.get("address"),
+        )
+        return {
+            "is_match": result["is_match"],
+            "score": result.get("score", 0),
+            "match_type": result.get("match_type"),
+            "matched_entity": result["details"]["name"] if result.get("details") else None,
+            "program": result["details"]["program"] if result.get("details") else None,
+        }
 
     else:
         raise ValueError(f"Unknown tool: {tool_name}")

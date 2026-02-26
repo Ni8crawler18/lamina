@@ -7,6 +7,8 @@ interface ComplianceData {
   total_holders: number;
   whitelisted_holders: number;
   blocked_transfers: number;
+  ofac_screenings: number;
+  ofac_flags: number;
   jurisdiction_breakdown: Record<string, number>;
   status: string;
 }
@@ -47,6 +49,18 @@ export default function ComplianceStatus({ data }: { data: ComplianceData | null
         <div className="rounded-xl border border-border/50 bg-card/30 p-4 text-center">
           <p className="text-2xl font-semibold text-red-400">{data.blocked_transfers}</p>
           <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">Blocked</p>
+        </div>
+      </div>
+
+      {/* OFAC Stats */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-xl border border-border/50 bg-card/30 p-4 text-center">
+          <p className="text-2xl font-semibold">{data.ofac_screenings ?? 0}</p>
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">OFAC Screenings</p>
+        </div>
+        <div className="rounded-xl border border-border/50 bg-card/30 p-4 text-center">
+          <p className="text-2xl font-semibold text-red-400">{data.ofac_flags ?? 0}</p>
+          <p className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">OFAC Flags</p>
         </div>
       </div>
 

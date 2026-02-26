@@ -71,6 +71,20 @@ CREATE TABLE IF NOT EXISTS reports (
     generated_at TEXT NOT NULL DEFAULT (datetime('now')),
     FOREIGN KEY (asset_id) REFERENCES assets(id)
 );
+
+CREATE TABLE IF NOT EXISTS screening_results (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    holder_account_id TEXT,
+    holder_name TEXT,
+    asset_id INTEGER,
+    is_match INTEGER NOT NULL DEFAULT 0,
+    score REAL DEFAULT 0,
+    match_type TEXT,
+    matched_name TEXT,
+    matched_program TEXT,
+    action_taken TEXT NOT NULL DEFAULT 'clear',
+    screened_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
 """
 
 
@@ -120,5 +134,17 @@ async def init_db():
     try:
         await db.executescript(SCHEMA)
         await db.commit()
+
+        # Migrate: add OFAC columns to holders if missing
+        for col, typedef in [
+            ("name", "TEXT"),
+            ("ofac_status", "TEXT DEFAULT 'pending'"),
+            ("ofac_screened_at", "TEXT"),
+        ]:
+            try:
+                await db.execute(f"ALTER TABLE holders ADD COLUMN {col} {typedef}")
+                await db.commit()
+            except Exception:
+                pass  # column already exists
     finally:
         await db.close()
