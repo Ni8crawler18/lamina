@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ExternalLink } from "lucide-react";
 
 interface Asset {
@@ -20,6 +20,7 @@ interface Asset {
 }
 
 export default function AssetCard({ asset }: { asset: Asset }) {
+  const router = useRouter();
   const statusColor = {
     active: "bg-emerald-500/10 text-emerald-400",
     matured: "bg-blue-500/10 text-blue-400",
@@ -29,8 +30,10 @@ export default function AssetCard({ asset }: { asset: Asset }) {
   const faceValue = asset.total_supply / Math.pow(10, asset.decimals);
 
   return (
-    <Link href={`/assets/${asset.id}`}>
-      <div className="group rounded-xl border border-border/50 bg-card/30 p-5 hover:border-primary/30 hover:bg-card/50 transition-all duration-200 cursor-pointer">
+    <div
+      onClick={() => router.push(`/assets/${asset.id}`)}
+      className="group rounded-xl border border-border/50 bg-card/30 p-5 hover:border-primary/30 hover:bg-card/50 transition-all duration-200 cursor-pointer"
+    >
         {/* Top row: name + status */}
         <div className="flex items-start justify-between mb-4">
           <div>
@@ -73,8 +76,7 @@ export default function AssetCard({ asset }: { asset: Asset }) {
             </a>
           </div>
         )}
-      </div>
-    </Link>
+    </div>
   );
 }
 
