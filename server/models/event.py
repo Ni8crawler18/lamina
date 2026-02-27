@@ -19,3 +19,8 @@ class EventResponse(BaseModel):
     status: str
     tx_hash: Optional[str] = None
     details: Optional[str] = None
+
+
+class UpcomingEventResponse(EventResponse):
+    asset_name: str
+    asset_symbol: str

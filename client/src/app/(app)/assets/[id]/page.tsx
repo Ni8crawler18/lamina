@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import HolderTable from "@/components/assets/holder-table";
 import ActionLog from "@/components/assets/action-log";
+import EventTimeline from "@/components/assets/event-timeline";
 import ComplianceStatus from "@/components/compliance/compliance-status";
 import Link from "next/link";
 import {
@@ -179,16 +180,20 @@ export default function AssetDetail() {
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-5 gap-3 mb-8">
+      <div className="grid grid-cols-4 gap-3 mb-8">
         <MetricCard label="Face Value" value={`$${faceValue.toLocaleString()}`} />
         <MetricCard label="NAV" value={`$${(asset.nav as number).toLocaleString()}`} />
         <MetricCard label="Coupon" value={`${((asset.coupon_rate as number) * 100).toFixed(2)}%`} />
         <MetricCard label="Jurisdiction" value={asset.jurisdiction as string} />
-        <MetricCard
-          label="Maturity"
-          value={asset.maturity_date ? new Date(asset.maturity_date as string).toLocaleDateString() : "N/A"}
-        />
       </div>
+
+      {/* Maturity Progress */}
+      {asset.maturity_date && (
+        <MaturityProgressCard
+          createdAt={asset.created_at as string}
+          maturityDate={asset.maturity_date as string}
+        />
+      )}
 
       {/* Tabs */}
       <Tabs defaultValue="holders">
@@ -212,34 +217,7 @@ export default function AssetDetail() {
         </TabsContent>
 
         <TabsContent value="events" className="mt-6">
-          {events.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-12">No scheduled events</p>
-          ) : (
-            <div className="space-y-1">
-              {events.map((event) => (
-                <div key={event.id as number} className="flex items-center justify-between px-4 py-3 rounded-lg hover:bg-card/50 transition-colors">
-                  <div>
-                    <p className="text-sm">{(event.event_type as string).replace(/_/g, " ")}</p>
-                    <p className="text-xs text-muted-foreground font-mono mt-0.5">
-                      {new Date(event.scheduled_at as string).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <Badge
-                    variant="outline"
-                    className={
-                      event.status === "completed"
-                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                        : event.status === "cancelled"
-                        ? "bg-red-500/10 text-red-400 border-red-500/20"
-                        : "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                    }
-                  >
-                    {event.status as string}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          )}
+          <EventTimeline events={events as never[]} />
         </TabsContent>
       </Tabs>
     </div>
@@ -299,5 +277,47 @@ function ActionButton({
         </span>
       ) : label}
     </button>
+  );
+}
+
+function MaturityProgressCard({ createdAt, maturityDate }: { createdAt: string; maturityDate: string }) {
+  const now = Date.now();
+  const start = new Date(createdAt).getTime();
+  const end = new Date(maturityDate).getTime();
+  const total = end - start;
+  const elapsed = now - start;
+  const progress = total > 0 ? Math.min(Math.max((elapsed / total) * 100, 0), 100) : 0;
+  const matured = now >= end;
+  const daysRemaining = matured ? 0 : Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+  const barColor = matured || progress > 95 ? "bg-red-400" : progress > 80 ? "bg-amber-400" : "bg-primary";
+
+  return (
+    <div className="rounded-xl border border-border/50 bg-card/30 px-5 py-4 mb-8">
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-[11px] text-muted-foreground uppercase tracking-wider">Maturity Progress</p>
+        <span className={`text-xs font-mono ${matured ? "text-red-400" : "text-muted-foreground"}`}>
+          {matured ? "Matured" : `${daysRemaining} days remaining`}
+        </span>
+      </div>
+      <div className="flex items-center gap-4">
+        <div className="flex-1">
+          <div className="w-full h-2 rounded-full bg-border/30">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${barColor}`}
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+        <span className="text-xs font-mono text-muted-foreground w-12 text-right">{progress.toFixed(1)}%</span>
+      </div>
+      <div className="flex items-center justify-between mt-2">
+        <span className="text-[10px] text-muted-foreground/50">
+          {new Date(createdAt).toLocaleDateString()}
+        </span>
+        <span className="text-[10px] text-muted-foreground/50">
+          {new Date(maturityDate).toLocaleDateString()}
+        </span>
+      </div>
+    </div>
   );
 }

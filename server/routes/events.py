@@ -3,9 +3,10 @@
 from fastapi import APIRouter, HTTPException
 
 from server.database import get_db
-from server.models.event import EventResponse
+from server.models.event import EventResponse, UpcomingEventResponse
 
 router = APIRouter(prefix="/api/assets/{asset_id}", tags=["events"])
+global_events_router = APIRouter(prefix="/api/events", tags=["events"])
 
 
 @router.get("/events", response_model=list[EventResponse])
@@ -47,5 +48,23 @@ async def get_audit_log(asset_id: int):
             "hcs_messages": messages,
             "local_log": [dict(r) for r in local_rows],
         }
+    finally:
+        await db.close()
+
+
+@global_events_router.get("/upcoming", response_model=list[UpcomingEventResponse])
+async def get_upcoming_events(limit: int = 10):
+    db = await get_db()
+    try:
+        rows = await db.execute_fetchall(
+            """SELECT se.*, a.name as asset_name, a.symbol as asset_symbol
+               FROM scheduled_events se
+               JOIN assets a ON se.asset_id = a.id
+               WHERE se.status = 'pending' AND a.status = 'active'
+               ORDER BY se.scheduled_at ASC
+               LIMIT ?""",
+            (limit,)
+        )
+        return [dict(row) for row in rows]
     finally:
         await db.close()

@@ -50,6 +50,11 @@ export default function AssetCard({ asset }: { asset: Asset }) {
           <Metric label="Jurisdiction" value={asset.jurisdiction} />
         </div>
 
+        {/* Maturity progress */}
+        {asset.maturity_date && (
+          <MaturityProgress createdAt={asset.created_at} maturityDate={asset.maturity_date} />
+        )}
+
         {/* Footer: token ID with HashScan link */}
         {asset.token_id && (
           <div className="mt-4 pt-3 border-t border-border/30 flex items-center justify-between">
@@ -78,6 +83,36 @@ function Metric({ label, value }: { label: string; value: string }) {
     <div>
       <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</p>
       <p className="font-medium text-sm mt-0.5">{value}</p>
+    </div>
+  );
+}
+
+function MaturityProgress({ createdAt, maturityDate }: { createdAt: string; maturityDate: string }) {
+  const now = Date.now();
+  const start = new Date(createdAt).getTime();
+  const end = new Date(maturityDate).getTime();
+  const total = end - start;
+  const elapsed = now - start;
+  const progress = total > 0 ? Math.min(Math.max((elapsed / total) * 100, 0), 100) : 0;
+  const matured = now >= end;
+
+  const daysRemaining = matured ? 0 : Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+  const barColor = matured || progress > 95 ? "bg-red-400" : progress > 80 ? "bg-amber-400" : "bg-primary";
+
+  return (
+    <div className="mt-4 pt-3 border-t border-border/30">
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Maturity</span>
+        <span className={`text-[10px] font-mono ${matured ? "text-red-400" : "text-muted-foreground"}`}>
+          {matured ? "Matured" : `${daysRemaining}d remaining`}
+        </span>
+      </div>
+      <div className="w-full h-1.5 rounded-full bg-border/30">
+        <div
+          className={`h-full rounded-full transition-all duration-500 ${barColor}`}
+          style={{ width: `${progress}%` }}
+        />
+      </div>
     </div>
   );
 }

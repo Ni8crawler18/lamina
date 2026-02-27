@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import AssetCard from "@/components/assets/asset-card";
+import UpcomingEvents from "@/components/dashboard/upcoming-events";
 import { getAssets, checkHealth } from "@/lib/api";
 import Link from "next/link";
 import { useWallet } from "@/contexts/wallet-context";
@@ -85,6 +86,22 @@ export default function Dashboard() {
         <StatCard label="Total Assets" value={String(assets.length)} />
         <StatCard label="Network" value="Hedera Testnet" />
       </div>
+
+      {/* Upcoming Events */}
+      {!loading && assets.length > 0 && (
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Upcoming Events</p>
+            <Link
+              href="/history"
+              className="text-xs text-primary hover:text-primary/80 transition-colors"
+            >
+              View All
+            </Link>
+          </div>
+          <UpcomingEvents />
+        </div>
+      )}
 
       {/* Assets */}
       {loading ? (

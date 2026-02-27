@@ -15,7 +15,7 @@ from server.scheduler.jobs import run_coupon_payments, run_nav_updates, check_ma
 from server.routes.assets import router as assets_router
 from server.routes.compliance import router as compliance_router
 from server.routes.lifecycle import router as lifecycle_router
-from server.routes.events import router as events_router
+from server.routes.events import router as events_router, global_events_router
 from server.routes.reports import router as reports_router
 from server.routes.chat import router as chat_router
 from server.routes.ofac import router as ofac_router
@@ -88,6 +88,7 @@ app.include_router(assets_router)
 app.include_router(compliance_router)
 app.include_router(lifecycle_router)
 app.include_router(events_router)
+app.include_router(global_events_router)
 app.include_router(reports_router)
 app.include_router(chat_router)
 app.include_router(ofac_router)
