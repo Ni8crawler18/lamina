@@ -14,8 +14,9 @@ function ConnectGate({ children }: { children: React.ReactNode }) {
           {/* Logo */}
           <div className="flex items-center justify-center gap-3 mb-8">
             <svg width="36" height="36" viewBox="0 0 28 28" fill="none">
-              <rect width="28" height="28" rx="8" fill="#8259ef" />
-              <path d="M8 9.5h4.5v9H8v-2.25h2.25v-4.5H8V9.5zM15.5 9.5H20v2.25h-2.25v4.5H20v2.25h-4.5v-9z" fill="white" />
+              <path d="M14 22L4 16.5L14 11L24 16.5L14 22Z" fill="#5a3db5" opacity="0.6"/>
+              <path d="M14 18L4 12.5L14 7L24 12.5L14 18Z" fill="#7c5ce7" opacity="0.8"/>
+              <path d="M14 14L4 8.5L14 3L24 8.5L14 14Z" fill="#a78bfa"/>
             </svg>
             <span className="text-xl font-semibold tracking-tight">Lamina</span>
           </div>
