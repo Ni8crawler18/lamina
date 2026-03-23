@@ -9,7 +9,6 @@ apscheduler
 anthropic
 reportlab
 jinja2
-xhtml2pdf
 python-dotenv
 python-multipart
 rapidfuzz
