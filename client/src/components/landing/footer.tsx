@@ -14,7 +14,7 @@ export default function Footer() {
         <div className="flex items-center gap-6 text-xs text-muted-foreground">
           <span>Hedera Hello Future Apex Hackathon 2026</span>
           <a
-            href="https://github.com"
+            href="https://github.com/Ni8crawler18/lamina"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-foreground transition-colors"

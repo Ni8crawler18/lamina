@@ -11,6 +11,7 @@ import {
   FileText,
   History,
   MessageSquare,
+  Presentation,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -21,6 +22,7 @@ const NAV_ITEMS = [
   { href: "/reports", label: "Reports", icon: FileText },
   { href: "/history", label: "History", icon: History },
   { href: "/chat", label: "Agent", icon: MessageSquare },
+  { href: "/pitch", label: "Pitch", icon: Presentation },
 ];
 
 function Logo() {

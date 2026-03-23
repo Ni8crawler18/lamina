@@ -41,8 +41,18 @@ export default function Hero() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
           </Link>
+          <Link
+            href="/slides.html"
+            target="_blank"
+            className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground border border-border/50 hover:border-border px-6 py-3 rounded-xl transition-all"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h16.5M3.75 3l3 9m13.5-9v11.25A2.25 2.25 0 0118 16.5h-2.25m0 0L12 21m3.75-4.5L12 21m0 0l-3.75-4.5" />
+            </svg>
+            Pitch Deck
+          </Link>
           <a
-            href="https://github.com"
+            href="https://github.com/Ni8crawler18/lamina"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground border border-border/50 hover:border-border px-6 py-3 rounded-xl transition-all"

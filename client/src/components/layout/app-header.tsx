@@ -12,6 +12,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/reports": "Reports",
   "/history": "Audit History",
   "/chat": "Agent",
+  "/pitch": "Pitch Deck",
 };
 
 export default function AppHeader() {

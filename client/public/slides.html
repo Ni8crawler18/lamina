@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lamina — Pitch Deck</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #08091a;
+    color: #e8e8ef;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .deck { position: relative; width: 100%; height: 100vh; }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6vh 8vw;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+
+  .slide.active { opacity: 1; pointer-events: auto; }
+
+  /* Typography */
+  .tag {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #8259ef;
+    margin-bottom: 1.5rem;
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+  }
+
+  h2 {
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.2rem;
+  }
+
+  .subtitle {
+    font-size: clamp(1rem, 1.5vw, 1.25rem);
+    color: #8b8b9e;
+    line-height: 1.6;
+    max-width: 680px;
+  }
+
+  .gradient { background: linear-gradient(135deg, #8259ef 0%, #b47aff 50%, #6ec6ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .gradient-blue { background: linear-gradient(135deg, #6ec6ff 0%, #8259ef 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+  /* Grid layouts */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2.5rem; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-top: 2.5rem; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1.2rem; margin-top: 2.5rem; }
+
+  /* Cards */
+  .card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 2rem;
+  }
+
+  .card-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: rgba(130,89,239,0.12);
+    border: 1px solid rgba(130,89,239,0.2);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+  }
+
+  .card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .card p { font-size: 0.85rem; color: #8b8b9e; line-height: 1.5; }
+
+  /* Stats */
+  .stat { text-align: center; }
+  .stat-value { font-size: clamp(2rem, 3.5vw, 3.5rem); font-weight: 800; letter-spacing: -0.03em; }
+  .stat-label { font-size: 0.75rem; color: #8b8b9e; margin-top: 0.3rem; text-transform: uppercase; letter-spacing: 0.1em; }
+
+  /* Problem items */
+  .problem-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.2rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .problem-item:last-child { border: none; }
+  .problem-num {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #8259ef;
+    background: rgba(130,89,239,0.1);
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .problem-item h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .problem-item p { font-size: 0.8rem; color: #8b8b9e; line-height: 1.5; }
+
+  /* Flow */
+  .flow { display: flex; align-items: center; gap: 0.5rem; margin-top: 2.5rem; flex-wrap: wrap; }
+  .flow-step {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    text-align: center;
+    flex: 1;
+    min-width: 120px;
+  }
+  .flow-step .emoji { font-size: 1.5rem; margin-bottom: 0.5rem; }
+  .flow-step h3 { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .flow-step p { font-size: 0.7rem; color: #8b8b9e; }
+  .flow-arrow { color: #8259ef; font-size: 1.2rem; flex-shrink: 0; }
+
+  /* Hedera services */
+  .service-card {
+    background: rgba(130,89,239,0.05);
+    border: 1px solid rgba(130,89,239,0.12);
+    border-radius: 16px;
+    padding: 1.8rem;
+  }
+  .service-card h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.4rem; }
+  .service-card .abbr { font-size: 0.7rem; color: #8259ef; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 0.6rem; }
+  .service-card ul { list-style: none; padding: 0; }
+  .service-card li { font-size: 0.78rem; color: #8b8b9e; padding: 0.2rem 0; display: flex; align-items: center; gap: 0.5rem; }
+  .service-card li::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: #8259ef; flex-shrink: 0; }
+
+  /* CTA slide */
+  .cta-links { display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; }
+  .cta-link {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .cta-primary { background: #8259ef; color: white; }
+  .cta-primary:hover { background: #7049d9; }
+  .cta-secondary { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #e8e8ef; }
+  .cta-secondary:hover { border-color: rgba(255,255,255,0.2); }
+
+  /* Orb */
+  .orb {
+    position: absolute;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.15;
+    pointer-events: none;
+  }
+  .orb-purple { background: #8259ef; top: -15%; right: -10%; }
+  .orb-blue { background: #6ec6ff; bottom: -20%; left: -10%; }
+
+  /* Progress bar */
+  .progress {
+    position: fixed;
+    bottom: 0; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #8259ef, #6ec6ff);
+    transition: width 0.4s ease;
+    z-index: 100;
+  }
+
+  /* Slide counter */
+  .counter {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 2rem;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #555;
+    letter-spacing: 0.1em;
+    font-variant-numeric: tabular-nums;
+    z-index: 100;
+  }
+
+  /* Keyboard hint */
+  .hint {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 2rem;
+    font-size: 0.65rem;
+    color: #444;
+    z-index: 100;
+  }
+  .hint kbd {
+    display: inline-block;
+    padding: 0.15rem 0.4rem;
+    border: 1px solid #333;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.6rem;
+    margin: 0 0.1rem;
+  }
+
+  /* Two column layout */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+  .two-col-wide { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 4rem; align-items: start; }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- SLIDE 1: Title -->
+  <div class="slide active" data-slide="0">
+    <div class="orb orb-purple"></div>
+    <div class="orb orb-blue"></div>
+    <div class="tag">Hedera Hello Future Apex Hackathon 2026</div>
+    <h1>
+      <span class="gradient">Lamina</span><br>
+      Autonomous RWA<br>
+      Lifecycle Agent
+    </h1>
+    <p class="subtitle">
+      One command to tokenize. Zero humans to manage.<br>
+      AI-powered bond lifecycle management on Hedera — from issuance to maturity.
+    </p>
+    <div class="cta-links" style="margin-top:2.5rem;">
+      <span class="cta-link cta-primary">DeFi & Tokenization Track</span>
+      <span class="cta-link cta-secondary">Hashgraph Online Bounty</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: Problem -->
+  <div class="slide" data-slide="1">
+    <div class="tag">The Problem</div>
+    <h2>Tokenizing assets is easy.<br><span class="gradient">Managing them is the bottleneck.</span></h2>
+    <div class="two-col" style="margin-top:2rem;">
+      <div>
+        <div class="problem-item">
+          <div class="problem-num">1</div>
+          <div>
+            <h3>Manual lifecycle operations</h3>
+            <p>Coupon payments, NAV updates, maturity settlement — all done by fund admins, lawyers, and compliance officers manually.</p>
+          </div>
+        </div>
+        <div class="problem-item">
+          <div class="problem-num">2</div>
+          <div>
+            <h3>Compliance overhead</h3>
+            <p>Every transfer needs KYC validation, jurisdiction checks, OFAC screening. One mistake = regulatory action.</p>
+          </div>
+        </div>
+        <div class="problem-item">
+          <div class="problem-num">3</div>
+          <div>
+            <h3>No audit trail</h3>
+            <p>Regulators want proof. Current systems rely on spreadsheets and emails — not cryptographic verification.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="text-align:center; padding:2.5rem;">
+          <div class="stat-value gradient">$16T</div>
+          <div class="stat-label" style="margin-bottom:2rem;">Projected tokenized RWA market by 2030</div>
+          <div class="stat-value" style="font-size:2rem;">5-15 bps</div>
+          <div class="stat-label" style="margin-bottom:2rem;">Cost of manual lifecycle management on AUM</div>
+          <div class="stat-value" style="font-size:2rem;">$33B</div>
+          <div class="stat-label">Current tokenized RWA market</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: Solution -->
+  <div class="slide" data-slide="2">
+    <div class="tag">The Solution</div>
+    <h2>One command. <span class="gradient">Full autonomy.</span></h2>
+    <p class="subtitle">The fund manager says "Tokenize this bond." Lamina handles everything else — for the asset's entire life.</p>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="emoji">&#x1F4DC;</div>
+        <h3>Issue</h3>
+        <p>Deploy compliant token on Hedera</p>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step">
+        <div class="emoji">&#x1F6E1;</div>
+        <h3>Comply</h3>
+        <p>KYC whitelist, OFAC screening, transfer rules</p>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step">
+        <div class="emoji">&#x1F504;</div>
+        <h3>Manage</h3>
+        <p>Auto coupon payments, NAV updates</p>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step">
+        <div class="emoji">&#x1F4CA;</div>
+        <h3>Report</h3>
+        <p>Quarterly compliance PDFs</p>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step">
+        <div class="emoji">&#x2705;</div>
+        <h3>Settle</h3>
+        <p>Redeem, return principal, burn tokens</p>
+      </div>
+    </div>
+    <div class="grid-3" style="margin-top:2rem;">
+      <div class="card">
+        <div class="card-icon">&#x1F916;</div>
+        <h3>AI-Powered Agent</h3>
+        <p>Natural language commands via Claude. "Who holds this bond?" "Generate Q1 report."</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">&#x23F0;</div>
+        <h3>Scheduled Automation</h3>
+        <p>Coupon payments, NAV updates, maturity checks run autonomously on schedule.</p>
+      </div>
+      <div class="card">
+        <div class="card-icon">&#x1F50D;</div>
+        <h3>OFAC Sanctions Screening</h3>
+        <p>Real-time SDN list screening on every whitelist and transfer. Fuzzy name matching.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: Hedera Integration -->
+  <div class="slide" data-slide="3">
+    <div class="tag">Deep Hedera Integration</div>
+    <h2>Not a wrapper. <span class="gradient-blue">Native Hedera.</span></h2>
+    <p class="subtitle">Every agent action uses Hedera's core services — Token Service, Consensus Service, and Mirror Node.</p>
+    <div class="grid-3" style="margin-top:2rem;">
+      <div class="service-card">
+        <h3>Hedera Token Service</h3>
+        <div class="abbr">HTS</div>
+        <ul>
+          <li>Token creation with KYC + freeze keys</li>
+          <li>Mint, transfer, wipe, burn operations</li>
+          <li>Proportional coupon distribution</li>
+          <li>Maturity redemption & token burn</li>
+        </ul>
+      </div>
+      <div class="service-card">
+        <h3>Hedera Consensus Service</h3>
+        <div class="abbr">HCS</div>
+        <ul>
+          <li>Per-asset audit topics</li>
+          <li>Every agent action logged immutably</li>
+          <li>Cryptographic proof for regulators</li>
+          <li>Verifiable on HashScan</li>
+        </ul>
+      </div>
+      <div class="service-card">
+        <h3>Mirror Node API</h3>
+        <div class="abbr">MIRROR</div>
+        <ul>
+          <li>Real-time token balance queries</li>
+          <li>Transaction history verification</li>
+          <li>HCS message retrieval for reports</li>
+          <li>Dashboard data feeds</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:2rem; display:flex; gap:1rem; flex-wrap:wrap;">
+      <span style="font-size:0.75rem; color:#8259ef; background:rgba(130,89,239,0.1); padding:0.4rem 0.8rem; border-radius:8px; border:1px solid rgba(130,89,239,0.2);">HashConnect Wallet Pairing</span>
+      <span style="font-size:0.75rem; color:#8259ef; background:rgba(130,89,239,0.1); padding:0.4rem 0.8rem; border-radius:8px; border:1px solid rgba(130,89,239,0.2);">Hedera Testnet</span>
+      <span style="font-size:0.75rem; color:#8259ef; background:rgba(130,89,239,0.1); padding:0.4rem 0.8rem; border-radius:8px; border:1px solid rgba(130,89,239,0.2);">hiero-sdk-python</span>
+      <span style="font-size:0.75rem; color:#8259ef; background:rgba(130,89,239,0.1); padding:0.4rem 0.8rem; border-radius:8px; border:1px solid rgba(130,89,239,0.2);">HashScan Explorer</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: Architecture -->
+  <div class="slide" data-slide="4">
+    <div class="tag">Architecture</div>
+    <h2>Four autonomous <span class="gradient">agent modules</span></h2>
+    <div class="grid-2" style="margin-top:1.5rem;">
+      <div class="card" style="border-left:3px solid #3b82f6;">
+        <h3 style="color:#60a5fa;">Lifecycle Agent</h3>
+        <p>Asset issuance, token deployment, coupon scheduling, NAV updates from treasury yields, maturity redemption and token burns.</p>
+      </div>
+      <div class="card" style="border-left:3px solid #f59e0b;">
+        <h3 style="color:#fbbf24;">Compliance Agent</h3>
+        <p>KYC whitelist management, jurisdiction enforcement (SEC Reg D/S, MiFID II), OFAC SDN screening, transfer validation.</p>
+      </div>
+      <div class="card" style="border-left:3px solid #a855f7;">
+        <h3 style="color:#c084fc;">Reporting Agent</h3>
+        <p>Quarterly compliance reports, investor statements, audit trail compilation. PDF generation from on-chain data.</p>
+      </div>
+      <div class="card" style="border-left:3px solid #10b981;">
+        <h3 style="color:#34d399;">Chat Agent</h3>
+        <p>Natural language interface powered by Claude. Fund managers issue commands in plain English — the agent orchestrates.</p>
+      </div>
+    </div>
+    <div style="margin-top:2rem;">
+      <div class="card" style="display:flex; gap:3rem; align-items:center; padding:1.5rem 2rem;">
+        <div>
+          <div style="font-size:0.65rem; color:#8b8b9e; text-transform:uppercase; letter-spacing:0.1em;">Tech Stack</div>
+        </div>
+        <div style="display:flex; gap:2rem; flex-wrap:wrap; font-size:0.8rem; color:#8b8b9e;">
+          <span><strong style="color:#e8e8ef;">Backend:</strong> FastAPI + Python</span>
+          <span><strong style="color:#e8e8ef;">Frontend:</strong> Next.js 16</span>
+          <span><strong style="color:#e8e8ef;">AI:</strong> Claude API</span>
+          <span><strong style="color:#e8e8ef;">DB:</strong> SQLite</span>
+          <span><strong style="color:#e8e8ef;">Scheduler:</strong> APScheduler</span>
+          <span><strong style="color:#e8e8ef;">Wallet:</strong> HashConnect</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: Demo Highlights -->
+  <div class="slide" data-slide="5">
+    <div class="tag">Live Demo</div>
+    <h2>End-to-end in <span class="gradient">3 minutes</span></h2>
+    <div class="grid-2" style="margin-top:2rem;">
+      <div>
+        <div class="problem-item">
+          <div class="problem-num" style="background:rgba(59,130,246,0.15); color:#60a5fa;">1</div>
+          <div>
+            <h3>Issue a Bond</h3>
+            <p>"Tokenize a $10M 5-year US Treasury bond" &rarr; Agent deploys HTS token + HCS audit topic</p>
+          </div>
+        </div>
+        <div class="problem-item">
+          <div class="problem-num" style="background:rgba(245,158,11,0.15); color:#fbbf24;">2</div>
+          <div>
+            <h3>Investor Onboarding</h3>
+            <p>Whitelist with KYC + OFAC screening &rarr; purchase tokens &rarr; all logged to HCS</p>
+          </div>
+        </div>
+        <div class="problem-item">
+          <div class="problem-num" style="background:rgba(239,68,68,0.15); color:#f87171;">3</div>
+          <div>
+            <h3>Compliance Block</h3>
+            <p>Restricted party tries to buy &rarr; agent blocks, logs reason on-chain</p>
+          </div>
+        </div>
+        <div class="problem-item">
+          <div class="problem-num" style="background:rgba(16,185,129,0.15); color:#34d399;">4</div>
+          <div>
+            <h3>Autonomous Operations</h3>
+            <p>Coupon distribution, NAV update, report generation — all autonomous</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="problem-item">
+          <div class="problem-num" style="background:rgba(168,85,247,0.15); color:#c084fc;">5</div>
+          <div>
+            <h3>Maturity Settlement</h3>
+            <p>Agent redeems all tokens, returns principal, burns tokens, generates final report</p>
+          </div>
+        </div>
+        <div class="problem-item">
+          <div class="problem-num" style="background:rgba(130,89,239,0.15); color:#8259ef;">6</div>
+          <div>
+            <h3>Full Audit Trail</h3>
+            <p>Every action on HCS &rarr; verifiable on HashScan. Immutable proof of compliance.</p>
+          </div>
+        </div>
+        <div class="card" style="margin-top:1rem; text-align:center;">
+          <p style="font-size:0.8rem; color:#8b8b9e; margin-bottom:1rem;">Hedera services used per demo flow</p>
+          <div style="display:flex; justify-content:center; gap:2.5rem;">
+            <div class="stat">
+              <div class="stat-value gradient" style="font-size:1.8rem;">12+</div>
+              <div class="stat-label">HTS Ops</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value gradient" style="font-size:1.8rem;">20+</div>
+              <div class="stat-label">HCS Logs</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value gradient" style="font-size:1.8rem;">10+</div>
+              <div class="stat-label">Mirror Queries</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: Market & Vision -->
+  <div class="slide" data-slide="6">
+    <div class="tag">Market Opportunity</div>
+    <h2>The <span class="gradient">operating system</span> for tokenized assets</h2>
+    <div class="grid-2" style="margin-top:2rem;">
+      <div>
+        <p class="subtitle" style="margin-bottom:2rem;">
+          Every tokenized bond, fund, and equity needs lifecycle management. BlackRock's BUIDL is $2.9B. Archax has $500M on Hedera. The market is $33B today, projected $16T by 2030.
+        </p>
+        <div class="card" style="margin-bottom:1rem;">
+          <h3>Revenue Model</h3>
+          <p>2-5 basis points on AUM managed by the agent.<br><strong style="color:#e8e8ef;">$1B AUM = $200K-500K/year recurring.</strong></p>
+        </div>
+        <div class="card">
+          <h3>Target Customers</h3>
+          <p>Securitize, Archax, Zoniqx, Franklin Templeton, any institution launching tokenized funds.</p>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:1rem;">
+          <h3>Chain-Agnostic Core</h3>
+          <p>Compliance + lifecycle + reporting agents are chain-agnostic. Hedera is the first adapter. Ethereum, Avalanche, Polygon, Solana next.</p>
+        </div>
+        <div class="card" style="margin-bottom:1rem;">
+          <h3>Why Hedera First</h3>
+          <p>Native token service (no smart contracts needed), HCS for immutable audit, $0.001 transactions, enterprise-grade finality.</p>
+        </div>
+        <div class="card" style="background:rgba(130,89,239,0.08); border-color:rgba(130,89,239,0.2);">
+          <h3 style="color:#b47aff;">Built to Win</h3>
+          <p>Deep HTS + HCS + Mirror Node integration. OFAC sanctions screening. HashConnect wallet. Real autonomous agent, not a wrapper.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: Thank You -->
+  <div class="slide" data-slide="7">
+    <div class="orb orb-purple"></div>
+    <div class="orb orb-blue"></div>
+    <div class="tag">Thank You</div>
+    <h1>
+      <span class="gradient">Lamina</span>
+    </h1>
+    <p class="subtitle" style="font-size:1.3rem; max-width:600px;">
+      Autonomous RWA lifecycle management on Hedera.<br>
+      From issuance to maturity — zero human intervention.
+    </p>
+    <div class="cta-links" style="margin-top:2.5rem;">
+      <a class="cta-link cta-primary" href="https://github.com/Ni8crawler18/lamina" target="_blank">
+        &#x2197; GitHub
+      </a>
+      <a class="cta-link cta-secondary" href="/dashboard" target="_top">
+        &#x26A1; Launch App
+      </a>
+    </div>
+    <div style="margin-top:3rem; display:flex; gap:3rem;">
+      <div class="stat">
+        <div class="stat-value gradient" style="font-size:2rem;">4</div>
+        <div class="stat-label">Agent Modules</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value gradient" style="font-size:2rem;">3</div>
+        <div class="stat-label">Hedera Services</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value gradient" style="font-size:2rem;">100%</div>
+        <div class="stat-label">Autonomous</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Progress bar -->
+<div class="progress" id="progress"></div>
+
+<!-- Counter -->
+<div class="counter" id="counter">1 / 8</div>
+
+<!-- Keyboard hint -->
+<div class="hint"><kbd>&larr;</kbd> <kbd>&rarr;</kbd> or click to navigate</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  function go(n) {
+    if (n < 0 || n >= total) return;
+    slides[current].classList.remove('active');
+    current = n;
+    slides[current].classList.add('active');
+    document.getElementById('progress').style.width = ((current + 1) / total * 100) + '%';
+    document.getElementById('counter').textContent = (current + 1) + ' / ' + total;
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(current + 1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); go(current - 1); }
+    if (e.key === 'Home') { e.preventDefault(); go(0); }
+    if (e.key === 'End') { e.preventDefault(); go(total - 1); }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('a') || e.target.closest('button')) return;
+    const x = e.clientX / window.innerWidth;
+    if (x > 0.5) go(current + 1);
+    else go(current - 1);
+  });
+
+  // Touch support
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+  document.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 50) { dx < 0 ? go(current + 1) : go(current - 1); }
+  });
+
+  go(0);
+</script>
+
+</body>
+</html>
