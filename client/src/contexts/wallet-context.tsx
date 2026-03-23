@@ -76,7 +76,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         setConnectionMode(null);
       });
 
-      await hc.init();
+      // Init with timeout — HashConnect can hang if WalletConnect relay is unreachable
+      await Promise.race([
+        hc.init(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("HashConnect init timeout")), 8000))
+      ]);
       hashconnectRef.current = hc;
       return hc;
     } catch (err) {
