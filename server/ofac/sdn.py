@@ -22,7 +22,7 @@ DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 SDN_CACHE = os.path.join(DATA_DIR, "sdn_cache.csv")
 ADD_CACHE = os.path.join(DATA_DIR, "add_cache.csv")
 
-MATCH_THRESHOLD = 85  # Jaro-Winkler-weighted ratio threshold
+MATCH_THRESHOLD = 93  # Fuzzy match threshold — raised to reduce false positives
 
 
 class OFACScreener:
