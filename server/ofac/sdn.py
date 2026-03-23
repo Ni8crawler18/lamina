@@ -148,31 +148,22 @@ class OFACScreener:
                                 self.addresses[addr.upper()] = entry_id
 
     def screen_name(self, name: str) -> dict:
-        """Fuzzy-match a name against the SDN list. Returns screening result."""
+        """Exact case-insensitive name match against the SDN list."""
         if not self.loaded or not name:
             return {"is_match": False, "score": 0, "details": None}
 
         name_upper = name.upper()
-        best_score = 0
-        best_entry_id = None
 
         for entry_id, sdn_name in self.names:
-            score = fuzz.WRatio(name_upper, sdn_name)
-            if score > best_score:
-                best_score = score
-                best_entry_id = entry_id
-                if score == 100:
-                    break
+            if name_upper == sdn_name:
+                return {
+                    "is_match": True,
+                    "score": 100,
+                    "match_type": "name_exact",
+                    "details": self.entry_details.get(entry_id),
+                }
 
-        if best_score >= MATCH_THRESHOLD and best_entry_id is not None:
-            return {
-                "is_match": True,
-                "score": best_score,
-                "match_type": "name_fuzzy",
-                "details": self.entry_details.get(best_entry_id),
-            }
-
-        return {"is_match": False, "score": best_score, "details": None}
+        return {"is_match": False, "score": 0, "details": None}
 
     def screen_address(self, address: str) -> dict:
         """Exact-match an address against known sanctioned crypto addresses."""
