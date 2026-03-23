@@ -93,9 +93,11 @@ export default function ChatPanel() {
                 <div className="max-w-[85%]">
                   {msg.role === "assistant" && (
                     <div className="flex items-center gap-2 mb-1.5">
-                      <div className="w-5 h-5 rounded-md bg-primary/20 flex items-center justify-center">
-                        <svg className="w-3 h-3 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      <div className="w-5 h-5 flex items-center justify-center">
+                        <svg width="18" height="18" viewBox="0 0 28 28" fill="none">
+                          <path d="M14 22L4 16.5L14 11L24 16.5L14 22Z" fill="#5a3db5" opacity="0.6"/>
+                          <path d="M14 18L4 12.5L14 7L24 12.5L14 18Z" fill="#7c5ce7" opacity="0.8"/>
+                          <path d="M14 14L4 8.5L14 3L24 8.5L14 14Z" fill="#a78bfa"/>
                         </svg>
                       </div>
                       <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Lamina</span>
