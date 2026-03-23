@@ -1,154 +1,138 @@
-# Lamina — Autonomous RWA Lifecycle Agent on Hedera
+<p align="center">
+  <img src="https://img.shields.io/badge/Hedera-Testnet-8259ef?style=flat-square" />
+  <img src="https://img.shields.io/badge/Python-FastAPI-009688?style=flat-square" />
+  <img src="https://img.shields.io/badge/Next.js-16-000?style=flat-square" />
+  <img src="https://img.shields.io/badge/AI-Claude_API-d97706?style=flat-square" />
+</p>
 
-An AI agent that autonomously manages the full lifecycle of tokenized real-world assets (RWAs) on Hedera — from issuance and compliance configuration to coupon distribution, NAV updates, maturity settlement, and regulatory reporting.
+# Lamina
 
-**Fund manager issues one command** ("Tokenize this bond") and Lamina handles everything for the asset's entire life.
+**Autonomous RWA lifecycle agent on Hedera.**
+
+One command to tokenize a bond. Zero humans to manage it after. Lamina handles compliance, coupon payments, NAV updates, regulatory reporting, and maturity settlement — autonomously.
+
+---
+
+## The Problem
+
+Tokenizing an asset takes minutes. Managing it takes years.
+
+Every tokenized bond needs: coupon payments on schedule, KYC checks on every transfer, OFAC sanctions screening, NAV updates from price feeds, quarterly reports for regulators, and maturity redemption at the end. Today, fund admins and lawyers do this manually — costing 5-15 basis points on AUM.
+
+The tokenized RWA market is $33B today, projected $16T by 2030. Every single asset needs lifecycle management. Nobody has automated it.
 
 ## How It Works
 
 ```
-Fund Manager: "Tokenize a $10M 5-year US Treasury bond, US accredited investors only"
+"Tokenize a $10M 5-year US Treasury bond, US accredited investors only"
 
-Lamina Agent:
-├── Identifies asset type → maps to regulatory framework (SEC Reg D)
-├── Configures KYC whitelist + transfer restrictions
-├── Deploys compliant token via Hedera Token Service (HTS)
-├── Creates immutable audit topic via Hedera Consensus Service (HCS)
-├── Schedules recurring coupon payments
-├── Monitors all transfers for compliance
+Lamina:
+├── Maps asset type → regulatory framework (SEC Reg D)
+├── Configures KYC whitelist + OFAC sanctions screening
+├── Deploys compliant token on Hedera (HTS)
+├── Creates immutable audit topic (HCS)
+├── Schedules coupon payments, NAV updates, maturity
+├── Validates every transfer against compliance rules
 ├── Generates quarterly regulatory reports (PDF)
-├── At maturity: redeems all tokens, returns principal, burns tokens
-└── Every action logged to HCS (immutable audit trail)
+├── At maturity → redeems tokens, returns principal, burns supply
+└── Every action logged on-chain — verifiable on HashScan
 ```
 
-## Architecture
+## Agent Modules
 
-### Agent Modules
-
-| Agent | Responsibility |
-|-------|---------------|
-| **Compliance** | KYC whitelist management, transfer validation, jurisdiction rules (SEC Reg D/S, MiFID II) |
-| **Lifecycle** | Token issuance, coupon distribution, NAV updates, maturity settlement |
-| **Reporting** | Compliance report generation (PDF), audit trail compilation |
-| **Chat** | Natural language interface powered by Claude API with tool use |
-
-### Tech Stack
-
-- **Backend**: Python / FastAPI / SQLite / APScheduler
-- **Frontend**: Next.js 14 / TypeScript / TailwindCSS / shadcn/ui
-- **Hedera**: HTS (tokens), HCS (audit logs), Mirror Node (queries)
-- **AI**: Claude API (Anthropic) for chat agent + report generation
-- **SDK**: hiero-sdk-python (native Python Hedera SDK)
-
-## Quick Start
-
-### Prerequisites
-- Python 3.12+
-- Node.js 18+
-- Hedera testnet account ([portal.hedera.com](https://portal.hedera.com))
-- Anthropic API key ([console.anthropic.com](https://console.anthropic.com))
-
-### Setup
-
-```bash
-# Clone
-git clone <repo-url> && cd lamina
-
-# Backend
-python -m venv venv && source venv/bin/activate
-pip install -r backend/requirements.txt
-
-# Frontend
-cd frontend && npm install && cd ..
-
-# Environment
-cp .env.example .env
-# Edit .env with your Hedera and Anthropic credentials
-```
-
-### Run
-
-```bash
-# Backend (terminal 1)
-source venv/bin/activate
-python -m uvicorn backend.main:app --reload --port 8000
-
-# Frontend (terminal 2)
-cd frontend && npm run dev
-```
-
-- Dashboard: http://localhost:3000
-- Chat Agent: http://localhost:3000/chat
-- API: http://localhost:8000/docs
-
-## Demo Flow
-
-1. **Issuance** — Chat: "Tokenize a $10M 5-year US Treasury bond, US accredited investors only"
-2. **Whitelist** — Add investor to KYC whitelist
-3. **Compliance Block** — Sanctioned country wallet gets blocked
-4. **Coupon Payment** — Agent distributes interest to all holders
-5. **NAV Update** — Agent pulls treasury rate, updates valuation
-6. **Report** — Agent generates compliance report PDF
-7. **Maturity** — Agent redeems tokens, burns supply, logs final settlement
+| Module | What it does |
+|--------|-------------|
+| **Compliance** | KYC whitelist, OFAC SDN screening (fuzzy match), jurisdiction enforcement (SEC Reg D/S, MiFID II), transfer validation |
+| **Lifecycle** | Token issuance, scheduled coupon distribution, NAV updates from treasury yields, maturity redemption & burn |
+| **Reporting** | Quarterly compliance reports, investor statements, audit trail compilation — all as downloadable PDFs |
+| **Chat** | Natural language interface powered by Claude. "Who holds this bond?" "Generate Q1 report." |
 
 ## Hedera Integration
 
+Not a wrapper. Lamina uses Hedera's native services for every operation.
+
 | Service | Usage |
 |---------|-------|
-| **HTS** | Token creation, minting, burning, transfers with KYC/freeze keys |
-| **HCS** | Every agent action logged as immutable audit trail per asset |
-| **Mirror Node** | Query HCS messages, verify token operations |
+| **HTS** | Token create, mint, transfer, wipe, burn — with KYC and freeze keys for compliance |
+| **HCS** | Per-asset audit topics. Every agent action logged immutably. Verifiable on HashScan |
+| **Mirror Node** | Token balances, transaction history, HCS message retrieval for reports |
+| **HashConnect** | Real wallet pairing via HashPack — not a simulated connection |
 
-## API Endpoints
+## Stack
 
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/api/assets` | List all tokenized assets |
-| POST | `/api/assets` | Issue new asset |
-| GET | `/api/assets/{id}` | Asset details |
-| POST | `/api/assets/{id}/whitelist` | Add investor to whitelist |
-| POST | `/api/assets/{id}/validate-transfer` | Check transfer compliance |
-| POST | `/api/assets/{id}/distribute-coupon` | Distribute coupon payments |
-| POST | `/api/assets/{id}/mature` | Execute maturity settlement |
-| GET | `/api/assets/{id}/audit-log` | HCS audit trail |
-| POST | `/api/assets/{id}/reports` | Generate compliance report |
-| POST | `/api/chat` | Natural language agent interface |
+```
+Backend     Python · FastAPI · SQLite · APScheduler · hiero-sdk-python
+Frontend    Next.js 16 · TypeScript · TailwindCSS · shadcn/ui
+AI          Claude API (Anthropic) — chat agent with tool use
+Screening   OFAC SDN list · rapidfuzz fuzzy matching · daily refresh
+Wallet      HashConnect · WalletConnect · HashPack
+```
+
+## Quick Start
+
+```bash
+git clone https://github.com/Ni8crawler18/lamina.git && cd lamina
+
+# backend
+python -m venv venv && source venv/bin/activate
+pip install -r server/requirements.txt
+
+# frontend
+cd client && npm install && cd ..
+
+# environment — add your Hedera + Anthropic keys
+cp .env.example .env
+
+# run
+python -m uvicorn server.main:app --port 8000 --reload   # terminal 1
+cd client && npm run dev                                   # terminal 2
+```
+
+**Dashboard** → `localhost:3000` · **API** → `localhost:8000/docs` · **Pitch Deck** → `localhost:3000/slides.html`
+
+## Demo Flow
+
+1. **Issue** — Natural language command → agent deploys HTS token + HCS audit topic
+2. **Onboard** — Whitelist investor with KYC + OFAC screening
+3. **Block** — Sanctioned party tries to buy → agent blocks, logs reason on-chain
+4. **Coupon** — Agent distributes interest to all holders proportionally
+5. **NAV** — Agent pulls treasury yield, updates valuation
+6. **Report** — Agent generates compliance report PDF from on-chain data
+7. **Mature** — Agent redeems all tokens, returns principal, burns supply, final report
+
+## API
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/assets` | List all assets |
+| `POST` | `/api/assets` | Issue new asset |
+| `POST` | `/api/assets/{id}/whitelist` | Add to KYC whitelist |
+| `POST` | `/api/assets/{id}/distribute-coupon` | Distribute coupon |
+| `POST` | `/api/assets/{id}/mature` | Execute maturity |
+| `GET` | `/api/assets/{id}/audit-log` | HCS audit trail |
+| `POST` | `/api/assets/{id}/reports` | Generate report |
+| `GET` | `/api/events/upcoming` | Cross-asset event timeline |
+| `POST` | `/api/ofac/screen` | OFAC sanctions check |
+| `POST` | `/api/chat` | Natural language agent |
 
 ## Project Structure
 
 ```
 lamina/
-├── backend/
-│   ├── main.py              # FastAPI entry point
-│   ├── config.py             # Environment settings
-│   ├── database.py           # SQLite schema + helpers
-│   ├── hedera/
-│   │   ├── client.py         # Hedera SDK client
-│   │   ├── token.py          # HTS operations
-│   │   └── consensus.py      # HCS audit logging
-│   ├── agents/
-│   │   ├── compliance.py     # KYC, whitelist, transfer validation
-│   │   ├── lifecycle.py      # Issuance, coupons, maturity
-│   │   ├── reporting.py      # PDF report generation
-│   │   └── chat.py           # Claude-powered NL interface
-│   ├── oracle/
-│   │   ├── treasury_rates.py # US Treasury yield data
-│   │   └── fx_rates.py       # Forex rates
-│   └── scheduler/
-│       └── jobs.py           # Automated coupon/NAV/maturity jobs
-├── frontend/
-│   ├── src/app/
-│   │   ├── page.tsx          # Dashboard
-│   │   ├── asset/[id]/       # Asset detail
-│   │   └── chat/             # Chat interface
-│   └── src/components/       # UI components
-└── pitch/
-    └── demo-script.md        # Demo walkthrough
+├── server/
+│   ├── main.py                 # FastAPI app
+│   ├── agents/                 # compliance, lifecycle, reporting, chat
+│   ├── hedera/                 # HTS token ops, HCS audit logging
+│   ├── ofac/                   # OFAC SDN screening
+│   ├── oracle/                 # treasury rates, FX rates
+│   ├── routes/                 # API endpoints
+│   └── scheduler/              # automated jobs
+├── client/
+│   ├── src/app/                # Next.js pages
+│   ├── src/components/         # UI components
+│   └── public/slides.html      # pitch deck
+└── CLAUDE.md                   # project spec
 ```
-
-## Hackathon
-
-Built for the [Hedera Hello Future Apex Hackathon 2026](https://hackathon.stackup.dev/web/events/hedera-hello-future-apex-hackathon-2026-the-finale) — DeFi & Tokenization track.
 
 ## License
 
