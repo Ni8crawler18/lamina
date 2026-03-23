@@ -1,3 +1,4 @@
+# Lamina server dependencies
 fastapi
 uvicorn[standard]
 pydantic
