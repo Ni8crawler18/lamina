@@ -186,10 +186,17 @@ When a user asks to purchase tokens, use the purchase_tokens tool. For example:
 Always confirm actions with clear summaries. Be concise and professional.
 If you need an asset_id and the user hasn't specified one, use list_assets first to find it.
 
+IMPORTANT: Only include HashScan links when you have a REAL transaction ID or token ID from a tool result. Use these formats:
+- Transaction: https://hashscan.io/testnet/transaction/{tx_id}
+- Token: https://hashscan.io/testnet/token/{token_id}
+- Account: https://hashscan.io/testnet/account/{account_id}
+- Topic: https://hashscan.io/testnet/topic/{topic_id}
+Never guess or fabricate IDs. If you don't have a real ID from a tool result, don't include a link.
+
 Current date: """ + datetime.utcnow().strftime("%Y-%m-%d")
 
 
-async def process_message(message: str) -> dict:
+async def process_message(message: str, history: list = None) -> dict:
     """Process a natural language message through Claude with tool use."""
     settings = get_settings()
 
@@ -203,7 +210,16 @@ async def process_message(message: str) -> dict:
     client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
 
     actions_taken = []
-    messages = [{"role": "user", "content": message}]
+
+    # Build messages with conversation history
+    messages = []
+    if history:
+        for msg in history[-10:]:  # Keep last 10 messages for context
+            role = msg.get("role", "user")
+            content = msg.get("content", "")
+            if role in ("user", "assistant") and content:
+                messages.append({"role": role, "content": content})
+    messages.append({"role": "user", "content": message})
 
     # Agentic loop: keep processing until Claude gives a final text response
     while True:

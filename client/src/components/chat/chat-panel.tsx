@@ -56,7 +56,11 @@ export default function ChatPanel() {
     setLoading(true);
 
     try {
-      const result = await sendChat(message);
+      // Send conversation history (exclude loading messages)
+      const history = messages
+        .filter((m) => !m.loading && m.content)
+        .map((m) => ({ role: m.role, content: m.content }));
+      const result = await sendChat(message, history);
       setMessages((prev) => {
         const next = [...prev];
         next[next.length - 1] = {
