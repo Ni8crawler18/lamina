@@ -71,8 +71,8 @@ export const purchaseTokens = (assetId: number, accountId: string, amount: numbe
   fetchAPI(`/api/assets/${assetId}/purchase?account_id=${accountId}&amount=${amount}`, { method: "POST" });
 
 // Chat
-export const sendChat = (message: string) =>
-  fetchAPI("/api/chat", { method: "POST", body: JSON.stringify({ message }) });
+export const sendChat = (message: string, history: { role: string; content: string }[] = []) =>
+  fetchAPI("/api/chat", { method: "POST", body: JSON.stringify({ message, history }) });
 
 // OFAC
 export const screenOFAC = (data: { name?: string; address?: string }) =>
