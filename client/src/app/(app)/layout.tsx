@@ -5,7 +5,7 @@ import AppHeader from "@/components/layout/app-header";
 import { WalletProvider, useWallet } from "@/contexts/wallet-context";
 
 function ConnectGate({ children }: { children: React.ReactNode }) {
-  const { isConnected, isConnecting, connect } = useWallet();
+  const { isConnected, isConnecting, connect, connectDemo } = useWallet();
 
   if (!isConnected) {
     return (
@@ -30,13 +30,14 @@ function ConnectGate({ children }: { children: React.ReactNode }) {
 
             <h2 className="text-lg font-semibold mb-2">Connect Your Wallet</h2>
             <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-              Connect your Hedera account to access the RWA management dashboard. All operations are executed on Hedera Testnet.
+              Connect your Hedera wallet to access the RWA management dashboard. All operations are executed on Hedera Testnet.
             </p>
 
+            {/* HashPack button */}
             <button
               onClick={connect}
               disabled={isConnecting}
-              className="w-full inline-flex items-center justify-center gap-2 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 px-5 py-3 rounded-xl transition-colors disabled:opacity-60 glow-purple"
+              className="w-full inline-flex items-center justify-center gap-2.5 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 px-5 py-3 rounded-xl transition-colors disabled:opacity-60 glow-purple"
             >
               {isConnecting ? (
                 <>
@@ -45,16 +46,36 @@ function ConnectGate({ children }: { children: React.ReactNode }) {
                 </>
               ) : (
                 <>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12" />
+                    <rect x="3" y="12" width="18" height="6" rx="2" />
                   </svg>
-                  Connect with Hedera (Demo)
+                  Connect with HashPack
                 </>
               )}
             </button>
 
+            {/* Divider */}
+            <div className="flex items-center gap-3 my-4">
+              <div className="flex-1 h-px bg-border/50" />
+              <span className="text-[10px] text-muted-foreground/50 uppercase tracking-wider">or</span>
+              <div className="flex-1 h-px bg-border/50" />
+            </div>
+
+            {/* Demo mode button */}
+            <button
+              onClick={connectDemo}
+              disabled={isConnecting}
+              className="w-full inline-flex items-center justify-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground border border-border/50 hover:border-border px-5 py-3 rounded-xl transition-all disabled:opacity-60"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Demo Mode
+            </button>
+
             <p className="text-[10px] text-muted-foreground/60 mt-4">
-              Demo mode — uses testnet operator account 0.0.8003096
+              Demo mode uses testnet operator account for preview
             </p>
           </div>
 

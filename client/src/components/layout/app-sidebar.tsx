@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useWallet } from "@/contexts/wallet-context";
 import {
   LayoutDashboard,
   Coins,
@@ -36,6 +37,7 @@ function Logo() {
 
 export default function AppSidebar() {
   const pathname = usePathname();
+  const { address, connectionMode } = useWallet();
 
   return (
     <aside className="w-[220px] bg-card/40 border-r border-border/50 flex flex-col h-screen fixed left-0 top-0 z-50">
@@ -72,7 +74,10 @@ export default function AppSidebar() {
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
           Hedera Testnet
         </div>
-        <p className="font-mono text-[11px] text-muted-foreground/60 mt-1">0.0.8003096</p>
+        <p className="font-mono text-[11px] text-muted-foreground/60 mt-1">{address || "—"}</p>
+        {connectionMode === "demo" && (
+          <p className="text-[9px] text-amber-400/70 mt-0.5">demo mode</p>
+        )}
       </div>
     </aside>
   );

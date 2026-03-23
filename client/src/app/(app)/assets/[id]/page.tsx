@@ -20,11 +20,28 @@ import {
   generateReport,
 } from "@/lib/api";
 
+interface Asset {
+  id: number;
+  name: string;
+  symbol: string;
+  token_id: string | null;
+  asset_type: string;
+  total_supply: number;
+  decimals: number;
+  coupon_rate: number;
+  maturity_date: string | null;
+  nav: number;
+  status: string;
+  jurisdiction: string;
+  investor_type: string;
+  created_at: string;
+}
+
 export default function AssetDetail() {
   const params = useParams();
   const assetId = Number(params.id);
 
-  const [asset, setAsset] = useState<Record<string, unknown> | null>(null);
+  const [asset, setAsset] = useState<Asset | null>(null);
   const [holders, setHolders] = useState<Record<string, unknown>[]>([]);
   const [compliance, setCompliance] = useState(null);
   const [auditLog, setAuditLog] = useState<{ hcs_messages: unknown[]; local_log: unknown[]; topic_id?: string } | null>(null);
@@ -87,11 +104,11 @@ export default function AssetDetail() {
     );
   }
 
-  const faceValue = (asset.total_supply as number) / Math.pow(10, asset.decimals as number);
+  const faceValue = asset.total_supply / Math.pow(10, asset.decimals);
   const statusColor = {
     active: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
     matured: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  }[asset.status as string] || "bg-muted text-muted-foreground";
+  }[asset.status] || "bg-muted text-muted-foreground";
 
   const allLogs = [
     ...(auditLog?.hcs_messages || []),
@@ -110,20 +127,20 @@ export default function AssetDetail() {
         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
-        <span className="text-foreground">{asset.name as string}</span>
+        <span className="text-foreground">{asset.name}</span>
       </div>
 
       {/* Header */}
       <div className="flex items-start justify-between mb-8">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-[22px] font-semibold tracking-tight">{asset.name as string}</h1>
+            <h1 className="text-[22px] font-semibold tracking-tight">{asset.name}</h1>
             <Badge variant="outline" className={statusColor}>
-              {asset.status as string}
+              {asset.status}
             </Badge>
           </div>
           <div className="flex items-center gap-3 mt-2 flex-wrap">
-            <span className="font-mono text-xs text-muted-foreground">{asset.symbol as string}</span>
+            <span className="font-mono text-xs text-muted-foreground">{asset.symbol}</span>
             <span className="text-muted-foreground/30">|</span>
             {asset.token_id ? (
               <a
@@ -132,7 +149,7 @@ export default function AssetDetail() {
                 rel="noopener noreferrer"
                 className="font-mono text-xs text-primary/70 hover:text-primary inline-flex items-center gap-1 transition-colors"
               >
-                {asset.token_id as string}
+                {asset.token_id}
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
               </a>
             ) : (
@@ -182,15 +199,15 @@ export default function AssetDetail() {
       {/* Stats Row */}
       <div className="grid grid-cols-4 gap-3 mb-8">
         <MetricCard label="Face Value" value={`$${faceValue.toLocaleString()}`} />
-        <MetricCard label="NAV" value={`$${(asset.nav as number).toLocaleString()}`} />
-        <MetricCard label="Coupon" value={`${((asset.coupon_rate as number) * 100).toFixed(2)}%`} />
-        <MetricCard label="Jurisdiction" value={asset.jurisdiction as string} />
+        <MetricCard label="NAV" value={`$${(asset.nav).toLocaleString()}`} />
+        <MetricCard label="Coupon" value={`${((asset.coupon_rate) * 100).toFixed(2)}%`} />
+        <MetricCard label="Jurisdiction" value={asset.jurisdiction} />
       </div>
 
       {/* Maturity Progress */}
       {asset.maturity_date && (
         <MaturityProgressCard
-          createdAt={asset.created_at as string}
+          createdAt={asset.created_at}
           maturityDate={asset.maturity_date as string}
         />
       )}
@@ -205,7 +222,7 @@ export default function AssetDetail() {
         </TabsList>
 
         <TabsContent value="holders" className="mt-6">
-          <HolderTable holders={holders as never[]} decimals={asset.decimals as number} />
+          <HolderTable holders={holders as never[]} decimals={asset.decimals} />
         </TabsContent>
 
         <TabsContent value="activity" className="mt-6">
