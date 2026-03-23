@@ -193,8 +193,7 @@ IMPORTANT: Only include HashScan links when you have a REAL transaction ID or to
 - Topic: https://hashscan.io/testnet/topic/{topic_id}
 Never guess or fabricate IDs. If you don't have a real ID from a tool result, don't include a link.
 
-When a report is generated successfully, always include the download link using the report_id from the result:
-- Format: [Download Report PDF](https://lamina-4ivt.onrender.com/api/reports/{report_id}/download)
+When a report is generated, the tool result includes a `download_url` field. Always include it as a clickable markdown link exactly as returned: [Download Report PDF](download_url_from_result). Do NOT modify or construct the URL yourself.
 
 Current date: """ + datetime.utcnow().strftime("%Y-%m-%d")
 

@@ -84,6 +84,7 @@ async def generate_report(asset_id: int, period: str = "Q1 2026", report_type: s
             "report_type": report_type,
             "period": period,
             "file_path": report_path,
+            "download_url": f"https://lamina-4ivt.onrender.com/api/reports/{report_id}/download",
             "narrative_preview": narrative[:500] if narrative else "",
         }
     finally:
