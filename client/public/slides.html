@@ -346,12 +346,21 @@
     .slide:last-child { page-break-after: auto; }
     .progress, .counter, .hint { display: none !important; }
     .orb { display: none; }
-    .gradient { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    /* Fix gradient text in print — use solid color instead of background-clip */
+    .gradient, .gradient-blue {
+      background: none !important;
+      -webkit-background-clip: unset !important;
+      background-clip: unset !important;
+      -webkit-text-fill-color: #b47aff !important;
+      color: #b47aff !important;
+      text-decoration: none !important;
+    }
+    h1, h2, h3, a, span, p, div { text-decoration: none !important; }
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 
     /* Bigger fonts for print readability */
     .tag { font-size: 0.8rem; }
-    h1 { font-size: 3.5rem; }
+    h1 { font-size: 3.5rem; white-space: nowrap; }
     h2 { font-size: 2.5rem; }
     .subtitle { font-size: 1.3rem; }
     .card h3, .svc h3, .num-item h3 { font-size: 1.1rem; }
@@ -379,12 +388,7 @@
     <div class="orb orb-purple"></div>
     <div class="orb orb-blue"></div>
     <div class="tag">Hedera &middot; DeFi & Tokenization Track</div>
-    <h1>
-      <span class="gradient">Lamina</span>
-    </h1>
-    <h1 style="font-size:clamp(1.8rem, 3vw, 2.8rem); font-weight:600; color:#6b6b80; margin-top:-0.5rem;">
-      Autonomous RWA Lifecycle Agent
-    </h1>
+    <h1 style="white-space:nowrap;"><span class="gradient">Lamina</span> <span style="font-size:0.55em; font-weight:600; color:#6b6b80;">&mdash; Autonomous RWA Lifecycle Agent</span></h1>
     <p class="subtitle" style="margin-top:1.5rem;">
       One command to tokenize a bond. Zero humans to manage it after.<br>
       AI-powered lifecycle management on Hedera — from issuance to maturity.
@@ -396,6 +400,7 @@
       <span class="tag-pill">HashConnect</span>
       <span class="tag-pill">Claude AI</span>
       <span class="tag-pill">OFAC Screening</span>
+      <span class="tag-pill">HOL Agent Registry</span>
     </div>
   </div>
 
@@ -663,6 +668,9 @@
       <span class="tag-pill">Hedera Testnet</span>
       <span class="tag-pill">HashScan Explorer</span>
       <span class="tag-pill">WalletConnect</span>
+      <span class="tag-pill">HCS-10 OpenConvAI</span>
+      <span class="tag-pill">HCS-11 Agent Profile</span>
+      <span class="tag-pill">HOL Registry: 0.0.8343867</span>
     </div>
   </div>
 
