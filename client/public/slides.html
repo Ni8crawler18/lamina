@@ -329,6 +329,26 @@
     border-radius: 6px;
     border: 1px solid rgba(130,89,239,0.12);
   }
+
+  /* Print / PDF styles */
+  @media print {
+    body { overflow: visible; height: auto; width: auto; background: #06070f; }
+    .deck { position: static; height: auto; }
+    .slide {
+      position: static !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      page-break-after: always;
+      page-break-inside: avoid;
+      min-height: 100vh;
+      padding: 5vh 6vw;
+    }
+    .slide:last-child { page-break-after: auto; }
+    .progress, .counter, .hint { display: none !important; }
+    .orb { display: none; }
+    .gradient { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  }
 </style>
 </head>
 <body>
@@ -360,8 +380,62 @@
     </div>
   </div>
 
-  <!-- SLIDE 2: Problem -->
+  <!-- SLIDE 2: Team & Introduction -->
   <div class="slide" data-slide="1">
+    <div class="tag">Team & Introduction</div>
+    <h2><span class="gradient">Venkatesh</span></h2>
+    <p class="subtitle" style="margin-bottom:2rem;">Founding Engineer (AI) — Bluink Labs</p>
+    <div class="two-col">
+      <div>
+        <div class="num-list">
+          <div class="num-item">
+            <div class="num">01</div>
+            <div>
+              <h3>AI Infrastructure</h3>
+              <p>2 years building data pipelines (Kafka, Spark), LLM integrations (LangChain, LangGraph), MCP servers, and agentic memory systems at Bluink Labs — a DPIIT-recognized startup (DIPP143482).</p>
+            </div>
+          </div>
+          <div class="num-item">
+            <div class="num">02</div>
+            <div>
+              <h3>Hedera Ecosystem</h3>
+              <p>Active contributor since DLT Climate Hackathon and Hello Future Hackathon 1.0. Built standalone projects that contribute to the Hedera ecosystem.</p>
+            </div>
+          </div>
+          <div class="num-item">
+            <div class="num">03</div>
+            <div>
+              <h3>Thesis</h3>
+              <p>AI-driven agents will transform asset management — reducing operational burden on fund managers while enabling efficient, data-driven decision-making. Lamina is built to prove this on Hedera.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:1rem;">
+          <h3>Core Skills</h3>
+          <p style="line-height:2;">
+            <span class="tag-pill">Python</span>
+            <span class="tag-pill">FastAPI</span>
+            <span class="tag-pill">LangChain</span>
+            <span class="tag-pill">LangGraph</span>
+            <span class="tag-pill">MCP</span>
+            <span class="tag-pill">Kafka</span>
+            <span class="tag-pill">Spark</span>
+            <span class="tag-pill">Next.js</span>
+            <span class="tag-pill">Hedera SDK</span>
+          </p>
+        </div>
+        <div class="card" style="background:rgba(130,89,239,0.04); border-color:rgba(130,89,239,0.15);">
+          <h3 style="color:#b47aff;">Bluink Labs</h3>
+          <p>DPIIT-recognized AI startup (DIPP143482). Building intelligent data infrastructure and AI-powered enterprise tools.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: Problem -->
+  <div class="slide" data-slide="2" >
     <div class="tag">The Problem</div>
     <h2>Tokenizing assets is easy.<br><span class="gradient">Managing them is the bottleneck.</span></h2>
     <div class="two-col" style="margin-top:2rem;">
@@ -402,7 +476,7 @@
   </div>
 
   <!-- SLIDE 3: Solution — Pipeline -->
-  <div class="slide" data-slide="2">
+  <div class="slide" data-slide="3">
     <div class="tag">The Solution</div>
     <h2>One command. <span class="gradient">Full autonomy.</span></h2>
     <p class="subtitle">Fund manager says "Tokenize this bond." Lamina handles everything — for the asset's entire life.</p>
@@ -445,7 +519,7 @@
   </div>
 
   <!-- SLIDE 4: Technical Architecture -->
-  <div class="slide" data-slide="3">
+  <div class="slide" data-slide="4">
     <div class="tag">Technical Architecture</div>
     <h2>System <span class="gradient">overview</span></h2>
     <div class="arch">
@@ -525,7 +599,7 @@
   </div>
 
   <!-- SLIDE 5: Hedera Deep Dive -->
-  <div class="slide" data-slide="4">
+  <div class="slide" data-slide="5">
     <div class="tag">Hedera Integration</div>
     <h2>Not a wrapper. <span class="gradient-blue">Native Hedera.</span></h2>
     <p class="subtitle" style="margin-bottom:2rem;">Every operation goes through Hedera's core services. No smart contracts. No bridges.</p>
@@ -574,7 +648,7 @@
   </div>
 
   <!-- SLIDE 6: Demo Flow -->
-  <div class="slide" data-slide="5">
+  <div class="slide" data-slide="6">
     <div class="tag">Live Demo</div>
     <h2>End-to-end in <span class="gradient">3 minutes</span></h2>
     <div class="two-col" style="margin-top:1.5rem;">
@@ -630,7 +704,7 @@
   </div>
 
   <!-- SLIDE 7: Market -->
-  <div class="slide" data-slide="6">
+  <div class="slide" data-slide="7">
     <div class="tag">Market & Vision</div>
     <h2>The <span class="gradient">operating system</span> for tokenized assets</h2>
     <div class="two-col" style="margin-top:2rem;">
@@ -664,8 +738,64 @@
     </div>
   </div>
 
-  <!-- SLIDE 8: Close -->
-  <div class="slide" data-slide="7">
+  <!-- SLIDE 9: Future Roadmap -->
+  <div class="slide" data-slide="8">
+    <div class="tag">Future Roadmap</div>
+    <h2>Key learnings & <span class="gradient">next steps</span></h2>
+    <div class="two-col" style="margin-top:2rem;">
+      <div>
+        <p class="subtitle" style="margin-bottom:1.5rem;">Learnings from building Lamina</p>
+        <div class="card" style="margin-bottom:1rem;">
+          <h3>OFAC Screening Tuning</h3>
+          <p>Fuzzy matching against 18K+ SDN entries requires careful threshold calibration. Started at 85%, moved to exact match for production reliability. Fuzzy matching works best with longer entity names.</p>
+        </div>
+        <div class="card" style="margin-bottom:1rem;">
+          <h3>Hedera SDK Maturity</h3>
+          <p>hiero-sdk-python is new but capable. Transaction freezing patterns, receipt handling, and mirror node queries all work reliably on testnet.</p>
+        </div>
+        <div class="card">
+          <h3>Agent Orchestration</h3>
+          <p>Claude API with tool_use enables powerful NL command parsing. Structured tool definitions map cleanly to Hedera operations.</p>
+        </div>
+      </div>
+      <div>
+        <p class="subtitle" style="margin-bottom:1.5rem;">Next steps if continued</p>
+        <div class="num-list">
+          <div class="num-item">
+            <div class="num" style="background:rgba(16,185,129,0.1); color:#34d399;">01</div>
+            <div>
+              <h3>Stablecoin Settlements</h3>
+              <p>USDC coupon payments and maturity redemptions via HTS token transfers.</p>
+            </div>
+          </div>
+          <div class="num-item">
+            <div class="num" style="background:rgba(59,130,246,0.1); color:#60a5fa;">02</div>
+            <div>
+              <h3>Multi-Chain Expansion</h3>
+              <p>Chain-agnostic core with thin settlement adapters. Ethereum, Avalanche, Polygon, Solana.</p>
+            </div>
+          </div>
+          <div class="num-item">
+            <div class="num" style="background:rgba(168,85,247,0.1); color:#c084fc;">03</div>
+            <div>
+              <h3>HOL Agent Registry</h3>
+              <p>Register Lamina in the Hashgraph Online agent registry for ecosystem discoverability.</p>
+            </div>
+          </div>
+          <div class="num-item">
+            <div class="num" style="background:rgba(245,158,11,0.1); color:#fbbf24;">04</div>
+            <div>
+              <h3>Institutional Pilot</h3>
+              <p>Partner with Archax, Securitize, or Zoniqx for a production pilot on tokenized fund management.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: Close -->
+  <div class="slide" data-slide="9">
     <div class="orb orb-purple"></div>
     <div class="orb orb-blue"></div>
     <div class="tag">Thank You</div>
@@ -698,7 +828,7 @@
 </div>
 
 <div class="progress" id="progress"></div>
-<div class="counter" id="counter">1 / 8</div>
+<div class="counter" id="counter">1 / 10</div>
 <div class="hint"><kbd>&larr;</kbd> <kbd>&rarr;</kbd> to navigate</div>
 
 <script>
