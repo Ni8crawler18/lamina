@@ -1,9 +1,17 @@
-"""Compliance Agent — KYC, whitelist management, transfer validation."""
+"""Compliance Agent — KYC, whitelist management, transfer validation.
+
+Enforces real jurisdiction-based rules:
+- SEC Reg D: US accredited investors only, 365-day lockup, max 2000 holders
+- SEC Reg S: Non-US investors only, 40-day distribution compliance period
+- MiFID II: EU qualified/professional investors, no lockup
+- FCA: UK professional/qualified investors
+- MAS: Singapore accredited/institutional investors
+"""
 
 import json
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from server.database import get_db
 from server.hedera.consensus import log_agent_action
@@ -16,6 +24,9 @@ with open(_jurisdictions_path) as f:
     JURISDICTIONS = json.load(f)
 
 BLOCKED_COUNTRIES = {"IR", "KP", "CU", "SY"}  # OFAC-sanctioned
+
+# Jurisdictions considered "US person" for Reg S purposes
+US_JURISDICTIONS = {"US"}
 
 
 async def configure_compliance(asset_id: int, jurisdiction: str, investor_type: str) -> dict:
@@ -137,8 +148,63 @@ async def validate_transfer(asset_id: int, from_id: str, to_id: str, amount: int
             await _log_blocked_transfer(db, asset, from_id, to_id, amount, reason)
             return False, reason
 
-        # Check max holder limit
-        for reg in rules.get("regulations", {}).values():
+        # ─── Jurisdiction-Specific Enforcement ──────────────
+
+        for reg_key, reg in rules.get("regulations", {}).items():
+
+            # 1. Investor type enforcement
+            #    Reg D: only accredited investors can hold
+            #    MiFID II: only qualified/professional
+            allowed_types = set(reg.get("investor_types", []))
+            if allowed_types:
+                recv_type = receiver.get("investor_type", "")
+                # Treasury accounts are exempt from investor type checks
+                if recv_type != "treasury" and recv_type not in allowed_types:
+                    reason = (
+                        f"{reg.get('name', reg_key)}: investor type '{recv_type}' not allowed. "
+                        f"Required: {', '.join(allowed_types)}"
+                    )
+                    await _log_blocked_transfer(db, asset, from_id, to_id, amount, reason)
+                    return False, reason
+
+            # 2. Lockup period enforcement
+            #    Reg D: 365-day lockup after initial purchase
+            #    Reg S: 40-day distribution compliance period
+            lockup_days = reg.get("lockup_period_days", 0)
+            if lockup_days and lockup_days > 0:
+                # Check when the sender first received tokens
+                sender_created = sender.get("created_at", "")
+                if sender_created:
+                    try:
+                        created_dt = datetime.fromisoformat(sender_created.replace("+00", "+00:00").split("+")[0])
+                        lockup_end = created_dt + timedelta(days=lockup_days)
+                        now = datetime.utcnow()
+                        if now < lockup_end:
+                            days_remaining = (lockup_end - now).days
+                            reason = (
+                                f"{reg.get('name', reg_key)}: {lockup_days}-day lockup period active. "
+                                f"{days_remaining} days remaining until {lockup_end.strftime('%Y-%m-%d')}"
+                            )
+                            # Treasury (operator) is exempt from lockup — they need to distribute tokens
+                            if sender.get("investor_type") != "treasury":
+                                await _log_blocked_transfer(db, asset, from_id, to_id, amount, reason)
+                                return False, reason
+                    except (ValueError, TypeError):
+                        pass  # Can't parse date, skip lockup check
+
+            # 3. Reg S cross-border restriction
+            #    Reg S assets cannot be transferred to US persons
+            if reg_key == "reg_s":
+                recv_jurisdiction = receiver.get("jurisdiction", "")
+                if recv_jurisdiction in US_JURISDICTIONS:
+                    reason = (
+                        f"SEC Regulation S: cannot transfer to US persons. "
+                        f"Receiver jurisdiction '{recv_jurisdiction}' is restricted."
+                    )
+                    await _log_blocked_transfer(db, asset, from_id, to_id, amount, reason)
+                    return False, reason
+
+            # 4. Max holder limit
             max_holders = reg.get("max_holders")
             if max_holders:
                 holder_count_row = await db.execute_fetchone(
@@ -147,7 +213,7 @@ async def validate_transfer(asset_id: int, from_id: str, to_id: str, amount: int
                 )
                 if holder_count_row and holder_count_row["cnt"] >= max_holders:
                     if not receiver["whitelisted"]:
-                        reason = f"Max holder limit ({max_holders}) reached"
+                        reason = f"{reg.get('name', reg_key)}: max holder limit ({max_holders}) reached"
                         await _log_blocked_transfer(db, asset, from_id, to_id, amount, reason)
                         return False, reason
 
@@ -213,12 +279,19 @@ async def add_to_whitelist(
         if jurisdiction in blocked:
             raise ValueError(f"Jurisdiction {jurisdiction} is blocked for this asset")
 
-        # Check investor type is allowed
+        # Check investor type is allowed by jurisdiction regulations
         allowed_types = set()
+        reg_names = []
         for reg in rules.get("regulations", {}).values():
-            allowed_types.update(reg.get("investor_types", []))
+            types = reg.get("investor_types", [])
+            allowed_types.update(types)
+            if types:
+                reg_names.append(reg.get("name", ""))
         if investor_type not in allowed_types and allowed_types:
-            raise ValueError(f"Investor type '{investor_type}' not allowed. Allowed: {allowed_types}")
+            raise ValueError(
+                f"Investor type '{investor_type}' not allowed under {', '.join(reg_names)}. "
+                f"Required: {', '.join(sorted(allowed_types))}"
+            )
 
         # OFAC sanctions screening
         ofac_status = "pending"
@@ -433,6 +506,18 @@ async def get_compliance_status(asset_id: int) -> dict:
             (asset_id,)
         )
 
+        # Get active regulations for this jurisdiction
+        rules = JURISDICTIONS.get(asset["jurisdiction"], JURISDICTIONS.get("US"))
+        regulations = {}
+        for reg_key, reg in rules.get("regulations", {}).items():
+            regulations[reg_key] = {
+                "name": reg.get("name", reg_key),
+                "investor_types": reg.get("investor_types", []),
+                "lockup_days": reg.get("lockup_period_days", 0),
+                "max_holders": reg.get("max_holders"),
+                "enforced": True,
+            }
+
         return {
             "asset_id": asset_id,
             "jurisdiction": asset["jurisdiction"],
@@ -443,6 +528,8 @@ async def get_compliance_status(asset_id: int) -> dict:
             "ofac_screenings": ofac_screened["cnt"] if ofac_screened else 0,
             "ofac_flags": ofac_flagged["cnt"] if ofac_flagged else 0,
             "jurisdiction_breakdown": {row["jurisdiction"]: row["cnt"] for row in jurisdictions},
+            "blocked_jurisdictions": rules.get("blocked_jurisdictions", []),
+            "regulations": regulations,
             "status": "compliant",
         }
     finally:
