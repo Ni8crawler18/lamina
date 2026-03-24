@@ -4,6 +4,7 @@ uvicorn[standard]
 pydantic
 pydantic-settings
 aiosqlite
+asyncpg
 aiohttp
 apscheduler
 anthropic
