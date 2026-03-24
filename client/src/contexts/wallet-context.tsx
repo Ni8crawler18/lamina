@@ -68,6 +68,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           setAddress(data.accountIds[0]);
           setConnectionMode("hashpack");
           setIsConnecting(false);
+          // Close the modal after successful pairing
+          try { hc.closePairingModal?.(); } catch { /* ignore */ }
         }
       });
 
@@ -76,10 +78,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         setConnectionMode(null);
       });
 
-      // Init with timeout — HashConnect can hang if WalletConnect relay is unreachable
+      // Init with timeout
       await Promise.race([
         hc.init(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error("HashConnect init timeout")), 8000))
+        new Promise((_, reject) => setTimeout(() => reject(new Error("HashConnect init timeout")), 10000))
       ]);
       hashconnectRef.current = hc;
       return hc;
@@ -126,9 +128,21 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     try {
       const hc = await getHashConnect();
       if (hc) {
-        hc.openPairingModal();
+        // Try direct extension connection first, fall back to pairing modal
+        try {
+          await hc.connectToLocalWallet();
+        } catch {
+          // Extension not available — show WalletConnect pairing modal
+          hc.openPairingModal();
+        }
+        // Auto-cancel connecting state after 30s if no pairing happens
+        setTimeout(() => {
+          setIsConnecting((prev) => {
+            if (prev) console.warn("Pairing timeout — use Demo Mode");
+            return false;
+          });
+        }, 30000);
       } else {
-        // HashConnect failed to init — fall back to demo
         console.warn("HashConnect unavailable, falling back to demo mode");
         setAddress("0.0.8003096");
         setConnectionMode("demo");
