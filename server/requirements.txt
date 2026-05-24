@@ -1,4 +1,4 @@
-# Lamina server dependencies
+# Lamina server dependencies — Robinhood Chain / Arbitrum branch
 fastapi
 uvicorn[standard]
 pydantic
@@ -13,4 +13,8 @@ jinja2
 python-dotenv
 python-multipart
 rapidfuzz
-hiero-sdk-python
+
+# EVM / Robinhood Chain (replaces hiero-sdk-python)
+web3>=6.0.0
+eth-account>=0.10.0
+py-solc-x           # compile Solidity locally (used by deploy script)

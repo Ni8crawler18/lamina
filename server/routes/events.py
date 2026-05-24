@@ -36,7 +36,7 @@ async def get_audit_log(asset_id: int):
         if not row or not row["topic_id"]:
             raise HTTPException(status_code=404, detail="Asset or topic not found")
 
-        from server.hedera.consensus import get_topic_messages
+        from server.arbitrum.audit import get_topic_messages
         messages = await get_topic_messages(row["topic_id"])
 
         local_rows = await db.execute_fetchall(

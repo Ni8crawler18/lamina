@@ -35,11 +35,11 @@ async def lifespan(app: FastAPI):
     logger.info("Database initialized")
 
     try:
-        from server.hedera.client import get_hedera_client
-        client = get_hedera_client()
-        logger.info(f"Hedera client connected: operator={client.operator_account_id}")
+        from server.arbitrum.client import get_web3, get_operator_address
+        w3 = get_web3()
+        logger.info(f"Robinhood Chain connected: chain_id={w3.eth.chain_id}  operator={get_operator_address()}")
     except Exception as e:
-        logger.warning(f"Hedera client init failed (will retry on first use): {e}")
+        logger.warning(f"Robinhood Chain client init failed (will retry on first use): {e}")
 
     # Load OFAC SDN list
     try:
@@ -68,7 +68,7 @@ settings = get_settings()
 
 app = FastAPI(
     title="Lamina",
-    description="Autonomous RWA Lifecycle Agent on Hedera",
+    description="Autonomous RWA Lifecycle Agent on Robinhood Chain / Arbitrum",
     version="0.1.0",
     lifespan=lifespan,
 )

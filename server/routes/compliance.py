@@ -45,9 +45,9 @@ async def validate_transfer(asset_id: int, from_id: str, to_id: str, amount: int
 @router.post("/purchase")
 async def purchase_tokens(asset_id: int, account_id: str, amount: int):
     from server.agents.compliance import validate_transfer as check_transfer
-    from server.hedera.token import transfer_tokens
-    from server.hedera.consensus import log_agent_action
-    from server.hedera.client import get_operator_account_id
+    from server.arbitrum.token import transfer_tokens
+    from server.arbitrum.audit import log_agent_action
+    from server.arbitrum.client import get_operator_address as get_operator_account_id
 
     db = await get_db()
     try:

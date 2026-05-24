@@ -5,9 +5,9 @@ import logging
 from datetime import datetime, timedelta
 
 from server.database import get_db
-from server.hedera.token import create_token, mint_tokens, burn_tokens, transfer_tokens
-from server.hedera.consensus import create_topic, log_agent_action
-from server.hedera.client import get_operator_account_id
+from server.arbitrum.token import create_token, mint_tokens, burn_tokens, transfer_tokens
+from server.arbitrum.audit import create_topic, log_agent_action
+from server.arbitrum.client import get_operator_address as get_operator_account_id
 
 logger = logging.getLogger(__name__)
 
@@ -25,18 +25,18 @@ async def issue_asset(
 ) -> dict:
     """Issue a new tokenized asset: create HTS token, HCS topic, store in DB, schedule events."""
 
-    # 1. Create HCS topic for audit logging
-    topic_id = create_topic(memo=f"Lamina audit: {name} ({symbol})")
-    logger.info(f"Created audit topic: {topic_id}")
-
-    # 2. Create HTS token
-    token_id = create_token(
+    # 1 + 2. Deploy token + audit topic atomically via LaminaFactory
+    #         (on EVM, create_token returns both token_address and topic_id
+    #          in a single transaction — no separate create_topic call needed)
+    token_id, topic_id = create_token(
         name=name,
         symbol=symbol,
         decimals=decimals,
         initial_supply=total_supply,
+        asset_type=asset_type,
+        jurisdiction=jurisdiction,
     )
-    logger.info(f"Created token: {token_id}")
+    logger.info(f"Deployed token: {token_id}  topic: {topic_id}")
 
     # 3. Log issuance to HCS
     log_agent_action(
@@ -150,7 +150,7 @@ async def _schedule_maturity(db, asset_id: int, maturity_date: str | None):
 
 async def distribute_coupon(asset_id: int) -> dict:
     """Distribute coupon payment as real HBAR transfers to all token holders proportionally."""
-    from server.hedera.token import transfer_hbar
+    from server.arbitrum.token import transfer_hbar
 
     db = await get_db()
     try:
@@ -318,7 +318,7 @@ async def update_nav_from_oracle(asset_id: int) -> dict:
 
 async def execute_maturity(asset_id: int) -> dict:
     """Execute maturity: wipe investor tokens, return HBAR principal, burn treasury tokens."""
-    from server.hedera.token import wipe_tokens, transfer_hbar
+    from server.arbitrum.token import wipe_tokens, transfer_hbar
 
     db = await get_db()
     try:

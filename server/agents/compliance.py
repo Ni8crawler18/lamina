@@ -14,7 +14,7 @@ import os
 from datetime import datetime, timedelta
 
 from server.database import get_db
-from server.hedera.consensus import log_agent_action
+from server.arbitrum.audit import log_agent_action
 
 logger = logging.getLogger(__name__)
 
@@ -258,7 +258,7 @@ async def add_to_whitelist(
     name: str | None = None,
 ) -> dict:
     """Add an investor to the whitelist. Creates real Hedera account, associates token, grants on-chain KYC."""
-    from server.hedera.token import (
+    from server.arbitrum.token import (
         create_account as hedera_create_account,
         associate_token, grant_kyc,
     )

@@ -36,7 +36,7 @@ TOOLS = [
             "type": "object",
             "properties": {
                 "asset_id": {"type": "integer", "description": "Asset ID"},
-                "account_id": {"type": "string", "description": "Hedera account ID (e.g. '0.0.1234'). Leave empty to auto-create a new account."},
+                "account_id": {"type": "string", "description": "EVM wallet address (e.g. '0xAbc...'). Leave empty to auto-create a new wallet."},
                 "name": {"type": "string", "description": "Investor's full legal name (used for OFAC sanctions screening)"},
                 "jurisdiction": {"type": "string", "description": "Investor's jurisdiction: US, EU, UK, SG"},
                 "investor_type": {"type": "string", "description": "Investor type: accredited, qualified, professional"},
@@ -115,7 +115,7 @@ TOOLS = [
             "type": "object",
             "properties": {
                 "asset_id": {"type": "integer", "description": "Asset ID"},
-                "account_id": {"type": "string", "description": "Buyer's Hedera account ID (e.g. '0.0.1234')"},
+                "account_id": {"type": "string", "description": "Buyer's EVM wallet address (e.g. '0xAbc...')"},
                 "amount": {"type": "integer", "description": "Number of tokens to purchase"},
             },
             "required": ["asset_id", "account_id", "amount"],
@@ -160,17 +160,17 @@ TOOLS = [
     },
 ]
 
-SYSTEM_PROMPT = """You are Lamina, an autonomous RWA (Real-World Asset) lifecycle management agent on Hedera.
+SYSTEM_PROMPT = """You are Lamina, an autonomous RWA (Real-World Asset) lifecycle management agent on Robinhood Chain — an Arbitrum L2 built specifically for tokenized real-world assets.
 
-You help fund managers tokenize and manage real-world assets like bonds, equities, and funds. You can:
-1. Tokenize new assets (create HTS tokens with compliance)
+You help fund managers tokenize and manage real-world assets like bonds, equities, and funds on Robinhood Chain. You can:
+1. Tokenize new assets (deploy ERC-3643-style compliance tokens)
 2. Manage KYC whitelists (add/remove investors, with OFAC sanctions screening)
-3. Distribute coupon payments to holders
-4. Generate compliance reports
-5. Execute maturity settlement
+3. Distribute coupon payments in USDC to holders
+4. Generate compliance reports (PDF with audit trail)
+5. Execute maturity settlement (force-burn tokens, return principal in USDC)
 6. Show asset details, holders, and compliance status
-7. Purchase/transfer tokens to investor accounts
-8. Validate transfers for compliance
+7. Purchase/transfer tokens to investor wallet addresses
+8. Validate transfers for compliance (KYC, jurisdiction, OFAC)
 9. Update asset NAV (Net Asset Value)
 10. Screen names/addresses against the OFAC SDN sanctions list
 
@@ -181,21 +181,20 @@ When a user asks to tokenize an asset, extract the details and use the issue_ass
 - "US accredited investors only" → jurisdiction=US, investor_type=accredited
 
 When a user asks to purchase tokens, use the purchase_tokens tool. For example:
-- "Buy 500 tokens for 0.0.12345" → purchase_tokens with the account_id and amount
+- "Buy 500 tokens for 0xAbc123..." → purchase_tokens with the account_id and amount
 
 Always confirm actions with clear summaries. Be concise and professional.
 If you need an asset_id and the user hasn't specified one, use list_assets first to find it.
 
 CRITICAL RULES FOR EVERY RESPONSE:
 
-1. HASHSCAN LINKS: After EVERY tool call that returns a tx_id, token_id, topic_id, or account_id, you MUST include clickable HashScan links. Read the FULL JSON result carefully — tx_id fields are always present in coupon distribution, purchase, and issuance results.
-   - Transaction: [View on HashScan](https://hashscan.io/testnet/transaction/{tx_id})
-   - Token: [View Token](https://hashscan.io/testnet/token/{token_id})
-   - Account: [View Account](https://hashscan.io/testnet/account/{account_id})
-   - Topic: [View Topic](https://hashscan.io/testnet/topic/{topic_id})
+1. BLOCK EXPLORER LINKS: After EVERY tool call that returns a tx_id, token_address, topic_id, or account address, you MUST include clickable Robinhood Chain Blockscout links. Read the FULL JSON result carefully — tx_id fields are always present in coupon distribution, purchase, and issuance results.
+   - Transaction: [View on Blockscout](https://explorer.testnet.chain.robinhood.com/tx/{tx_id})
+   - Token contract: [View Token](https://explorer.testnet.chain.robinhood.com/address/{token_address})
+   - Account: [View Account](https://explorer.testnet.chain.robinhood.com/address/{account_address})
 
-2. COUPON DISTRIBUTION: The result contains a "payments" array. Each payment has a "tx_id" field. For EACH payment, include a HashScan transaction link. Example format:
-   - Brightwood Capital: 106 paid — [View Transaction](https://hashscan.io/testnet/transaction/0.0.8003096@1234567890.123456789)
+2. COUPON DISTRIBUTION: The result contains a "payments" array. Each payment has a "tx_id" field. For EACH payment, include a Blockscout transaction link. Example format:
+   - Investor 0xAbc...: 45 USDC paid — [View Transaction](https://explorer.testnet.chain.robinhood.com/tx/0x...)
 
 3. REPORT DOWNLOAD: The result includes a "download_url" field. Always include it: [Download Report PDF](download_url_value)
 
@@ -359,9 +358,9 @@ async def _execute_tool(tool_name: str, tool_input: dict) -> dict:
 
     elif tool_name == "purchase_tokens":
         from server.agents.compliance import validate_transfer as check_transfer
-        from server.hedera.token import transfer_tokens
-        from server.hedera.consensus import log_agent_action as log_action
-        from server.hedera.client import get_operator_account_id
+        from server.arbitrum.token import transfer_tokens
+        from server.arbitrum.audit import log_agent_action as log_action
+        from server.arbitrum.client import get_operator_address as get_operator_account_id
 
         asset_id = tool_input["asset_id"]
         account_id = tool_input["account_id"]

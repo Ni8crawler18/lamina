@@ -7,7 +7,7 @@ import re
 from datetime import datetime
 
 from server.database import get_db
-from server.hedera.consensus import get_topic_messages, log_agent_action
+from server.arbitrum.audit import get_topic_messages, log_agent_action
 from server.config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -256,7 +256,7 @@ During {period}, the Lamina autonomous agent performed {len([e for e in events i
 All {whitelisted} whitelisted holders passed KYC/AML verification. Transfer validation was enforced on every token movement, with jurisdiction and investor type checks performed automatically.
 
 3. On-Chain Audit Trail
-Every agent action was logged to Hedera Consensus Service (Topic: {asset.get('topic_id', 'N/A')}), providing immutable, tamper-proof records of all operations. These records can be independently verified on HashScan.
+Every agent action was logged to the AuditLog contract on Robinhood Chain (Topic: {asset.get('topic_id', 'N/A')}), providing immutable, tamper-proof records of all operations. These records can be independently verified on the Robinhood Chain block explorer.
 
 4. Recommendations
 Continue monitoring holder compliance status and ensure all scheduled coupon payments execute on time."""
@@ -303,8 +303,8 @@ async def _generate_pdf_report(
     filepath = os.path.join(REPORTS_DIR, filename)
 
     try:
-        from server.hedera.client import get_operator_account_id
-        operator_id = str(get_operator_account_id())
+        from server.arbitrum.client import get_operator_address
+        operator_id = get_operator_address()
     except Exception:
         operator_id = "N/A"
 
