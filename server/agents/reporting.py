@@ -40,7 +40,7 @@ async def generate_report(asset_id: int, period: str = "Q1 2026", report_type: s
         if asset["topic_id"]:
             hcs_messages = await get_topic_messages(asset["topic_id"])
 
-        # Generate report narrative using Claude API
+        # Generate report narrative using the AI agent
         narrative = await _generate_report_narrative(asset, holders, events, audit_entries, period, report_type)
 
         # Generate PDF
@@ -92,7 +92,7 @@ async def generate_report(asset_id: int, period: str = "Q1 2026", report_type: s
 
 
 async def _generate_report_narrative(asset, holders, events, audit_entries, period: str, report_type: str = "compliance") -> str:
-    """Use Claude API to generate a report narrative from on-chain data."""
+    """Use the AI agent to generate a report narrative from on-chain data."""
     settings = get_settings()
 
     if not settings.anthropic_api_key:
@@ -189,7 +189,7 @@ Use plain text only. Do NOT use markdown formatting like #, ##, **, *, or | tabl
         raw = message.content[0].text
         return _strip_markdown(raw)
     except Exception as e:
-        logger.error(f"Claude API report generation failed: {e}")
+        logger.error(f"AI report generation failed: {e}")
         return _fallback_narrative(asset, holders, events, period, report_type)
 
 

@@ -1,4 +1,4 @@
-"""Chat Agent — Natural language interface powered by Claude API with tool use."""
+"""Chat Agent — Natural language interface with agentic tool use."""
 
 import json
 import logging
@@ -9,7 +9,7 @@ from server.database import get_db
 
 logger = logging.getLogger(__name__)
 
-# Tool definitions for Claude
+# Tool definitions for the AI agent
 TOOLS = [
     {
         "name": "issue_asset",
@@ -204,7 +204,7 @@ Current date: """ + datetime.utcnow().strftime("%Y-%m-%d")
 
 
 async def process_message(message: str, history: list = None) -> dict:
-    """Process a natural language message through Claude with tool use."""
+    """Process a natural language message through the AI agent with tool use."""
     settings = get_settings()
 
     if not settings.anthropic_api_key:
@@ -228,7 +228,7 @@ async def process_message(message: str, history: list = None) -> dict:
                 messages.append({"role": role, "content": content})
     messages.append({"role": "user", "content": message})
 
-    # Agentic loop: keep processing until Claude gives a final text response
+    # Agentic loop: keep processing until the agent gives a final text response
     while True:
         response = client.messages.create(
             model="claude-haiku-4-5-20251001",
@@ -238,7 +238,7 @@ async def process_message(message: str, history: list = None) -> dict:
             messages=messages,
         )
 
-        # Check if Claude wants to use tools
+        # Check if the agent wants to use tools
         if response.stop_reason == "tool_use":
             # Process all tool calls
             tool_results = []
@@ -280,7 +280,7 @@ async def process_message(message: str, history: list = None) -> dict:
             messages.append({"role": "assistant", "content": response.content})
             messages.append({"role": "user", "content": tool_results})
         else:
-            # Claude gave a final text response
+            # Agent gave a final text response
             text_response = ""
             for block in response.content:
                 if hasattr(block, "text"):

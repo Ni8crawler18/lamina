@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     # Block explorer base URL (for HashScan-equivalent links)
     explorer_url:        str = "https://explorer.testnet.chain.robinhood.com"
 
-    # ─── Anthropic ───────────────────────────────────────────────────────────
+    # ─── AI Agent ────────────────────────────────────────────────────────────
     anthropic_api_key:   str = ""
 
     # ─── Server ──────────────────────────────────────────────────────────────
