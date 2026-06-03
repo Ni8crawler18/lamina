@@ -110,6 +110,20 @@ class Report(Base):
     generated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
+class McpAudit(Base):
+    """Audit trail of every MCP tool call (no sensitive args stored — tool + outcome only)."""
+
+    __tablename__ = "mcp_audit"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    ts: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    scope: Mapped[str | None] = mapped_column(String(16), nullable=True)   # read | admin
+    tool: Mapped[str] = mapped_column(String(64))
+    status: Mapped[str] = mapped_column(String(16))                        # ok | error | denied
+    client_ip: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    error: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+
 class ScreeningResult(Base):
     __tablename__ = "screening_results"
 

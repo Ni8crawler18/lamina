@@ -37,6 +37,14 @@ class Settings(BaseSettings):
     # -- AI -------------------------------------------------------------------
     anthropic_api_key: str = ""
 
+    # -- MCP server (off by default; handles critical ops, so guard carefully) -
+    mcp_enabled: bool = False           # mount /mcp only when explicitly on
+    mcp_allow_writes: bool = False      # value-moving tools require this AND admin scope
+    mcp_read_token: str = ""            # bearer token → read scope
+    mcp_admin_token: str = ""           # bearer token → admin scope (distinct from read)
+    mcp_allowed_ips: str = ""           # optional CSV client-IP allowlist
+    mcp_rate_limit_per_min: int = 60    # per-token sliding-window cap
+
     # -- server ---------------------------------------------------------------
     backend_host: str = "0.0.0.0"
     backend_port: int = 8000

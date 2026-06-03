@@ -51,6 +51,16 @@ async def lifespan(app: FastAPI):
 
     await OFACScreener.get_instance().load()  # cache-first; fast unless stale
     start_scheduler()
+
+    if settings.mcp_enabled:
+        from app.mcp.server import get_session_manager
+        logger.info("MCP server enabled at /mcp (writes=%s)", settings.mcp_allow_writes)
+        async with get_session_manager().run():
+            logger.info("Lamina ready")
+            yield
+            stop_scheduler()
+            return
+
     logger.info("Lamina ready")
     yield
     stop_scheduler()
@@ -69,6 +79,11 @@ app.add_middleware(
 
 for r in (chains, assets, compliance, payouts, lifecycle, events, reports, ofac, chat):
     app.include_router(r.router)
+
+# MCP server (authed) — mounted only when explicitly enabled.
+if get_settings().mcp_enabled:
+    from app.mcp.server import mcp_asgi_app
+    app.mount("/mcp", mcp_asgi_app())
 
 
 @app.get("/health", tags=["health"])
