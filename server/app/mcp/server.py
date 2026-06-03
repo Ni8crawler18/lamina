@@ -21,16 +21,9 @@ from app.config import get_settings
 from app.database import get_sessionmaker
 from app.mcp.auth import McpAuthASGI, current_client, current_scope
 from app.models.orm import McpAudit
-from app.services.ai.tools import TOOLS, execute_tool
+from app.services.ai.tools import TOOLS, execute_tool, is_write_tool as _is_write
 
 logger = logging.getLogger(__name__)
-
-# Read-only tools (data exposure only). Everything else in TOOLS moves value/state.
-READ_TOOLS = {"list_chains", "list_assets", "show_holders", "show_compliance", "screen_ofac"}
-
-
-def _is_write(name: str) -> bool:
-    return name not in READ_TOOLS
 
 
 def _visible_tools() -> list[dict]:

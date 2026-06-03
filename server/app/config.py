@@ -45,6 +45,11 @@ class Settings(BaseSettings):
     mcp_allowed_ips: str = ""           # optional CSV client-IP allowlist
     mcp_rate_limit_per_min: int = 60    # per-token sliding-window cap
 
+    # -- Messaging channels (off by default; same care — they move value) ------
+    channels_enabled: bool = False
+    telegram_bot_token: str = ""
+    telegram_allowed_chat_ids: str = ""  # CSV of allowed Telegram chat IDs
+
     # -- server ---------------------------------------------------------------
     backend_host: str = "0.0.0.0"
     backend_port: int = 8000

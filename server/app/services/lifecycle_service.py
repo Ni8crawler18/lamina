@@ -104,7 +104,7 @@ class LifecycleService:
             {"tokens_wiped": total_wiped, "tokens_burned": burned, "redemptions": len(redemptions)},
         )
         return {
-            "asset_id": asset_id, "chain": asset.chain, "status": "matured",
-            "tokens_wiped": total_wiped, "tokens_burned": burned,
+            "asset_id": asset_id, "chain": asset.chain, "token_id": asset.token_id,
+            "status": "matured", "tokens_wiped": total_wiped, "tokens_burned": burned,
             "burn_result": burn_result, "redemptions": redemptions,
         }

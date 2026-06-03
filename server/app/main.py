@@ -52,17 +52,21 @@ async def lifespan(app: FastAPI):
     await OFACScreener.get_instance().load()  # cache-first; fast unless stale
     start_scheduler()
 
-    if settings.mcp_enabled:
-        from app.mcp.server import get_session_manager
-        logger.info("MCP server enabled at /mcp (writes=%s)", settings.mcp_allow_writes)
-        async with get_session_manager().run():
-            logger.info("Lamina ready")
-            yield
-            stop_scheduler()
-            return
-
-    logger.info("Lamina ready")
-    yield
+    from contextlib import AsyncExitStack
+    async with AsyncExitStack() as stack:
+        if settings.mcp_enabled:
+            from app.mcp.server import get_session_manager
+            await stack.enter_async_context(get_session_manager().run())
+            logger.info("MCP server enabled at /mcp (writes=%s)", settings.mcp_allow_writes)
+        if settings.channels_enabled:
+            from app.channels import telegram
+            telegram.start()
+            logger.info("Messaging channels enabled (telegram)")
+        logger.info("Lamina ready")
+        yield
+        if settings.channels_enabled:
+            from app.channels import telegram
+            await telegram.stop()
     stop_scheduler()
 
 

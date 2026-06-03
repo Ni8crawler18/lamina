@@ -6,6 +6,8 @@ explorer_url so the agent can build links.
 
 from __future__ import annotations
 
+import contextvars
+
 from app.chains.registry import get_registry
 from app.integrations.ofac.sdn import OFACScreener
 from app.repositories.assets import AssetRepository
@@ -145,8 +147,24 @@ def _asset_dict(a) -> dict:
             "explorer_url": _explorer(a.chain)}
 
 
+# Read-only tools (data exposure only); everything else moves value/state.
+READ_TOOLS = {"list_chains", "list_assets", "show_holders", "show_compliance", "screen_ofac"}
+
+# When set, write tools are NOT executed — they return a confirmation stub instead.
+# Channels (Telegram/WhatsApp) use this to require an explicit "YES" before moving value.
+propose_writes: contextvars.ContextVar[bool] = contextvars.ContextVar("propose_writes", default=False)
+
+
+def is_write_tool(name: str) -> bool:
+    return name not in READ_TOOLS
+
+
 async def execute_tool(session, name: str, args: dict) -> dict:
     """Dispatch a tool call to the right service. Returns a JSON-serializable dict."""
+    if propose_writes.get() and is_write_tool(name):
+        return {"confirmation_required": True, "tool": name, "args": args,
+                "message": f"This will run '{name}', which moves value/changes state. Confirm to proceed."}
+
     if name == "list_chains":
         return {"chains": [
             {"slug": c.slug, "name": c.name, "native_symbol": c.native_symbol,
