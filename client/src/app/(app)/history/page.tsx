@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getAssets, getAuditLog } from "@/lib/api";
+import { useChain } from "@/contexts/chain-context";
 import AuditTimeline from "@/components/history/audit-timeline";
 
 interface Asset {
@@ -24,6 +25,7 @@ interface LogEntry {
   details?: string;
   created_at?: string;
   topic_id?: string;
+  asset_id?: number;
 }
 
 export default function HistoryPage() {
@@ -33,11 +35,12 @@ export default function HistoryPage() {
   const [agentFilter, setAgentFilter] = useState("all");
   const [topicId, setTopicId] = useState<string | undefined>();
   const [loading, setLoading] = useState(true);
+  const { active } = useChain();
 
   useEffect(() => {
     const load = async () => {
       try {
-        const data = await getAssets();
+        const data = await getAssets(active.slug);
         setAssets(data);
 
         // Load all audit logs
@@ -45,9 +48,26 @@ export default function HistoryPage() {
         for (const asset of data) {
           try {
             const audit = await getAuditLog(asset.id);
-            const hcs = (audit.hcs_messages || []).map((m: LogEntry) => ({ ...m, topic_id: audit.topic_id }));
-            const local = audit.local_log || [];
-            entries.push(...hcs, ...local);
+            // backend returns { topic_id, chain, entries: [{sequence, timestamp, agent, action, details}] }
+            const mapped: LogEntry[] = (audit.entries || []).map(
+              (e: { sequence?: number; timestamp?: string; agent?: string; action?: string; details?: Record<string, unknown> }) => ({
+                sequence_number: e.sequence,
+                consensus_timestamp: e.timestamp,
+                topic_id: audit.topic_id,
+                asset_id: asset.id,
+                content: {
+                  agent: e.agent,
+                  action: e.action,
+                  timestamp: e.timestamp,
+                  // entries double-wrap details; unwrap the inner payload when present
+                  details:
+                    e.details && typeof e.details === "object" && "details" in e.details
+                      ? (e.details.details as Record<string, unknown>)
+                      : ((e.details as Record<string, unknown>) || {}),
+                },
+              })
+            );
+            entries.push(...mapped);
             if (audit.topic_id && !topicId) setTopicId(audit.topic_id);
           } catch {
             // Skip
@@ -68,9 +88,10 @@ export default function HistoryPage() {
     };
     load();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [active.slug]);
 
   const filtered = allEntries.filter((entry) => {
+    if (selectedAssetId != null && entry.asset_id !== selectedAssetId) return false;
     const agent = entry.content?.agent || entry.agent || "unknown";
     if (agentFilter !== "all" && agent !== agentFilter) return false;
     return true;
@@ -89,7 +110,8 @@ export default function HistoryPage() {
       <div className="mb-8">
         <h1 className="text-[22px] font-semibold tracking-tight">Audit History</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
-          Immutable action log — verified on Hedera Consensus Service
+          Immutable action log — every agent action recorded on-chain ·{" "}
+          <span className="text-foreground">{active.name}</span>
         </p>
       </div>
 
@@ -127,7 +149,7 @@ export default function HistoryPage() {
         </span>
       </div>
 
-      <AuditTimeline entries={filtered} topicId={topicId} />
+      <AuditTimeline entries={filtered} topicId={topicId} chain={active} />
     </div>
   );
 }

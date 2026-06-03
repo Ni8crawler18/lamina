@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getAssets, getHolders, getEvents } from "@/lib/api";
+import { useChain } from "@/contexts/chain-context";
 import CouponDistributor from "@/components/payouts/coupon-distributor";
 import MaturityCard from "@/components/payouts/maturity-card";
 import { Badge } from "@/components/ui/badge";
@@ -30,13 +31,14 @@ export default function PayoutsPage() {
   const [holderCount, setHolderCount] = useState(0);
   const [payoutHistory, setPayoutHistory] = useState<PayoutEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const { active } = useChain();
 
   useEffect(() => {
     const load = async () => {
       try {
-        const data = await getAssets();
+        const data = await getAssets(active.slug);
         setAssets(data);
-        if (data.length > 0) setSelectedAsset(data[0]);
+        setSelectedAsset(data.length > 0 ? data[0] : null);
       } catch (err) {
         console.error("Failed to load assets:", err);
       } finally {
@@ -44,7 +46,7 @@ export default function PayoutsPage() {
       }
     };
     load();
-  }, []);
+  }, [active.slug]);
 
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -122,7 +124,7 @@ export default function PayoutsPage() {
               refreshDetails();
             }} />
             <MaturityCard asset={selectedAsset} onComplete={() => {
-              getAssets().then(setAssets);
+              getAssets(active.slug).then(setAssets);
               refreshDetails();
             }} />
           </div>

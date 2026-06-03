@@ -43,6 +43,14 @@ const config: Config = {
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
+  			violet: 'hsl(var(--violet))',
+  			indigo: 'hsl(var(--indigo))',
+  			cyan: 'hsl(var(--cyan))',
+  			ink: {
+  				0: 'hsl(var(--ink-0))',
+  				1: 'hsl(var(--ink-1))',
+  				2: 'hsl(var(--ink-2))',
+  			},
   			chart: {
   				'1': 'hsl(var(--chart-1))',
   				'2': 'hsl(var(--chart-2))',
@@ -50,6 +58,11 @@ const config: Config = {
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
   			}
+  		},
+  		fontFamily: {
+  			sans: ['"Hanken Grotesk"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+  			mono: ['"Hanken Grotesk"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+  			display: ['"Hanken Grotesk"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

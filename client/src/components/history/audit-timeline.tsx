@@ -1,6 +1,7 @@
 "use client";
 
 import { ExternalLink } from "lucide-react";
+import type { ChainBrand } from "@/lib/chains";
 
 interface LogEntry {
   sequence_number?: number;
@@ -32,13 +33,37 @@ const agentBadgeColors: Record<string, string> = {
   chat: "text-emerald-400 bg-emerald-400/10",
 };
 
+/** Best on-chain explorer link for an entry: prefer a tx, then the token, then an account. */
+function explorerLink(
+  chain: ChainBrand | undefined,
+  details: Record<string, unknown>,
+): { label: string; url: string } | null {
+  if (!chain?.explorer || !details) return null;
+  const evm = chain.family !== "hedera";
+  const str = (v: unknown) => (typeof v === "string" && v && v !== "-" ? v : undefined);
+
+  const tx = str(details.tx) || str(details.tx_hash) || str(details.transaction_id);
+  if (tx) {
+    const h = evm ? (tx.startsWith("0x") ? tx : `0x${tx}`) : tx;
+    return { label: "transaction", url: evm ? `${chain.explorer}/tx/${h}` : `${chain.explorer}/transaction/${tx}` };
+  }
+  const token = str(details.token_ref) || str(details.token_id);
+  if (token) return { label: "token", url: evm ? `${chain.explorer}/address/${token}` : `${chain.explorer}/token/${token}` };
+  const acct = str(details.account_id) || str(details.buyer) || str(details.to);
+  if (acct) return { label: "account", url: evm ? `${chain.explorer}/address/${acct}` : `${chain.explorer}/account/${acct}` };
+  return null;
+}
+
 export default function AuditTimeline({
   entries,
   topicId,
+  chain,
 }: {
   entries: LogEntry[];
   topicId?: string;
+  chain?: ChainBrand;
 }) {
+  const isHedera = chain?.family === "hedera";
   if (entries.length === 0) {
     return (
       <div className="rounded-xl border border-border/40 bg-card/20 p-12 text-center">
@@ -58,8 +83,8 @@ export default function AuditTimeline({
           const action = entry.content?.action || entry.action || "unknown";
           const timestamp = entry.content?.timestamp || entry.consensus_timestamp || entry.created_at || "";
           const details = entry.content?.details || (entry.details ? (() => { try { return JSON.parse(entry.details as string); } catch { return {}; } })() : {});
-          const isHCS = entry.sequence_number != null;
           const entryTopicId = entry.topic_id || topicId;
+          const link = explorerLink(chain, details as Record<string, unknown>);
 
           return (
             <div key={i} className="relative flex gap-4 px-2 py-3 rounded-lg hover:bg-card/30 transition-colors group">
@@ -88,26 +113,27 @@ export default function AuditTimeline({
                     {timestamp ? new Date(timestamp).toLocaleString() : ""}
                   </span>
 
-                  {isHCS && (
-                    <span className="inline-flex items-center gap-1 text-[10px] text-primary/70 bg-primary/5 px-1.5 py-0.5 rounded">
-                      <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      HCS #{entry.sequence_number}
-                    </span>
-                  )}
-
-                  {isHCS && entryTopicId && (
+                  {link ? (
                     <a
-                      href={`https://hashscan.io/testnet/topic/${entryTopicId}`}
+                      href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[10px] text-muted-foreground/40 hover:text-primary/70 transition-colors opacity-0 group-hover:opacity-100 inline-flex items-center gap-0.5"
+                      className="text-[10px] text-primary/70 hover:text-primary transition-colors inline-flex items-center gap-0.5"
                     >
                       <ExternalLink className="w-2.5 h-2.5" />
-                      HashScan
+                      view {link.label}
                     </a>
-                  )}
+                  ) : isHedera && entryTopicId ? (
+                    <a
+                      href={`${chain?.explorer || "https://hashscan.io/testnet"}/topic/${entryTopicId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] text-primary/70 hover:text-primary transition-colors inline-flex items-center gap-0.5"
+                    >
+                      <ExternalLink className="w-2.5 h-2.5" />
+                      audit topic
+                    </a>
+                  ) : null}
                 </div>
               </div>
             </div>

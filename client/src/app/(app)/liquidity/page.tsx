@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getAssets } from "@/lib/api";
+import { useChain } from "@/contexts/chain-context";
 import PurchaseForm from "@/components/compliance/purchase-form";
 import WhitelistForm from "@/components/compliance/whitelist-form";
 
@@ -16,11 +17,12 @@ interface Asset {
 export default function LiquidityPage() {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
+  const { active } = useChain();
 
   useEffect(() => {
     const load = async () => {
       try {
-        const data = await getAssets();
+        const data = await getAssets(active.slug);
         setAssets(data.filter((a: Asset) => a.status === "active"));
       } catch (err) {
         console.error("Failed to load assets:", err);
@@ -29,7 +31,7 @@ export default function LiquidityPage() {
       }
     };
     load();
-  }, []);
+  }, [active.slug]);
 
   if (loading) {
     return (

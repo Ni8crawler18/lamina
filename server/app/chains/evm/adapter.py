@@ -106,6 +106,20 @@ class EvmAdapter(ChainAdapter):
         except Exception as e:
             logger.warning("gas estimation failed (%s); using fallback %d", e, gas_fallback)
             tx["gas"] = gas_fallback
+        # Some public RPCs (notably Polygon Amoy) report inflated gas prices AND
+        # reject txs whose total fee exceeds a node-side cap (commonly 1 native token).
+        # Clamp gasPrice so the fee stays just under that cap — the clamped price still
+        # far exceeds the real network requirement, so the tx confirms normally.
+        fee_cap_native = getattr(self.config, "tx_fee_cap_native", 0.95)
+        fee_cap_wei = w3.to_wei(fee_cap_native, "ether")
+        if tx["gas"] * tx["gasPrice"] > fee_cap_wei:
+            capped = fee_cap_wei // tx["gas"]
+            logger.warning(
+                "[%s] tx fee %.3f exceeds cap %.2f; lowering gasPrice %d -> %d wei",
+                self.config.slug, tx["gas"] * tx["gasPrice"] / 1e18, fee_cap_native,
+                tx["gasPrice"], capped,
+            )
+            tx["gasPrice"] = capped
         signed = w3.eth.account.sign_transaction(tx, self._pk)
         tx_hash = w3.eth.send_raw_transaction(signed.raw_transaction)
         receipt = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=300)

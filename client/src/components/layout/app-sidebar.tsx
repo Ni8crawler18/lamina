@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useWallet } from "@/contexts/wallet-context";
+import { useChain } from "@/contexts/chain-context";
 import {
   LayoutDashboard,
   Coins,
@@ -37,7 +38,8 @@ function Logo() {
 
 export default function AppSidebar() {
   const pathname = usePathname();
-  const { address, connectionMode } = useWallet();
+  const { address, email, mode } = useWallet();
+  const { active } = useChain();
 
   return (
     <aside className="w-[220px] bg-card/40 border-r border-border/50 flex flex-col h-screen fixed left-0 top-0 z-50">
@@ -72,11 +74,13 @@ export default function AppSidebar() {
       <div className="p-4 mx-3 mb-3 rounded-lg bg-secondary/40 border border-border/30">
         <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          Hedera Testnet
+          {active.name}
         </div>
-        <p className="font-mono text-[11px] text-muted-foreground/60 mt-1">{address || "—"}</p>
-        {connectionMode === "demo" && (
-          <p className="text-[9px] text-amber-400/70 mt-0.5">demo mode</p>
+        <p className="font-mono text-[11px] text-muted-foreground/60 mt-1 truncate">
+          {address || email || "—"}
+        </p>
+        {mode && (
+          <p className="text-[9px] text-amber-400/70 mt-0.5">{mode === "demo" ? "demo mode" : mode}</p>
         )}
       </div>
     </aside>

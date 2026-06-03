@@ -65,7 +65,7 @@ export default function WhitelistForm({ assets }: { assets: Asset[] }) {
         <input
           value={accountId}
           onChange={(e) => setAccountId(e.target.value)}
-          placeholder="0.0.12345 or leave blank"
+          placeholder="0x… address (or leave blank)"
           className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:border-primary/40"
         />
       </div>

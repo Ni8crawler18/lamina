@@ -13,8 +13,9 @@ const geistMono = localFont({
 });
 
 export const metadata = {
-  title: "Lamina",
-  description: "Autonomous RWA lifecycle agent on Hedera",
+  title: "Lamina — Autonomous RWA Lifecycle Agent",
+  description:
+    "One instruction issues a compliant real-world asset; an AI agent runs its entire regulated lifecycle — KYC/OFAC, coupons, NAV, maturity, reporting — across 7 chains.",
 };
 
 export default function RootLayout({
@@ -24,6 +25,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200;300;400;500;600&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>

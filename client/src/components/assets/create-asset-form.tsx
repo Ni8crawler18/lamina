@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createAsset } from "@/lib/api";
+import { useChain } from "@/contexts/chain-context";
 
 interface CreateAssetFormProps {
   onSuccess: () => void;
@@ -11,6 +12,7 @@ interface CreateAssetFormProps {
 export default function CreateAssetForm({ onSuccess, onClose }: CreateAssetFormProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { active } = useChain();
   // Default maturity: 5 years from today
   const defaultMaturity = new Date(Date.now() + 5 * 365.25 * 86400000).toISOString().split("T")[0];
 
@@ -37,6 +39,7 @@ export default function CreateAssetForm({ onSuccess, onClose }: CreateAssetFormP
     try {
       await createAsset({
         ...form,
+        chain: active.slug,
         total_supply: Number(form.total_supply) * Math.pow(10, form.decimals),
         coupon_rate: Number(form.coupon_rate) / 100,
         maturity_date: form.maturity_date || null,
@@ -165,22 +168,28 @@ export default function CreateAssetForm({ onSuccess, onClose }: CreateAssetFormP
         <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</p>
       )}
 
-      <div className="flex justify-end gap-3 pt-2">
-        <button
-          type="button"
-          onClick={onClose}
-          className="px-4 py-2 text-xs text-muted-foreground hover:text-foreground border border-border/50 rounded-lg transition-colors"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={loading}
-          className="px-4 py-2 text-xs text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg transition-colors disabled:opacity-40 flex items-center gap-2"
-        >
-          {loading && <span className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" />}
-          {loading ? "Creating..." : "Create Asset"}
-        </button>
+      <div className="flex items-center justify-between gap-3 pt-2">
+        <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+          <img src={`${active.logo}?v=6`} alt="" className={`h-3.5 w-3.5 object-contain ${active.family === "hedera" ? "scale-[0.82]" : ""}`} />
+          Deploying on <span className="text-foreground">{active.name}</span>
+        </span>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 text-xs text-muted-foreground hover:text-foreground border border-border/50 rounded-lg transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-4 py-2 text-xs text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg transition-colors disabled:opacity-40 flex items-center gap-2"
+          >
+            {loading && <span className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" />}
+            {loading ? "Creating..." : "Create Asset"}
+          </button>
+        </div>
       </div>
     </form>
   );

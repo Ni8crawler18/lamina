@@ -14,7 +14,7 @@ interface Asset {
 export default function PurchaseForm({ assets }: { assets: Asset[] }) {
   const { address } = useWallet();
   const [assetId, setAssetId] = useState<number>(assets[0]?.id || 0);
-  const [accountId, setAccountId] = useState("");
+  const [accountId, setAccountId] = useState(address || "");
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [validating, setValidating] = useState(false);
@@ -74,7 +74,7 @@ export default function PurchaseForm({ assets }: { assets: Asset[] }) {
         <input
           value={accountId}
           onChange={(e) => setAccountId(e.target.value)}
-          placeholder="0.0.12345"
+          placeholder="0x… or 0.0.x recipient"
           className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:border-primary/40"
         />
       </div>

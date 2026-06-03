@@ -6,6 +6,8 @@ import UpcomingEvents from "@/components/dashboard/upcoming-events";
 import { getAssets, checkHealth } from "@/lib/api";
 import Link from "next/link";
 import { useWallet } from "@/contexts/wallet-context";
+import { useChain } from "@/contexts/chain-context";
+import { explorerAddressUrl } from "@/lib/chains";
 import { ExternalLink } from "lucide-react";
 
 interface Asset {
@@ -26,28 +28,33 @@ interface Asset {
 }
 
 export default function Dashboard() {
-  const { address } = useWallet();
+  const { address, email } = useWallet();
+  const { active } = useChain();
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
   const [backendUp, setBackendUp] = useState(false);
 
   useEffect(() => {
+    let alive = true;
     const load = async () => {
       try {
         await checkHealth();
+        if (!alive) return;
         setBackendUp(true);
-        const data = await getAssets();
-        setAssets(data);
+        const data = await getAssets(active.slug);
+        if (alive) setAssets(data);
       } catch {
-        setBackendUp(false);
+        if (alive) setBackendUp(false);
       } finally {
-        setLoading(false);
+        if (alive) setLoading(false);
       }
     };
     load();
     const interval = setInterval(load, 30000);
-    return () => clearInterval(interval);
-  }, []);
+    return () => { alive = false; clearInterval(interval); };
+  }, [active.slug]);
+
+  const explorer = address ? explorerAddressUrl(active, address) : null;
 
   const activeAssets = assets.filter((a) => a.status === "active");
   const totalAUM = assets.reduce((sum, a) => sum + a.nav, 0);
@@ -59,16 +66,28 @@ export default function Dashboard() {
         <div>
           <h1 className="text-[22px] font-semibold tracking-tight">Overview</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Account{" "}
-            <a
-              href={`https://hashscan.io/testnet/account/${address}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-mono text-primary/80 hover:text-primary inline-flex items-center gap-1"
-            >
-              {address}
-              <ExternalLink className="w-3 h-3" />
-            </a>
+            {address ? (
+              <>
+                Account{" "}
+                {explorer ? (
+                  <a
+                    href={explorer}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-primary/80 hover:text-primary inline-flex items-center gap-1"
+                  >
+                    {address}
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                ) : (
+                  <span className="font-mono text-primary/80">{address}</span>
+                )}
+                {" · "}
+                <span className="text-muted-foreground">{active.name}</span>
+              </>
+            ) : (
+              <>Signed in as <span className="text-foreground">{email}</span> · {active.name}</>
+            )}
           </p>
         </div>
         {!backendUp && !loading && (
@@ -84,7 +103,7 @@ export default function Dashboard() {
         <StatCard label="Total AUM" value={`$${totalAUM.toLocaleString()}`} highlight />
         <StatCard label="Active Assets" value={String(activeAssets.length)} />
         <StatCard label="Total Assets" value={String(assets.length)} />
-        <StatCard label="Network" value="Hedera Testnet" />
+        <StatCard label="Network" value={active.name} />
       </div>
 
       {/* Upcoming Events */}
@@ -115,9 +134,9 @@ export default function Dashboard() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
           </div>
-          <p className="text-base font-medium mb-1.5">No assets yet</p>
+          <p className="text-base font-medium mb-1.5">No assets on {active.name} yet</p>
           <p className="text-sm text-muted-foreground mb-6 max-w-sm mx-auto">
-            Create your first tokenized real-world asset on Hedera, or use the Agent for natural language commands.
+            Create your first tokenized real-world asset on {active.name}, or use the Agent for natural language commands.
           </p>
           <div className="flex items-center justify-center gap-3">
             <Link

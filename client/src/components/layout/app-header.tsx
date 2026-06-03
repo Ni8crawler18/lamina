@@ -2,6 +2,9 @@
 
 import { usePathname } from "next/navigation";
 import { useWallet } from "@/contexts/wallet-context";
+import { useChain } from "@/contexts/chain-context";
+import { explorerAddressUrl } from "@/lib/chains";
+import ChainToggle from "./chain-toggle";
 import { ExternalLink, LogOut } from "lucide-react";
 
 const PAGE_TITLES: Record<string, string> = {
@@ -15,33 +18,49 @@ const PAGE_TITLES: Record<string, string> = {
   "/pitch": "Pitch Deck",
 };
 
+function shortAddr(a: string) {
+  if (a.startsWith("0x") && a.length > 12) return `${a.slice(0, 6)}…${a.slice(-4)}`;
+  return a;
+}
+
 export default function AppHeader() {
   const pathname = usePathname();
-  const { address, isConnected, disconnect } = useWallet();
+  const { address, email, mode, isConnected, disconnect } = useWallet();
+  const { active } = useChain();
 
   const title = PAGE_TITLES[pathname] || (pathname.startsWith("/assets/") ? "Asset Detail" : "Lamina");
+  const explorer = address ? explorerAddressUrl(active, address) : null;
 
   return (
-    <header className="h-14 border-b border-border/30 flex items-center justify-between px-8">
+    <header className="flex h-14 items-center justify-between border-b border-border/30 px-8">
       <h1 className="text-sm font-medium tracking-tight">{title}</h1>
+
       {isConnected && (
         <div className="flex items-center gap-3">
-          <a
-            href={`https://hashscan.io/testnet/account/${address}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-primary transition-colors"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            {address}
-            <ExternalLink className="w-3 h-3" />
-          </a>
-          <button
-            onClick={disconnect}
-            className="text-muted-foreground/50 hover:text-red-400 transition-colors p-1"
-            title="Disconnect"
-          >
-            <LogOut className="w-3.5 h-3.5" />
+          <ChainToggle />
+
+          {/* identity chip */}
+          <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-card/40 px-2.5 py-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+            {address ? (
+              explorer ? (
+                <a href={explorer} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground transition-colors hover:text-foreground">
+                  {shortAddr(address)}
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              ) : (
+                <span className="text-xs font-mono text-muted-foreground">{shortAddr(address)}</span>
+              )
+            ) : (
+              <span className="text-xs text-muted-foreground">{email ?? "Signed in"}</span>
+            )}
+            {mode && (
+              <span className="rounded bg-background px-1.5 py-0.5 text-[9px] uppercase tracking-wide text-muted-foreground/70">{mode}</span>
+            )}
+          </div>
+
+          <button onClick={disconnect} className="p-1 text-muted-foreground/50 transition-colors hover:text-red-400" title="Sign out">
+            <LogOut className="h-3.5 w-3.5" />
           </button>
         </div>
       )}

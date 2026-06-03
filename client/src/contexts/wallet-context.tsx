@@ -10,78 +10,188 @@ import {
   type ReactNode,
 } from "react";
 
+export type AuthMode = "metamask" | "hashpack" | "google" | "demo";
+export type Family = "evm" | "hedera";
+
 interface WalletState {
-  address: string | null;
+  address: string | null; // EVM 0x… or Hedera 0.0.x (null for Google identity)
+  email: string | null; // Google
+  name: string | null; // Google display name
+  family: Family | null;
+  chainId: number | null; // EVM numeric chain id reported by the wallet
+  mode: AuthMode | null;
   isConnected: boolean;
   isConnecting: boolean;
-  connectionMode: "hashpack" | "demo" | null;
-  connect: () => void;
+  error: string | null;
+  connectMetaMask: () => Promise<void>;
+  connectHashPack: () => Promise<void>;
+  connectGoogle: () => Promise<void>;
   connectDemo: () => void;
   disconnect: () => void;
 }
 
+const noop = () => {};
 const WalletContext = createContext<WalletState>({
   address: null,
+  email: null,
+  name: null,
+  family: null,
+  chainId: null,
+  mode: null,
   isConnected: false,
   isConnecting: false,
-  connectionMode: null,
-  connect: () => {},
-  connectDemo: () => {},
-  disconnect: () => {},
+  error: null,
+  connectMetaMask: async () => {},
+  connectHashPack: async () => {},
+  connectGoogle: async () => {},
+  connectDemo: noop,
+  disconnect: noop,
 });
 
-const WALLETCONNECT_PROJECT_ID =
-  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "";
+const WALLETCONNECT_PROJECT_ID = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || "";
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
+const DEMO_ADDRESS = "0xFa3e5d58ea338A274B7d739117AFfAe80168A429"; // testnet operator (preview only)
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function win(): any {
+  return typeof window === "undefined" ? undefined : (window as any);
+}
+
+let gsiPromise: Promise<void> | null = null;
+function loadGsi(): Promise<void> {
+  if (gsiPromise) return gsiPromise;
+  gsiPromise = new Promise<void>((resolve, reject) => {
+    if (win()?.google?.accounts?.id) return resolve();
+    const s = document.createElement("script");
+    s.src = "https://accounts.google.com/gsi/client";
+    s.async = true;
+    s.defer = true;
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error("Failed to load Google sign-in"));
+    document.head.appendChild(s);
+  });
+  return gsiPromise;
+}
+
+// decode a Google JWT credential payload without a dependency
+function decodeJwt(token: string): Record<string, string> {
+  const part = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+  return JSON.parse(decodeURIComponent(escape(atob(part))));
+}
 
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [address, setAddress] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
+  const [name, setName] = useState<string | null>(null);
+  const [family, setFamily] = useState<Family | null>(null);
+  const [chainId, setChainId] = useState<number | null>(null);
+  const [mode, setMode] = useState<AuthMode | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
-  const [connectionMode, setConnectionMode] = useState<"hashpack" | "demo" | null>(null);
+  const [error, setError] = useState<string | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const hashconnectRef = useRef<any>(null);
   const initedRef = useRef(false);
 
-  // Initialize HashConnect lazily (only on first real connect)
+  const reset = useCallback(() => {
+    setAddress(null);
+    setEmail(null);
+    setName(null);
+    setFamily(null);
+    setChainId(null);
+    setMode(null);
+  }, []);
+
+  // ── Restore session ──────────────────────────────────────────
+  useEffect(() => {
+    if (initedRef.current) return;
+    initedRef.current = true;
+    const saved = win()?.sessionStorage?.getItem("lamina_auth");
+    if (saved) {
+      try {
+        const d = JSON.parse(saved);
+        setMode(d.mode ?? null);
+        setAddress(d.address ?? null);
+        setEmail(d.email ?? null);
+        setName(d.name ?? null);
+        setFamily(d.family ?? null);
+        setChainId(d.chainId ?? null);
+      } catch { /* ignore */ }
+    }
+  }, []);
+
+  // ── Persist session ──────────────────────────────────────────
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (mode) {
+      sessionStorage.setItem(
+        "lamina_auth",
+        JSON.stringify({ mode, address, email, name, family, chainId })
+      );
+    } else {
+      sessionStorage.removeItem("lamina_auth");
+    }
+  }, [mode, address, email, name, family, chainId]);
+
+  // ── MetaMask (EVM) ───────────────────────────────────────────
+  const connectMetaMask = useCallback(async () => {
+    setError(null);
+    const eth = win()?.ethereum;
+    if (!eth) {
+      setError("MetaMask not detected. Install the MetaMask extension and retry.");
+      return;
+    }
+    setIsConnecting(true);
+    try {
+      const accounts: string[] = await eth.request({ method: "eth_requestAccounts" });
+      const hex = await eth.request({ method: "eth_chainId" });
+      if (!accounts?.length) throw new Error("No account returned");
+      setAddress(accounts[0]);
+      setChainId(parseInt(hex, 16));
+      setFamily("evm");
+      setMode("metamask");
+
+      // live updates
+      eth.removeAllListeners?.("accountsChanged");
+      eth.removeAllListeners?.("chainChanged");
+      eth.on?.("accountsChanged", (accs: string[]) => {
+        if (!accs?.length) reset();
+        else setAddress(accs[0]);
+      });
+      eth.on?.("chainChanged", (cid: string) => setChainId(parseInt(cid, 16)));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "MetaMask connection failed");
+    } finally {
+      setIsConnecting(false);
+    }
+  }, [reset]);
+
+  // ── HashPack (Hedera) ────────────────────────────────────────
   const getHashConnect = useCallback(async () => {
     if (hashconnectRef.current) return hashconnectRef.current;
     if (typeof window === "undefined") return null;
-
     try {
       const { HashConnect } = await import("hashconnect");
       const { LedgerId } = await import("@hashgraph/sdk");
-
       const hc = new HashConnect(
         LedgerId.TESTNET,
         WALLETCONNECT_PROJECT_ID,
-        {
-          name: "Lamina",
-          description: "Autonomous RWA Lifecycle Agent on Hedera",
-          icons: [],
-          url: typeof window !== "undefined" ? window.location.origin : "",
-        },
+        { name: "Lamina", description: "Autonomous RWA Lifecycle Agent", icons: [], url: window.location.origin },
         false
       );
-
-      // Register events before init
       hc.pairingEvent.on((data: { accountIds: string[] }) => {
-        if (data.accountIds && data.accountIds.length > 0) {
+        if (data.accountIds?.length) {
           setAddress(data.accountIds[0]);
-          setConnectionMode("hashpack");
+          setFamily("hedera");
+          setMode("hashpack");
           setIsConnecting(false);
-          // Close the modal after successful pairing
-          try { hc.closePairingModal?.(); } catch { /* ignore */ }
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          try { (hc as any).closePairingModal?.(); } catch { /* ignore */ }
         }
       });
-
-      hc.disconnectionEvent.on(() => {
-        setAddress(null);
-        setConnectionMode(null);
-      });
-
-      // Init with timeout
+      hc.disconnectionEvent.on(() => reset());
       await Promise.race([
         hc.init(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error("HashConnect init timeout")), 10000))
+        new Promise((_, rej) => setTimeout(() => rej(new Error("HashConnect init timeout")), 10000)),
       ]);
       hashconnectRef.current = hc;
       return hc;
@@ -89,101 +199,108 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       console.error("HashConnect init failed:", err);
       return null;
     }
-  }, []);
+  }, [reset]);
 
-  // Restore session on mount
-  useEffect(() => {
-    if (initedRef.current) return;
-    initedRef.current = true;
-
-    // Check for saved demo session
-    if (typeof window !== "undefined") {
-      const saved = sessionStorage.getItem("lamina_wallet");
-      if (saved) {
-        try {
-          const data = JSON.parse(saved);
-          setAddress(data.address);
-          setConnectionMode(data.mode);
-        } catch { /* ignore */ }
-      }
-    }
-  }, []);
-
-  // Persist to sessionStorage
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (address && connectionMode) {
-      sessionStorage.setItem(
-        "lamina_wallet",
-        JSON.stringify({ address, mode: connectionMode })
-      );
-    } else {
-      sessionStorage.removeItem("lamina_wallet");
-    }
-  }, [address, connectionMode]);
-
-  // Connect via HashPack
-  const connect = useCallback(async () => {
+  const connectHashPack = useCallback(async () => {
+    setError(null);
     setIsConnecting(true);
     try {
       const hc = await getHashConnect();
-      if (hc) {
-        // Try direct extension connection first, fall back to pairing modal
-        try {
-          await hc.connectToLocalWallet();
-        } catch {
-          // Extension not available — show WalletConnect pairing modal
-          hc.openPairingModal();
-        }
-        // Auto-cancel connecting state after 30s if no pairing happens
-        setTimeout(() => {
-          setIsConnecting((prev) => {
-            if (prev) console.warn("Pairing timeout — use Demo Mode");
-            return false;
-          });
-        }, 30000);
-      } else {
-        console.warn("HashConnect unavailable, falling back to demo mode");
-        setAddress("0.0.8003096");
-        setConnectionMode("demo");
+      if (!hc) {
+        setError("HashPack unavailable. Install the HashPack extension or use Demo mode.");
         setIsConnecting(false);
+        return;
       }
+      try {
+        await hc.connectToLocalWallet();
+      } catch {
+        hc.openPairingModal();
+      }
+      setTimeout(() => setIsConnecting((p) => (p ? false : p)), 30000);
     } catch (err) {
-      console.error("Connect failed:", err);
+      setError(err instanceof Error ? err.message : "HashPack connection failed");
       setIsConnecting(false);
     }
   }, [getHashConnect]);
 
-  // Connect in demo mode
-  const connectDemo = useCallback(() => {
+  // ── Google (identity) ────────────────────────────────────────
+  const connectGoogle = useCallback(async () => {
+    setError(null);
+    if (!GOOGLE_CLIENT_ID) {
+      setError("Google sign-in not configured — set NEXT_PUBLIC_GOOGLE_CLIENT_ID.");
+      return;
+    }
     setIsConnecting(true);
-    setTimeout(() => {
-      setAddress("0.0.8003096");
-      setConnectionMode("demo");
+    try {
+      await loadGsi();
+      const google = win().google;
+      google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: (resp: { credential: string }) => {
+          try {
+            const p = decodeJwt(resp.credential);
+            setEmail(p.email ?? null);
+            setName(p.name ?? p.given_name ?? null);
+            setAddress(null);
+            setFamily(null);
+            setMode("google");
+          } catch {
+            setError("Could not read Google profile.");
+          } finally {
+            setIsConnecting(false);
+          }
+        },
+      });
+      google.accounts.id.prompt((n: { isNotDisplayed?: () => boolean; isSkippedMoment?: () => boolean }) => {
+        if (n.isNotDisplayed?.() || n.isSkippedMoment?.()) {
+          setIsConnecting(false);
+          setError("Google prompt was dismissed. Allow third-party sign-in and retry.");
+        }
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Google sign-in failed");
       setIsConnecting(false);
-    }, 400);
+    }
   }, []);
 
-  // Disconnect
+  // ── Demo ─────────────────────────────────────────────────────
+  const connectDemo = useCallback(() => {
+    setError(null);
+    setIsConnecting(true);
+    setTimeout(() => {
+      setAddress(DEMO_ADDRESS);
+      setFamily("evm");
+      setMode("demo");
+      setIsConnecting(false);
+    }, 350);
+  }, []);
+
   const disconnect = useCallback(async () => {
-    if (connectionMode === "hashpack" && hashconnectRef.current) {
-      try {
-        await hashconnectRef.current.disconnect();
-      } catch { /* ignore */ }
+    if (mode === "hashpack" && hashconnectRef.current) {
+      try { await hashconnectRef.current.disconnect(); } catch { /* ignore */ }
     }
-    setAddress(null);
-    setConnectionMode(null);
+    if (mode === "google" && win()?.google?.accounts?.id) {
+      try { win().google.accounts.id.disableAutoSelect(); } catch { /* ignore */ }
+    }
     hashconnectRef.current = null;
-  }, [connectionMode]);
+    reset();
+  }, [mode, reset]);
 
   return (
     <WalletContext.Provider
       value={{
         address,
-        isConnected: !!address,
+        email,
+        name,
+        family,
+        chainId,
+        mode,
+        isConnected: !!mode,
         isConnecting,
-        connectionMode,
-        connect,
+        error,
+        connectMetaMask,
+        connectHashPack,
+        connectGoogle,
         connectDemo,
         disconnect,
       }}

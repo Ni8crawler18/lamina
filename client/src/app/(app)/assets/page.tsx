@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { getAssets } from "@/lib/api";
+import { useChain } from "@/contexts/chain-context";
 import AssetCard from "@/components/assets/asset-card";
 import CreateAssetForm from "@/components/assets/create-asset-form";
 import { Plus, Search, X } from "lucide-react";
@@ -29,17 +30,18 @@ export default function AssetsPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
   const [search, setSearch] = useState("");
+  const { active } = useChain();
 
   const loadAssets = useCallback(async () => {
     try {
-      const data = await getAssets();
+      const data = await getAssets(active.slug);
       setAssets(data);
     } catch (err) {
       console.error("Failed to load assets:", err);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [active.slug]);
 
   useEffect(() => {
     loadAssets();

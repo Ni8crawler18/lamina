@@ -24,8 +24,13 @@ async function fetchAPI(path: string, options?: RequestInit) {
   return res.json();
 }
 
+// Chains
+export const getChains = (enabledOnly = false) =>
+  fetchAPI(`/api/chains${enabledOnly ? "?enabled_only=true" : ""}`);
+
 // Assets
-export const getAssets = () => fetchAPI("/api/assets");
+export const getAssets = (chain?: string) =>
+  fetchAPI(`/api/assets${chain ? `?chain=${encodeURIComponent(chain)}` : ""}`);
 export const getAsset = (id: number) => fetchAPI(`/api/assets/${id}`);
 export const createAsset = (data: Record<string, unknown>) =>
   fetchAPI("/api/assets", { method: "POST", body: JSON.stringify(data) });
@@ -68,7 +73,10 @@ export const generateReport = (assetId: number, reportType = "compliance", perio
 
 // Purchase
 export const purchaseTokens = (assetId: number, accountId: string, amount: number) =>
-  fetchAPI(`/api/assets/${assetId}/purchase?account_id=${accountId}&amount=${amount}`, { method: "POST" });
+  fetchAPI(`/api/assets/${assetId}/purchase`, {
+    method: "POST",
+    body: JSON.stringify({ account_id: accountId, amount }),
+  });
 
 // Chat
 export const sendChat = (message: string, history: { role: string; content: string }[] = []) =>

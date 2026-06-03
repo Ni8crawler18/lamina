@@ -1,16 +1,27 @@
-Lamina — Deployed Contracts (hardened v1.1, 2026-06-03)
-========================================================
+Lamina — Deployed Contracts (all 8 networks)
+============================================
+Last updated: 2026-06-04
 
-Deployer / operator (all chains): 0xFa3e5d58ea338A274B7d739117AFfAe80168A429
+Deployer / operator (all EVM chains): 0xFa3e5d58ea338A274B7d739117AFfAe80168A429
+Hedera operator account:              0.0.8003096
 
-Contracts:
+Contract roles
+--------------
   LaminaFactory  — deploys a compliant RWA token + an audit topic in one tx
   AuditLog       — access-controlled, append-only on-chain audit trail
-  LaminaRWAToken — ERC-3643-style compliance token (deployed per asset via the factory)
+  LaminaRWAToken — ERC-3643-style permissioned compliance token
+                   (deployed per asset at runtime via the factory; not a fixed address)
+  USDC           — settlement asset for coupons & principal
 
---------------------------------------------------------
-ARBITRUM SEPOLIA  (chainId 421614)  — primary, verified-friendly explorer
---------------------------------------------------------
+Note: Base, Arc, Avalanche and Ethereum Sepolia share the same Factory/AuditLog
+addresses. This is expected — they were deployed by the same operator at the same
+nonce, so CREATE produces identical addresses across chains (deterministic).
+
+
+========================================================================
+1) ARBITRUM SEPOLIA   (chainId 421614)   — source-verified on Arbiscan
+   explorer: https://sepolia.arbiscan.io
+========================================================================
 LaminaFactory : 0x8610E57f1357a41c2991ba64764c2Fdc8b2DD33e
   https://sepolia.arbiscan.io/address/0x8610E57f1357a41c2991ba64764c2Fdc8b2DD33e
 AuditLog      : 0x2721b95C0fF4756D71Ab6357A38C35e458627595
@@ -18,17 +29,96 @@ AuditLog      : 0x2721b95C0fF4756D71Ab6357A38C35e458627595
 USDC (Circle) : 0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d
   https://sepolia.arbiscan.io/address/0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d
 
---------------------------------------------------------
-ROBINHOOD CHAIN TESTNET  (chainId 46630, Arbitrum Orbit)
---------------------------------------------------------
+
+========================================================================
+2) ROBINHOOD CHAIN TESTNET   (chainId 46630, Arbitrum Orbit)
+   explorer: https://explorer.testnet.chain.robinhood.com
+========================================================================
 LaminaFactory : 0xd556c46758B2C4B62f929256dc3FA53fbd375A3A
   https://explorer.testnet.chain.robinhood.com/address/0xd556c46758B2C4B62f929256dc3FA53fbd375A3A
 AuditLog      : 0x153786D589c1d3bddEa68f232269d47Cb110D6Cd
   https://explorer.testnet.chain.robinhood.com/address/0x153786D589c1d3bddEa68f232269d47Cb110D6Cd
-USDC (Mock)   : 0x5B6C7cAF7F99f99154fD8375ec935Fcf03F326f5
-  https://explorer.testnet.chain.robinhood.com/address/0x5B6C7cAF7F99f99154fD8375ec935Fcf03F326f5
-(note: Robinhood explorer occasionally returns 530 — infra on their side; chain RPC is live.)
+USDC (Mock,   : 0x5B6C7cAF7F99f99154fD8375ec935Fcf03F326f5
+ public mint)   https://explorer.testnet.chain.robinhood.com/address/0x5B6C7cAF7F99f99154fD8375ec935Fcf03F326f5
+(note: the Robinhood explorer occasionally returns 5xx — their infra; the RPC is live.)
 
---------------------------------------------------------
-Also deployed (earlier contract version) on: Base Sepolia, Avalanche Fuji,
-Ethereum Sepolia, Arc Testnet, Polygon Amoy. See server/config/chains/*.toml.
+
+========================================================================
+3) BASE SEPOLIA   (chainId 84532)
+   explorer: https://sepolia.basescan.org
+========================================================================
+LaminaFactory : 0x45a36ea47577A4415cAc75256F78ccD66bC29E2c
+  https://sepolia.basescan.org/address/0x45a36ea47577A4415cAc75256F78ccD66bC29E2c
+AuditLog      : 0xca7f1c8BC559F0E20c3F12085A7Fa426397977f7
+  https://sepolia.basescan.org/address/0xca7f1c8BC559F0E20c3F12085A7Fa426397977f7
+USDC (Circle) : 0x036CbD53842c5426634e7929541eC2318f3dCF7e
+  https://sepolia.basescan.org/address/0x036CbD53842c5426634e7929541eC2318f3dCF7e
+
+
+========================================================================
+4) ARC TESTNET   (chainId 5042002)   — USDC is the native gas token
+   explorer: https://testnet.arcscan.app
+========================================================================
+LaminaFactory : 0x45a36ea47577A4415cAc75256F78ccD66bC29E2c
+  https://testnet.arcscan.app/address/0x45a36ea47577A4415cAc75256F78ccD66bC29E2c
+AuditLog      : 0xca7f1c8BC559F0E20c3F12085A7Fa426397977f7
+  https://testnet.arcscan.app/address/0xca7f1c8BC559F0E20c3F12085A7Fa426397977f7
+USDC (native, : 0x3600000000000000000000000000000000000000
+ ERC-20, 6dp)   https://testnet.arcscan.app/address/0x3600000000000000000000000000000000000000
+
+
+========================================================================
+5) AVALANCHE FUJI   (chainId 43113)
+   explorer: https://testnet.snowtrace.io
+========================================================================
+LaminaFactory : 0x45a36ea47577A4415cAc75256F78ccD66bC29E2c
+  https://testnet.snowtrace.io/address/0x45a36ea47577A4415cAc75256F78ccD66bC29E2c
+AuditLog      : 0xca7f1c8BC559F0E20c3F12085A7Fa426397977f7
+  https://testnet.snowtrace.io/address/0xca7f1c8BC559F0E20c3F12085A7Fa426397977f7
+USDC (Circle) : 0x5425890298aed601595a70AB815c96711a31Bc65
+  https://testnet.snowtrace.io/address/0x5425890298aed601595a70AB815c96711a31Bc65
+
+
+========================================================================
+6) ETHEREUM SEPOLIA   (chainId 11155111)
+   explorer: https://sepolia.etherscan.io
+========================================================================
+LaminaFactory : 0x45a36ea47577A4415cAc75256F78ccD66bC29E2c
+  https://sepolia.etherscan.io/address/0x45a36ea47577A4415cAc75256F78ccD66bC29E2c
+AuditLog      : 0xca7f1c8BC559F0E20c3F12085A7Fa426397977f7
+  https://sepolia.etherscan.io/address/0xca7f1c8BC559F0E20c3F12085A7Fa426397977f7
+USDC (Circle) : 0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238
+  https://sepolia.etherscan.io/address/0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238
+
+
+========================================================================
+7) POLYGON AMOY   (chainId 80002)
+   explorer: https://amoy.polygonscan.com
+========================================================================
+LaminaFactory : 0xa96aAbCE0Ab4c9758B05D361d09A11144F3F6D6A
+  https://amoy.polygonscan.com/address/0xa96aAbCE0Ab4c9758B05D361d09A11144F3F6D6A
+AuditLog      : 0x45a36ea47577A4415cAc75256F78ccD66bC29E2c
+  https://amoy.polygonscan.com/address/0x45a36ea47577A4415cAc75256F78ccD66bC29E2c
+USDC (Circle) : 0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582
+  https://amoy.polygonscan.com/address/0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582
+
+  Live sample asset (issued 2026-06-04, "Amoy Test Bond" / ATB):
+    token: 0x8a3722aD41072d9c39b1CB4a7fEF05B8b5DE42C9
+    https://amoy.polygonscan.com/address/0x8a3722aD41072d9c39b1CB4a7fEF05B8b5DE42C9
+
+
+========================================================================
+8) HEDERA TESTNET   (chainId 296 — identifier only; non-EVM)
+   explorer: https://hashscan.io/testnet
+========================================================================
+No fixed Factory/AuditLog contracts on Hedera. Lamina uses Hedera-native
+services: each asset is an HTS token and its audit trail is an HCS topic,
+both created at runtime by the operator (so addresses are per-asset, not fixed).
+
+USDC (Circle  : 0.0.429274
+ testnet HTS)   https://hashscan.io/testnet/token/0.0.429274
+Operator acct : 0.0.8003096
+  https://hashscan.io/testnet/account/0.0.8003096
+
+
+Source of truth: server/config/chains/*.toml
