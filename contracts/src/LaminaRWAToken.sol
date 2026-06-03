@@ -103,7 +103,10 @@ contract LaminaRWAToken is ERC20, ERC20Burnable, AccessControl {
     }
 
     // ─── Mint (= HTS mint) ────────────────────────────────────────────────────
+    /// @notice Mint to a KYC-approved holder only (ERC-3643: recipients must be verified,
+    ///         even on issuance — prevents tokens landing in an unvetted wallet).
     function mint(address to, uint256 amount) external onlyRole(MINTER_ROLE) {
+        require(kycApproved[to], "LaminaRWA: mint recipient not KYC approved");
         _mint(to, amount);
     }
 

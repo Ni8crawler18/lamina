@@ -23,13 +23,17 @@ contract DeployLamina is Script {
 
         vm.startBroadcast(deployerKey);
 
-        // 1. Deploy AuditLog (shared, immutable)
+        // 1. Deploy AuditLog (deployer is owner + first writer == agent operator)
         AuditLog auditLog = new AuditLog();
         console.log("AuditLog deployed     :", address(auditLog));
 
         // 2. Deploy LaminaFactory (references AuditLog)
         LaminaFactory factory = new LaminaFactory(address(auditLog));
         console.log("LaminaFactory deployed:", address(factory));
+
+        // 3. Authorize the factory to create audit topics during deployAsset()
+        auditLog.setWriter(address(factory), true);
+        console.log("Factory authorized as AuditLog writer");
 
         vm.stopBroadcast();
 

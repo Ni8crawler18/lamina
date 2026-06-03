@@ -12,6 +12,6 @@ rpc_url_env   = "RPC_URL_ARBITRUM_SEPOLIA"
 explorer_url  = "https://sepolia.arbiscan.io"
 
 [contracts]
-factory   = "0x45a36ea47577A4415cAc75256F78ccD66bC29E2c"
-audit_log = "0xca7f1c8BC559F0E20c3F12085A7Fa426397977f7"
+factory   = "0x8610E57f1357a41c2991ba64764c2Fdc8b2DD33e"  # hardened (v1.1) 2026-06-03
+audit_log = "0x2721b95C0fF4756D71Ab6357A38C35e458627595"  # access-controlled AuditLog
 usdc      = "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d"  # Circle official Arbitrum Sepolia USDC

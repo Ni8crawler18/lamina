@@ -13,6 +13,6 @@ rpc_url_env   = "RPC_URL_ROBINHOOD_TESTNET"
 explorer_url  = "https://explorer.testnet.chain.robinhood.com"
 
 [contracts]
-factory   = "0x45a36ea47577A4415cAc75256F78ccD66bC29E2c"
-audit_log = "0xca7f1c8BC559F0E20c3F12085A7Fa426397977f7"
+factory   = "0xd556c46758B2C4B62f929256dc3FA53fbd375A3A"  # hardened (v1.1) 2026-06-03
+audit_log = "0x153786D589c1d3bddEa68f232269d47Cb110D6Cd"  # access-controlled AuditLog
 usdc      = "0x5B6C7cAF7F99f99154fD8375ec935Fcf03F326f5"  # Mock USDC, 6 dec, public mint
