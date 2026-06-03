@@ -37,12 +37,19 @@ out/
 .DS_Store
 Thumbs.db
 
-# Reports
+# Generated reports
 server/data/reports/*.pdf
 
-# OFAC SDN cache
-server/data/sdn_cache.csv
-server/data/add_cache.csv
+# OFAC SDN cache (regenerated at runtime)
+server/app/integrations/ofac/*.csv
+
+# Foundry build artifacts
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+
+# Local wallet scratch (never commit keys)
+wallet.txt
 
 # Vercel
 .vercel
@@ -50,3 +57,5 @@ server/data/add_cache.csv
 # Claude Code
 CLAUDE.md
 .claude/
+
+workflow-docs/

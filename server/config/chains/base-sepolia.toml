@@ -1,0 +1,17 @@
+# Base Sepolia testnet.
+# enabled=false until Lamina contracts (factory + audit_log) are deployed here.
+name          = "Base Sepolia"
+slug          = "base-sepolia"
+family        = "evm"
+chain_id      = 84532
+enabled       = true
+native_symbol = "ETH"
+
+rpc_url       = "https://sepolia.base.org"
+rpc_url_env   = "RPC_URL_BASE_SEPOLIA"
+explorer_url  = "https://sepolia.basescan.org"
+
+[contracts]
+factory   = "0x45a36ea47577A4415cAc75256F78ccD66bC29E2c"
+audit_log = "0xca7f1c8BC559F0E20c3F12085A7Fa426397977f7"
+usdc      = "0x036CbD53842c5426634e7929541eC2318f3dCF7e"  # Circle official Base Sepolia USDC

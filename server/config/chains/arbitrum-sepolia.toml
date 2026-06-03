@@ -1,0 +1,17 @@
+# Arbitrum Sepolia testnet.
+# enabled=false until Lamina contracts (factory + audit_log) are deployed here.
+name          = "Arbitrum Sepolia"
+slug          = "arbitrum-sepolia"
+family        = "evm"
+chain_id      = 421614
+enabled       = true
+native_symbol = "ETH"
+
+rpc_url       = "https://sepolia-rollup.arbitrum.io/rpc"
+rpc_url_env   = "RPC_URL_ARBITRUM_SEPOLIA"
+explorer_url  = "https://sepolia.arbiscan.io"
+
+[contracts]
+factory   = "0x45a36ea47577A4415cAc75256F78ccD66bC29E2c"
+audit_log = "0xca7f1c8BC559F0E20c3F12085A7Fa426397977f7"
+usdc      = "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d"  # Circle official Arbitrum Sepolia USDC

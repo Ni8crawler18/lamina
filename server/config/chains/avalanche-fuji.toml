@@ -1,0 +1,17 @@
+# Avalanche Fuji C-Chain testnet.
+# enabled=false until Lamina contracts (factory + audit_log) are deployed here.
+name          = "Avalanche Fuji"
+slug          = "avalanche-fuji"
+family        = "evm"
+chain_id      = 43113
+enabled       = true
+native_symbol = "AVAX"
+
+rpc_url       = "https://api.avax-test.network/ext/bc/C/rpc"
+rpc_url_env   = "RPC_URL_AVALANCHE_FUJI"
+explorer_url  = "https://testnet.snowtrace.io"
+
+[contracts]
+factory   = "0x45a36ea47577A4415cAc75256F78ccD66bC29E2c"
+audit_log = "0xca7f1c8BC559F0E20c3F12085A7Fa426397977f7"
+usdc      = "0x5425890298aed601595a70AB815c96711a31Bc65"  # Circle official Fuji USDC

@@ -1,0 +1,51 @@
+[project]
+name = "lamina-backend"
+version = "0.2.0"
+description = "Lamina — multi-chain autonomous RWA lifecycle backend"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.1.0",
+    # database
+    "sqlalchemy[asyncio]>=2.0.30",
+    "asyncpg>=0.29.0",
+    # chains (EVM)
+    "web3>=7.0.0",
+    # AI
+    "anthropic>=0.40.0",
+    # jobs / integrations
+    "apscheduler>=3.10.0",
+    "aiohttp>=3.9.0",
+    "rapidfuzz>=3.6.0",
+    # reporting
+    "reportlab>=4.0.0",
+    "jinja2>=3.1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.6.0",
+    "mypy>=1.10.0",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=5.0.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "W"]
+ignore = ["E501"]  # line length handled by formatter
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+warn_unused_ignores = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

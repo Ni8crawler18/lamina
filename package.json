@@ -1,0 +1,21 @@
+{
+  "name": "lamina",
+  "version": "1.0.0",
+  "description": "<p align=\"center\">   <img src=\"https://img.shields.io/badge/Hedera-Testnet-8259ef?style=flat-square\" />   <img src=\"https://img.shields.io/badge/Python-FastAPI-009688?style=flat-square\" />   <img src=\"https://img.shields.io/badge/Next.js-16-000?style=flat-square\" />   <img src=\"https://img.shields.io/badge/AI-Claude_API-d97706?style=flat-square\" /> </p>",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ni8crawler18/lamina.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Ni8crawler18/lamina/issues"
+  },
+  "homepage": "https://github.com/Ni8crawler18/lamina#readme"
+}

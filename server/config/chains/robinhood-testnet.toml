@@ -1,0 +1,18 @@
+# Robinhood Chain Testnet — Arbitrum Orbit L2 (RWA-focused).
+# Fully deployed: Lamina contracts + Mock USDC live here.
+name          = "Robinhood Chain Testnet"
+slug          = "robinhood-testnet"
+family        = "evm"
+chain_id      = 46630
+enabled       = true
+native_symbol = "ETH"
+
+# Public RPC. Override with the env var named below for a private/paid endpoint.
+rpc_url       = "https://rpc.testnet.chain.robinhood.com"
+rpc_url_env   = "RPC_URL_ROBINHOOD_TESTNET"
+explorer_url  = "https://explorer.testnet.chain.robinhood.com"
+
+[contracts]
+factory   = "0x45a36ea47577A4415cAc75256F78ccD66bC29E2c"
+audit_log = "0xca7f1c8BC559F0E20c3F12085A7Fa426397977f7"
+usdc      = "0x5B6C7cAF7F99f99154fD8375ec935Fcf03F326f5"  # Mock USDC, 6 dec, public mint

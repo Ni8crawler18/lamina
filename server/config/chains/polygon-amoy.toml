@@ -1,0 +1,17 @@
+# Polygon Amoy testnet.
+# enabled=false until Lamina contracts (factory + audit_log) are deployed here.
+name          = "Polygon Amoy"
+slug          = "polygon-amoy"
+family        = "evm"
+chain_id      = 80002
+enabled       = true
+native_symbol = "POL"
+
+rpc_url       = "https://rpc-amoy.polygon.technology"
+rpc_url_env   = "RPC_URL_POLYGON_AMOY"
+explorer_url  = "https://amoy.polygonscan.com"
+
+[contracts]
+factory   = "0xa96aAbCE0Ab4c9758B05D361d09A11144F3F6D6A"
+audit_log = "0x45a36ea47577A4415cAc75256F78ccD66bC29E2c"
+usdc      = "0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582"  # Circle official Amoy USDC

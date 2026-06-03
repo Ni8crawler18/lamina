@@ -1,0 +1,19 @@
+# Hedera Testnet — non-EVM (Hashgraph). Uses native HTS (tokens) + HCS (audit),
+# not deployed contracts, so there is no factory/audit_log address. The adapter
+# (app/chains/hedera/) ports the existing, working server/hedera/ logic.
+# enabled=false until that adapter is ported & verified (Phase 1).
+name          = "Hedera Testnet"
+slug          = "hedera-testnet"
+family        = "hedera"
+chain_id      = 296            # Hedera testnet EVM chain id (identifier only)
+enabled       = true
+native_symbol = "HBAR"
+
+# Mirror node REST endpoint (Hedera has no JSON-RPC for native HTS/HCS).
+rpc_url       = "https://testnet.mirrornode.hedera.com"
+rpc_url_env   = "RPC_URL_HEDERA_TESTNET"
+explorer_url  = "https://hashscan.io/testnet"
+
+[contracts]
+# Hedera identifies tokens/topics by 0.0.x IDs, not addresses.
+usdc = "0.0.429274"   # Circle testnet USDC token id (verify)

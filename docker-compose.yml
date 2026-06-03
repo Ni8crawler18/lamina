@@ -1,0 +1,22 @@
+# Local dev infra for Lamina backend.
+# Host port 5433 (host 5432 may already be in use).
+services:
+  postgres:
+    image: postgres:17
+    container_name: lamina-pg
+    environment:
+      POSTGRES_USER: lamina
+      POSTGRES_PASSWORD: lamina
+      POSTGRES_DB: lamina
+    ports:
+      - "5433:5432"
+    volumes:
+      - lamina_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lamina"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  lamina_pgdata:

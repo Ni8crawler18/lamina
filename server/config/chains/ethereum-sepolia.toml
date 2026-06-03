@@ -1,0 +1,16 @@
+# Ethereum Sepolia testnet. Lamina contracts deployed 2026-06-03.
+name          = "Ethereum Sepolia"
+slug          = "ethereum-sepolia"
+family        = "evm"
+chain_id      = 11155111
+enabled       = true
+native_symbol = "ETH"
+
+rpc_url       = "https://ethereum-sepolia-rpc.publicnode.com"
+rpc_url_env   = "RPC_URL_ETHEREUM_SEPOLIA"
+explorer_url  = "https://sepolia.etherscan.io"
+
+[contracts]
+factory   = "0x45a36ea47577A4415cAc75256F78ccD66bC29E2c"
+audit_log = "0xca7f1c8BC559F0E20c3F12085A7Fa426397977f7"
+usdc      = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238"  # Circle official Sepolia USDC
