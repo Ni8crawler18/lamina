@@ -59,6 +59,7 @@ function Nav() {
           <a href="#chains" className="transition-colors hover:text-foreground">Networks</a>
           <a href="#surfaces" className="transition-colors hover:text-foreground">Integrations</a>
           <a href="#trust" className="transition-colors hover:text-foreground">Compliance</a>
+          <a href="/slides.html" target="_blank" rel="noopener" className="transition-colors hover:text-foreground">Slides</a>
         </div>
         <Link
           href="/dashboard"
