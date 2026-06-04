@@ -6,7 +6,7 @@ from datetime import datetime
 
 from sqlalchemy import select
 
-from app.models.orm import ScheduledEvent
+from app.models.orm import Asset, ScheduledEvent
 from app.repositories.base import BaseRepository
 
 
@@ -23,6 +23,19 @@ class EventRepository(BaseRepository):
             stmt = stmt.where(ScheduledEvent.status == status)
         res = await self.session.execute(stmt.order_by(ScheduledEvent.scheduled_at))
         return list(res.scalars().all())
+
+    async def upcoming(self, chain: str | None = None, limit: int = 10) -> list[tuple[ScheduledEvent, Asset]]:
+        """Pending events across assets (optionally one chain), soonest first, with their asset."""
+        stmt = (
+            select(ScheduledEvent, Asset)
+            .join(Asset, ScheduledEvent.asset_id == Asset.id)
+            .where(ScheduledEvent.status == "pending")
+        )
+        if chain:
+            stmt = stmt.where(Asset.chain == chain)
+        stmt = stmt.order_by(ScheduledEvent.scheduled_at).limit(limit)
+        res = await self.session.execute(stmt)
+        return [(row[0], row[1]) for row in res.all()]
 
     async def next_pending(self, asset_id: int, event_type: str) -> ScheduledEvent | None:
         res = await self.session.execute(

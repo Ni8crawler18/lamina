@@ -34,6 +34,12 @@ class Settings(BaseSettings):
     hedera_operator_key: str = ""
     hedera_network: str = "testnet"
 
+    # Solana (non-EVM family) — operator keypair for Token-2022 RWA tokens.
+    # Provide ONE of these (path takes precedence): a solana-keygen json file, or
+    # a base58-encoded 64-byte secret key.
+    solana_keypair_path: str = ""
+    solana_operator_key: str = ""
+
     # -- AI -------------------------------------------------------------------
     anthropic_api_key: str = ""
 

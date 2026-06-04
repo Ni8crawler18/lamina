@@ -57,6 +57,45 @@ function win(): any {
   return typeof window === "undefined" ? undefined : (window as any);
 }
 
+// ── EVM provider discovery (EIP-6963) ─────────────────────────
+// Brave, Coinbase Wallet and MetaMask all inject into window.ethereum and
+// clobber each other. EIP-6963 lets each wallet announce itself so we can
+// pick MetaMask deterministically, with a legacy `.providers` fallback.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const discovered: { rdns: string; name: string; provider: any }[] = [];
+if (typeof window !== "undefined") {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  window.addEventListener("eip6963:announceProvider", (e: any) => {
+    const d = e?.detail;
+    if (d?.info?.rdns && !discovered.some((x) => x.rdns === d.info.rdns)) {
+      discovered.push({ rdns: d.info.rdns, name: d.info.name, provider: d.provider });
+    }
+  });
+  window.dispatchEvent(new Event("eip6963:requestProvider"));
+}
+
+/** Resolve the best EVM provider: MetaMask first, else any injected wallet. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function resolveEvmProvider(): Promise<{ provider: any; label: string } | null> {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event("eip6963:requestProvider"));
+    await new Promise((r) => setTimeout(r, 120)); // let wallets respond
+  }
+  const mm = discovered.find((d) => d.rdns === "io.metamask");
+  if (mm) return { provider: mm.provider, label: "MetaMask" };
+  if (discovered.length) return { provider: discovered[0].provider, label: discovered[0].name };
+
+  // Legacy fallback: window.ethereum (possibly an array of providers)
+  const eth = win()?.ethereum;
+  if (!eth) return null;
+  if (Array.isArray(eth.providers)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const inj = eth.providers.find((p: any) => p.isMetaMask) || eth.providers[0];
+    return { provider: inj, label: inj?.isMetaMask ? "MetaMask" : "Wallet" };
+  }
+  return { provider: eth, label: eth.isMetaMask ? "MetaMask" : eth.isBraveWallet ? "Brave Wallet" : "Wallet" };
+}
+
 let gsiPromise: Promise<void> | null = null;
 function loadGsi(): Promise<void> {
   if (gsiPromise) return gsiPromise;
@@ -135,13 +174,15 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   // ── MetaMask (EVM) ───────────────────────────────────────────
   const connectMetaMask = useCallback(async () => {
     setError(null);
-    const eth = win()?.ethereum;
-    if (!eth) {
-      setError("MetaMask not detected. Install the MetaMask extension and retry.");
-      return;
-    }
     setIsConnecting(true);
     try {
+      const resolved = await resolveEvmProvider();
+      if (!resolved?.provider) {
+        setError("No EVM wallet detected. Install MetaMask (or enable Brave Wallet) and retry.");
+        setIsConnecting(false);
+        return;
+      }
+      const eth = resolved.provider;
       const accounts: string[] = await eth.request({ method: "eth_requestAccounts" });
       const hex = await eth.request({ method: "eth_chainId" });
       if (!accounts?.length) throw new Error("No account returned");
@@ -159,7 +200,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       });
       eth.on?.("chainChanged", (cid: string) => setChainId(parseInt(cid, 16)));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "MetaMask connection failed");
+      const msg = e instanceof Error ? e.message : "Wallet connection failed";
+      // EIP-1193 user-rejected (4001) → friendlier copy
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      setError((e as any)?.code === 4001 ? "Connection request rejected in your wallet." : msg);
     } finally {
       setIsConnecting(false);
     }

@@ -29,6 +29,15 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Non-EVM chain SDKs are opt-in so the default install stays lean and the chains
+# they back are disabled until configured. Install with: pip install -e ".[solana]"
+solana = [
+    "solana>=0.34.0",   # RPC client + spl.token (Token-2022) instructions
+    "solders>=0.21.0",  # keypairs, pubkeys, instruction/transaction primitives
+]
+hedera = [
+    "hiero-sdk-python>=0.2.0",
+]
 dev = [
     "ruff>=0.6.0",
     "mypy>=1.10.0",

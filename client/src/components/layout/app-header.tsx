@@ -5,7 +5,7 @@ import { useWallet } from "@/contexts/wallet-context";
 import { useChain } from "@/contexts/chain-context";
 import { explorerAddressUrl } from "@/lib/chains";
 import ChainToggle from "./chain-toggle";
-import { ExternalLink, LogOut } from "lucide-react";
+import { ExternalLink, LogOut, AlertTriangle } from "lucide-react";
 
 const PAGE_TITLES: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -25,11 +25,19 @@ function shortAddr(a: string) {
 
 export default function AppHeader() {
   const pathname = usePathname();
-  const { address, email, mode, isConnected, disconnect } = useWallet();
-  const { active } = useChain();
+  const { address, email, mode, chainId, family, isConnected, disconnect } = useWallet();
+  const { active, switchWalletNetwork } = useChain();
 
   const title = PAGE_TITLES[pathname] || (pathname.startsWith("/assets/") ? "Asset Detail" : "Lamina");
   const explorer = address ? explorerAddressUrl(active, address) : null;
+
+  // Wallet on a different EVM network than the active chain (cosmetic — backend signs).
+  const wrongNetwork =
+    family === "evm" &&
+    active.family === "evm" &&
+    chainId != null &&
+    active.chainId != null &&
+    chainId !== active.chainId;
 
   return (
     <header className="flex h-14 items-center justify-between border-b border-border/30 px-8">
@@ -37,6 +45,16 @@ export default function AppHeader() {
 
       {isConnected && (
         <div className="flex items-center gap-3">
+          {wrongNetwork && (
+            <button
+              onClick={() => void switchWalletNetwork()}
+              className="flex items-center gap-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1.5 text-xs text-amber-400 transition-colors hover:bg-amber-500/20"
+              title={`Wallet is on chain ${chainId}; switch to ${active.name}`}
+            >
+              <AlertTriangle className="h-3.5 w-3.5" />
+              Switch to {active.name}
+            </button>
+          )}
           <ChainToggle />
 
           {/* identity chip */}

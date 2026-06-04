@@ -7,6 +7,7 @@ interface ChainState {
   active: ChainBrand;
   chains: ChainBrand[]; // live chains, for the toggle
   setChain: (slug: string) => void;
+  switchWalletNetwork: () => Promise<void>; // ask the wallet to switch to `active`
 }
 
 const DEFAULT = LIVE_CHAINS[0] ?? CHAINS[0];
@@ -15,6 +16,7 @@ const ChainContext = createContext<ChainState>({
   active: DEFAULT,
   chains: LIVE_CHAINS,
   setChain: () => {},
+  switchWalletNetwork: async () => {},
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,16 +24,34 @@ function eth(): any {
   return typeof window === "undefined" ? undefined : (window as any).ethereum;
 }
 
-/** Best-effort: ask MetaMask to switch to the EVM chain. Backend signs txs, so
- *  this is cosmetic — failures are swallowed (chain may not be added to the wallet). */
+/** Ask the wallet to switch to the EVM chain, adding it first if unknown (4902).
+ *  Backend signs txs, so this is a convenience — failures are swallowed. */
 async function trySwitchEvmNetwork(chain: ChainBrand) {
   const provider = eth();
   if (!provider || chain.family !== "evm" || !chain.chainId) return;
   const hexId = "0x" + chain.chainId.toString(16);
   try {
     await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: hexId }] });
-  } catch {
-    /* chain not in wallet / user declined — ignore, backend still settles */
+  } catch (err: unknown) {
+    // 4902 = chain not added to the wallet → add it, then it becomes active.
+    const code = (err as { code?: number })?.code;
+    if (code === 4902 && chain.rpc) {
+      try {
+        await provider.request({
+          method: "wallet_addEthereumChain",
+          params: [{
+            chainId: hexId,
+            chainName: `${chain.name} (Lamina testnet)`,
+            nativeCurrency: { name: chain.nativeSymbol || "ETH", symbol: chain.nativeSymbol || "ETH", decimals: 18 },
+            rpcUrls: [chain.rpc],
+            blockExplorerUrls: chain.explorer ? [chain.explorer] : undefined,
+          }],
+        });
+      } catch {
+        /* user declined add — ignore, backend still settles */
+      }
+    }
+    /* other errors (user declined switch) — ignore */
   }
 }
 
@@ -55,8 +75,12 @@ export function ChainProvider({ children }: { children: ReactNode }) {
     void trySwitchEvmNetwork(next);
   }, []);
 
+  const switchWalletNetwork = useCallback(async () => {
+    await trySwitchEvmNetwork(active);
+  }, [active]);
+
   return (
-    <ChainContext.Provider value={{ active, chains: LIVE_CHAINS, setChain }}>
+    <ChainContext.Provider value={{ active, chains: LIVE_CHAINS, setChain, switchWalletNetwork }}>
       {children}
     </ChainContext.Provider>
   );

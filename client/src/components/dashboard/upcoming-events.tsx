@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { DollarSign, Clock, TrendingUp, FileText } from "lucide-react";
 import { getUpcomingEvents } from "@/lib/api";
+import { useChain } from "@/contexts/chain-context";
 
 interface UpcomingEvent {
   id: number;
@@ -39,13 +40,15 @@ export default function UpcomingEvents() {
   const [events, setEvents] = useState<UpcomingEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [, setTick] = useState(0);
+  const { active } = useChain();
 
   useEffect(() => {
-    getUpcomingEvents(5)
+    setLoading(true);
+    getUpcomingEvents(5, active.slug)
       .then(setEvents)
       .catch(() => setEvents([]))
       .finally(() => setLoading(false));
-  }, []);
+  }, [active.slug]);
 
   // Tick every 60s to update countdowns
   useEffect(() => {

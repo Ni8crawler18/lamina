@@ -1,5 +1,8 @@
 "use client";
 
+import { ExternalLink } from "lucide-react";
+import { explorerAddressUrl, type ChainBrand } from "@/lib/chains";
+
 interface Holder {
   id: number;
   account_id: string;
@@ -12,7 +15,7 @@ interface Holder {
   ofac_status?: string;
 }
 
-export default function HolderTable({ holders, decimals = 2 }: { holders: Holder[]; decimals?: number }) {
+export default function HolderTable({ holders, decimals = 2, chain }: { holders: Holder[]; decimals?: number; chain?: ChainBrand }) {
   if (!holders || holders.length === 0) {
     return (
       <p className="text-sm text-muted-foreground text-center py-12">
@@ -40,7 +43,19 @@ export default function HolderTable({ holders, decimals = 2 }: { holders: Holder
           {holders.map((h) => (
             <tr key={h.id} className="border-t border-border/30 hover:bg-card/50 transition-colors">
               <td className="py-3 pl-4">
-                <span className="font-mono text-xs">{h.account_id}</span>
+                {explorerAddressUrl(chain, h.account_id) ? (
+                  <a
+                    href={explorerAddressUrl(chain, h.account_id)!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-xs text-primary/70 hover:text-primary inline-flex items-center gap-1 transition-colors group"
+                  >
+                    {h.account_id}
+                    <ExternalLink className="w-2.5 h-2.5 opacity-0 group-hover:opacity-100" />
+                  </a>
+                ) : (
+                  <span className="font-mono text-xs">{h.account_id}</span>
+                )}
               </td>
               <td className="py-3 text-xs text-muted-foreground">{h.name || "—"}</td>
               <td className="py-3 text-right">

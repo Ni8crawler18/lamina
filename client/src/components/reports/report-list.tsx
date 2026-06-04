@@ -6,12 +6,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 interface Report {
   id: number;
-  asset_id: number;
+  asset_id?: number;
   asset_name?: string;
   report_type: string;
   period: string;
   generated_at: string;
-  file_path?: string;
+  download_url?: string;
 }
 
 export default function ReportList({ reports }: { reports: Report[] }) {
@@ -50,15 +50,13 @@ export default function ReportList({ reports }: { reports: Report[] }) {
                 {report.generated_at ? new Date(report.generated_at + "Z").toLocaleString() : "—"}
               </td>
               <td className="px-4 py-3 text-right">
-                {report.file_path && (
-                  <button
-                    onClick={() => window.open(`${API_URL}/api/reports/${report.id}/download`, "_blank")}
-                    className="text-xs text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1"
-                  >
-                    <Download className="w-3 h-3" />
-                    Download
-                  </button>
-                )}
+                <button
+                  onClick={() => window.open(`${API_URL}${report.download_url || `/api/reports/${report.id}/download`}`, "_blank")}
+                  className="text-xs text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1"
+                >
+                  <Download className="w-3 h-3" />
+                  Download
+                </button>
               </td>
             </tr>
           ))}

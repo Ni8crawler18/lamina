@@ -28,7 +28,8 @@ def _build_adapter(config: ChainConfig) -> ChainAdapter:
         from app.chains.hedera.adapter import HederaAdapter
         return HederaAdapter(config)
     if config.family == "solana":
-        raise NotImplementedError("Solana adapter is phase 2")
+        from app.chains.solana.adapter import SolanaAdapter
+        return SolanaAdapter(config)
     raise ValueError(f"Unknown chain family '{config.family}' for chain '{config.slug}'")
 
 

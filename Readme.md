@@ -113,7 +113,7 @@ docker compose up -d
 
 # 2. backend
 python -m venv venv && source venv/bin/activate
-pip install -r server/requirements.txt
+pip install -e server/                 # optional chains: pip install -e "server/[solana,hedera]"
 cp server/.env.example server/.env     # add RPC URLs, deployer key, Anthropic key
 
 # 3. frontend

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import AssetCard from "@/components/assets/asset-card";
 import UpcomingEvents from "@/components/dashboard/upcoming-events";
+import CrossChainSummary from "@/components/dashboard/cross-chain-summary";
 import { getAssets, checkHealth } from "@/lib/api";
 import Link from "next/link";
 import { useWallet } from "@/contexts/wallet-context";
@@ -98,9 +99,17 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Stats */}
+      {/* Cross-chain rollup — portfolio across every network */}
+      {backendUp && <CrossChainSummary />}
+
+      {/* Active-chain stats */}
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+          On {active.name}
+        </p>
+      </div>
       <div className="grid grid-cols-4 gap-3 mb-8">
-        <StatCard label="Total AUM" value={`$${totalAUM.toLocaleString()}`} highlight />
+        <StatCard label="AUM" value={`$${totalAUM.toLocaleString()}`} highlight />
         <StatCard label="Active Assets" value={String(activeAssets.length)} />
         <StatCard label="Total Assets" value={String(assets.length)} />
         <StatCard label="Network" value={active.name} />

@@ -83,6 +83,7 @@ app.add_middleware(
 
 for r in (chains, assets, compliance, payouts, lifecycle, events, reports, ofac, chat):
     app.include_router(r.router)
+app.include_router(events.events_router)
 
 # MCP server (authed) — mounted only when explicitly enabled.
 if get_settings().mcp_enabled:

@@ -58,8 +58,8 @@ export const matureAsset = (assetId: number) =>
 // Events
 export const getEvents = (assetId: number) =>
   fetchAPI(`/api/assets/${assetId}/events`);
-export const getUpcomingEvents = (limit = 10) =>
-  fetchAPI(`/api/events/upcoming?limit=${limit}`);
+export const getUpcomingEvents = (limit = 10, chain?: string) =>
+  fetchAPI(`/api/events/upcoming?limit=${limit}${chain ? `&chain=${encodeURIComponent(chain)}` : ""}`);
 
 // Audit Log
 export const getAuditLog = (assetId: number) =>

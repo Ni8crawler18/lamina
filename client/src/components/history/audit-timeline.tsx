@@ -1,7 +1,7 @@
 "use client";
 
 import { ExternalLink } from "lucide-react";
-import type { ChainBrand } from "@/lib/chains";
+import { explorerTxUrl, explorerTokenUrl, explorerAddressUrl, type ChainBrand } from "@/lib/chains";
 
 interface LogEntry {
   sequence_number?: number;
@@ -39,18 +39,23 @@ function explorerLink(
   details: Record<string, unknown>,
 ): { label: string; url: string } | null {
   if (!chain?.explorer || !details) return null;
-  const evm = chain.family !== "hedera";
   const str = (v: unknown) => (typeof v === "string" && v && v !== "-" ? v : undefined);
 
   const tx = str(details.tx) || str(details.tx_hash) || str(details.transaction_id);
   if (tx) {
-    const h = evm ? (tx.startsWith("0x") ? tx : `0x${tx}`) : tx;
-    return { label: "transaction", url: evm ? `${chain.explorer}/tx/${h}` : `${chain.explorer}/transaction/${tx}` };
+    const url = explorerTxUrl(chain, tx);
+    if (url) return { label: "transaction", url };
   }
   const token = str(details.token_ref) || str(details.token_id);
-  if (token) return { label: "token", url: evm ? `${chain.explorer}/address/${token}` : `${chain.explorer}/token/${token}` };
+  if (token) {
+    const url = explorerTokenUrl(chain, token);
+    if (url) return { label: "token", url };
+  }
   const acct = str(details.account_id) || str(details.buyer) || str(details.to);
-  if (acct) return { label: "account", url: evm ? `${chain.explorer}/address/${acct}` : `${chain.explorer}/account/${acct}` };
+  if (acct) {
+    const url = explorerAddressUrl(chain, acct);
+    if (url) return { label: "account", url };
+  }
   return null;
 }
 

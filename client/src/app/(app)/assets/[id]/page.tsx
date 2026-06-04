@@ -19,9 +19,11 @@ import {
   matureAsset,
   generateReport,
 } from "@/lib/api";
+import { chainBySlug, explorerTokenUrl } from "@/lib/chains";
 
 interface Asset {
   id: number;
+  chain: string;
   name: string;
   symbol: string;
   token_id: string | null;
@@ -44,7 +46,7 @@ export default function AssetDetail() {
   const [asset, setAsset] = useState<Asset | null>(null);
   const [holders, setHolders] = useState<Record<string, unknown>[]>([]);
   const [compliance, setCompliance] = useState(null);
-  const [auditLog, setAuditLog] = useState<{ hcs_messages: unknown[]; local_log: unknown[]; topic_id?: string } | null>(null);
+  const [auditLog, setAuditLog] = useState<{ entries: unknown[]; topic_id?: string; chain?: string } | null>(null);
   const [events, setEvents] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -55,7 +57,7 @@ export default function AssetDetail() {
         getAsset(assetId),
         getHolders(assetId),
         getCompliance(assetId),
-        getAuditLog(assetId).catch(() => ({ hcs_messages: [], local_log: [] })),
+        getAuditLog(assetId).catch(() => ({ entries: [] })),
         getEvents(assetId),
       ]);
       setAsset(assetData);
@@ -105,15 +107,15 @@ export default function AssetDetail() {
   }
 
   const faceValue = asset.total_supply / Math.pow(10, asset.decimals);
+  const chain = chainBySlug(asset.chain);
+  const isHedera = chain?.family === "hedera";
+  const tokenUrl = asset.token_id ? explorerTokenUrl(chain, asset.token_id) : null;
   const statusColor = {
     active: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
     matured: "bg-blue-500/10 text-blue-400 border-blue-500/20",
   }[asset.status] || "bg-muted text-muted-foreground";
 
-  const allLogs = [
-    ...(auditLog?.hcs_messages || []),
-    ...(auditLog?.local_log || []),
-  ] as Record<string, unknown>[];
+  const allLogs = (auditLog?.entries || []) as Record<string, unknown>[];
 
   return (
     <div className="p-8">
@@ -143,23 +145,37 @@ export default function AssetDetail() {
             <span className="font-mono text-xs text-muted-foreground">{asset.symbol}</span>
             <span className="text-muted-foreground/30">|</span>
             {asset.token_id ? (
-              <a
-                href={`https://hashscan.io/testnet/token/${asset.token_id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-mono text-xs text-primary/70 hover:text-primary inline-flex items-center gap-1 transition-colors"
-              >
-                {asset.token_id}
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-              </a>
+              tokenUrl ? (
+                <a
+                  href={tokenUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-mono text-xs text-primary/70 hover:text-primary inline-flex items-center gap-1 transition-colors"
+                >
+                  {asset.token_id}
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                </a>
+              ) : (
+                <span className="font-mono text-xs text-muted-foreground">{asset.token_id}</span>
+              )
             ) : (
               <span className="font-mono text-xs text-muted-foreground">pending</span>
             )}
-            {auditLog?.topic_id && (
+            {chain && (
+              <>
+                <span className="text-muted-foreground/30">|</span>
+                <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: chain.color }} />
+                  {chain.name}
+                </span>
+              </>
+            )}
+            {/* Audit trail: Hedera HCS topic links to explorer; EVM audit-topic shown as reference */}
+            {auditLog?.topic_id && isHedera && (
               <>
                 <span className="text-muted-foreground/30">|</span>
                 <a
-                  href={`https://hashscan.io/testnet/topic/${auditLog.topic_id}`}
+                  href={`${chain?.explorer || "https://hashscan.io/testnet"}/topic/${auditLog.topic_id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="font-mono text-xs text-primary/70 hover:text-primary inline-flex items-center gap-1 transition-colors"
@@ -222,11 +238,11 @@ export default function AssetDetail() {
         </TabsList>
 
         <TabsContent value="holders" className="mt-6">
-          <HolderTable holders={holders as never[]} decimals={asset.decimals} />
+          <HolderTable holders={holders as never[]} decimals={asset.decimals} chain={chain} />
         </TabsContent>
 
         <TabsContent value="activity" className="mt-6">
-          <ActionLog entries={allLogs as never[]} />
+          <ActionLog entries={allLogs as never[]} chain={chain} />
         </TabsContent>
 
         <TabsContent value="compliance" className="mt-6">
@@ -234,7 +250,7 @@ export default function AssetDetail() {
         </TabsContent>
 
         <TabsContent value="events" className="mt-6">
-          <EventTimeline events={events as never[]} />
+          <EventTimeline events={events as never[]} chain={chain} />
         </TabsContent>
       </Tabs>
     </div>

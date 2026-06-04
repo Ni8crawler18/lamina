@@ -11,6 +11,30 @@ from app.utils.aio import run_chain
 
 router = APIRouter(prefix="/api/assets/{asset_id}", tags=["events"])
 
+# Cross-asset event endpoints (not scoped to a single asset).
+events_router = APIRouter(prefix="/api/events", tags=["events"])
+
+
+@events_router.get("/upcoming")
+async def upcoming_events(
+    chain: str | None = None, limit: int = 10, session: AsyncSession = Depends(get_session)
+):
+    rows = await EventRepository(session).upcoming(chain, limit)
+    return [
+        {
+            "id": e.id,
+            "asset_id": e.asset_id,
+            "event_type": e.event_type,
+            "scheduled_at": e.scheduled_at,
+            "status": e.status,
+            "tx_hash": e.tx_hash,
+            "asset_name": a.name,
+            "asset_symbol": a.symbol,
+            "chain": a.chain,
+        }
+        for e, a in rows
+    ]
+
 
 @router.get("/events")
 async def list_events(asset_id: int, status: str | None = None, session: AsyncSession = Depends(get_session)):

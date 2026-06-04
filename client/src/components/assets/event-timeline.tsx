@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { DollarSign, Clock, TrendingUp, FileText, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { explorerTxUrl, type ChainBrand } from "@/lib/chains";
 
 interface ScheduledEvent {
   id: number;
@@ -42,7 +43,7 @@ function formatCountdown(scheduledAt: string): { text: string; overdue: boolean 
   return { text: `in ${minutes}m`, overdue: false };
 }
 
-export default function EventTimeline({ events }: { events: ScheduledEvent[] }) {
+export default function EventTimeline({ events, chain }: { events: ScheduledEvent[]; chain?: ChainBrand }) {
   const [, setTick] = useState(0);
 
   // Tick every 60s to update countdowns
@@ -129,15 +130,15 @@ export default function EventTimeline({ events }: { events: ScheduledEvent[] }) 
                       : `Executed: ${event.executed_at ? new Date(event.executed_at).toLocaleString() : new Date(event.scheduled_at).toLocaleString()}`}
                   </span>
 
-                  {event.tx_hash && (
+                  {event.tx_hash && explorerTxUrl(chain, event.tx_hash) && (
                     <a
-                      href={`https://hashscan.io/testnet/transaction/${event.tx_hash}`}
+                      href={explorerTxUrl(chain, event.tx_hash)!}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-[10px] text-primary/70 hover:text-primary transition-colors inline-flex items-center gap-0.5 opacity-0 group-hover:opacity-100"
                     >
                       <ExternalLink className="w-2.5 h-2.5" />
-                      HashScan
+                      view tx
                     </a>
                   )}
                 </div>

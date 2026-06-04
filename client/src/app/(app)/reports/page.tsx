@@ -19,7 +19,7 @@ interface Report {
   report_type: string;
   period: string;
   generated_at: string;
-  file_path?: string;
+  download_url?: string;
 }
 
 export default function ReportsPage() {

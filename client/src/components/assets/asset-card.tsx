@@ -2,9 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { ExternalLink } from "lucide-react";
+import { chainBySlug, explorerTokenUrl, explorerName } from "@/lib/chains";
 
 interface Asset {
   id: number;
+  chain?: string;
   name: string;
   symbol: string;
   token_id: string | null;
@@ -21,6 +23,8 @@ interface Asset {
 
 export default function AssetCard({ asset }: { asset: Asset }) {
   const router = useRouter();
+  const chain = chainBySlug(asset.chain);
+  const tokenUrl = asset.token_id ? explorerTokenUrl(chain, asset.token_id) : null;
   const statusColor = {
     active: "bg-emerald-500/10 text-emerald-400",
     matured: "bg-blue-500/10 text-blue-400",
@@ -58,22 +62,24 @@ export default function AssetCard({ asset }: { asset: Asset }) {
           <MaturityProgress createdAt={asset.created_at} maturityDate={asset.maturity_date} />
         )}
 
-        {/* Footer: token ID with HashScan link */}
+        {/* Footer: token ID with explorer link */}
         {asset.token_id && (
-          <div className="mt-4 pt-3 border-t border-border/30 flex items-center justify-between">
-            <span className="font-mono text-[10px] text-muted-foreground/60">
+          <div className="mt-4 pt-3 border-t border-border/30 flex items-center justify-between gap-2">
+            <span className="font-mono text-[10px] text-muted-foreground/60 truncate">
               {asset.token_id}
             </span>
-            <a
-              href={`https://hashscan.io/testnet/token/${asset.token_id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="text-[10px] text-primary/50 hover:text-primary transition-colors inline-flex items-center gap-0.5 opacity-0 group-hover:opacity-100"
-            >
-              <ExternalLink className="w-2.5 h-2.5" />
-              HashScan
-            </a>
+            {tokenUrl && (
+              <a
+                href={tokenUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="text-[10px] text-primary/50 hover:text-primary transition-colors inline-flex items-center gap-0.5 opacity-0 group-hover:opacity-100 flex-shrink-0"
+              >
+                <ExternalLink className="w-2.5 h-2.5" />
+                {explorerName(chain)}
+              </a>
+            )}
           </div>
         )}
     </div>
