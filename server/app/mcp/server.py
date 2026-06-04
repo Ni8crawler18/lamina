@@ -1,4 +1,4 @@
-"""Lamina MCP server.
+"""Laminaa MCP server.
 
 Exposes the RWA tool layer (services/ai/tools.py) over Streamable HTTP, reusing the
 same execute_tool dispatch as the AI agent. READ tools are always available; WRITE

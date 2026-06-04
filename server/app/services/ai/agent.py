@@ -1,4 +1,4 @@
-"""Lamina AI agent — Claude with tool use over the RWA services."""
+"""Laminaa AI agent — Claude with tool use over the RWA services."""
 
 from __future__ import annotations
 

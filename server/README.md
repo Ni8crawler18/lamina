@@ -1,4 +1,4 @@
-# Lamina - chain architecture
+# Laminaa - chain architecture
 
 Multi-chain autonomous RWA lifecycle backend. FastAPI · SQLAlchemy 2.0 (async) ·
 Postgres · web3 (EVM) + Hedera · Anthropic AI agent.

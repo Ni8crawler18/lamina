@@ -33,7 +33,7 @@ export default function ChatPanel() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "I'm Lamina, your RWA lifecycle agent on Hedera. I can tokenize assets, manage compliance, distribute coupons, generate reports, and execute purchases. What would you like to do?",
+      content: "I'm Laminaa, your RWA lifecycle agent on Hedera. I can tokenize assets, manage compliance, distribute coupons, generate reports, and execute purchases. What would you like to do?",
     },
   ]);
   const [input, setInput] = useState("");
@@ -104,7 +104,7 @@ export default function ChatPanel() {
                           <path d="M14 14L4 8.5L14 3L24 8.5L14 14Z" fill="#a78bfa"/>
                         </svg>
                       </div>
-                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Lamina</span>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">Laminaa</span>
                     </div>
                   )}
                   <div className={`rounded-xl px-4 py-3 ${
@@ -203,7 +203,7 @@ export default function ChatPanel() {
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Message Lamina..."
+            placeholder="Message Laminaa..."
             disabled={loading}
             className="flex-1 bg-card/30 border border-border/50 rounded-xl px-4 py-2.5 text-sm placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-colors disabled:opacity-50"
           />

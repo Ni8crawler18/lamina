@@ -65,8 +65,8 @@ export default function LoginScreen() {
       <div className="relative z-10 mx-auto my-auto w-full max-w-md px-6 py-12">
         <div className="w-full">
           <div className="mb-8 flex items-center justify-center gap-2.5">
-            <img src="/logo.svg" alt="Lamina" className="h-8 w-8" />
-            <span className="text-xl font-medium tracking-tight">Lamina</span>
+            <img src="/logo.svg" alt="Laminaa" className="h-8 w-8" />
+            <span className="text-xl font-medium tracking-tight">Laminaa</span>
           </div>
 
           <div className="glass rounded-2xl p-7">
@@ -105,7 +105,7 @@ export default function LoginScreen() {
           </div>
 
           <p className="mt-6 text-center text-[11px] leading-relaxed text-muted-foreground/70">
-            Lamina&apos;s agent signs on-chain actions; your wallet identifies you and your investors.
+            Laminaa&apos;s agent signs on-chain actions; your wallet identifies you and your investors.
             Testnet only — no mainnet funds at risk.
           </p>
         </div>

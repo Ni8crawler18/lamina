@@ -8,7 +8,7 @@ export default function Footer() {
             <path d="M14 18L4 12.5L14 7L24 12.5L14 18Z" fill="#7c5ce7" opacity="0.8"/>
             <path d="M14 14L4 8.5L14 3L24 8.5L14 14Z" fill="#a78bfa"/>
           </svg>
-          <span className="text-sm font-semibold">Lamina</span>
+          <span className="text-sm font-semibold">Laminaa</span>
           <span className="text-xs text-muted-foreground ml-2">Autonomous RWA lifecycle agent</span>
         </div>
 

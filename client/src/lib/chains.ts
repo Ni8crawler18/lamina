@@ -1,4 +1,4 @@
-// Chains Lamina deploys to. Logos are recolored to a cohesive blue monochrome
+// Chains Laminaa deploys to. Logos are recolored to a cohesive blue monochrome
 // (see /public/chains/*.png) so the set reads as one enterprise system.
 export type ChainBrand = {
   slug: string;

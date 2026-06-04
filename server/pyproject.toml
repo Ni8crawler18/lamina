@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "lamina-backend"
 version = "0.2.0"
-description = "Lamina — multi-chain autonomous RWA lifecycle backend"
+description = "Laminaa — multi-chain autonomous RWA lifecycle backend"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115.0",

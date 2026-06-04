@@ -1,4 +1,4 @@
-"""Lamina backend — FastAPI app, lifespan, router registration.
+"""Laminaa backend — FastAPI app, lifespan, router registration.
 
 Orchestration only: business logic lives in services/.
 """
@@ -39,7 +39,7 @@ async def lifespan(app: FastAPI):
         level=getattr(logging, settings.log_level.upper(), logging.INFO),
         format="%(asctime)s %(name)s %(levelname)s %(message)s",
     )
-    logger.info("Starting Lamina backend (%s)…", settings.environment)
+    logger.info("Starting Laminaa backend (%s)…", settings.environment)
 
     get_registry().load()
     try:
@@ -62,7 +62,7 @@ async def lifespan(app: FastAPI):
             from app.channels import telegram
             telegram.start()
             logger.info("Messaging channels enabled (telegram)")
-        logger.info("Lamina ready")
+        logger.info("Laminaa ready")
         yield
         if settings.channels_enabled:
             from app.channels import telegram
@@ -70,7 +70,7 @@ async def lifespan(app: FastAPI):
     stop_scheduler()
 
 
-app = FastAPI(title="Lamina API", version="0.2.0", lifespan=lifespan)
+app = FastAPI(title="Laminaa API", version="0.2.0", lifespan=lifespan)
 
 app.add_middleware(RequestContextMiddleware)
 app.add_middleware(
@@ -96,7 +96,7 @@ async def health():
     reg = get_registry()
     return {
         "status": "ok",
-        "service": "lamina",
+        "service": "Laminaa",
         "version": "0.2.0",
         "chains_enabled": [c.slug for c in reg.list_enabled()],
         "ofac_loaded": OFACScreener.get_instance().loaded,

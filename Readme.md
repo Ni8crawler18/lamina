@@ -6,11 +6,11 @@
   <img src="https://img.shields.io/badge/AI-Claude-d97706?style=flat-square" />
 </p>
 
-# Lamina
+# Laminaa
 
 **Autonomous, multi-chain RWA lifecycle agent.**
 
-One command to tokenize a bond. Zero humans to manage it after. Lamina handles compliance, coupon payments, NAV updates, regulatory reporting and maturity settlement — autonomously — on whichever network your investors are on.
+One command to tokenize a bond. Zero humans to manage it after. Laminaa handles compliance, coupon payments, NAV updates, regulatory reporting and maturity settlement — autonomously — on whichever network your investors are on.
 
 ---
 
@@ -27,7 +27,7 @@ Tokenized RWAs are ~$24B on-chain today and projected at $16T by 2030 (BCG). Eve
 ```
 "Tokenize a $10M 5-year US Treasury bond, US accredited investors only"
 
-Lamina:
+Laminaa:
 ├── Maps asset type → regulatory framework (SEC Reg D / Reg S, MiFID II)
 ├── Configures KYC whitelist + OFAC SDN sanctions screening
 ├── Deploys a compliant token on the chosen chain
@@ -80,7 +80,7 @@ People **and** agents drive the same engine:
 ## Architecture
 
 ```
- Interfaces                 Lamina engine (AI agent)            Networks
+ Interfaces                 Laminaa engine (AI agent)            Networks
  ───────────                ────────────────────────           ────────────────────
  REST / Web console   ──▶   Issuance · Compliance        ──▶   EVM adapter (web3.py)
  Telegram             ──▶   Lifecycle · Reporting               → ERC-3643 / ERC-20
@@ -159,7 +159,7 @@ Every step appears in **Audit History** with a one-click explorer link to its on
 ## Project Structure
 
 ```
-lamina/
+Laminaa/
 ├── server/                       # Python FastAPI backend
 │   ├── app/
 │   │   ├── main.py               # app init, routers, lifespan

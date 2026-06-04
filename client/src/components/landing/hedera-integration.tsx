@@ -34,7 +34,7 @@ export default function HederaIntegration() {
             Deep Hedera integration
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto mt-4">
-            Not a wrapper — Lamina uses Hedera&apos;s native services for every operation.
+            Not a wrapper — Laminaa uses Hedera&apos;s native services for every operation.
           </p>
         </div>
 

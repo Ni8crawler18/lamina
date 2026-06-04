@@ -28,7 +28,7 @@ export default function AppHeader() {
   const { address, email, mode, chainId, family, isConnected, disconnect } = useWallet();
   const { active, switchWalletNetwork } = useChain();
 
-  const title = PAGE_TITLES[pathname] || (pathname.startsWith("/assets/") ? "Asset Detail" : "Lamina");
+  const title = PAGE_TITLES[pathname] || (pathname.startsWith("/assets/") ? "Asset Detail" : "Laminaa");
   const explorer = address ? explorerAddressUrl(active, address) : null;
 
   // Wallet on a different EVM network than the active chain (cosmetic — backend signs).

@@ -13,7 +13,7 @@ const geistMono = localFont({
 });
 
 export const metadata = {
-  title: "Lamina — Autonomous RWA Lifecycle Agent",
+  title: "Laminaa — Autonomous RWA Lifecycle Agent",
   description:
     "One instruction issues a compliant real-world asset; an AI agent runs its entire regulated lifecycle — KYC/OFAC, coupons, NAV, maturity, reporting — across 7 chains.",
 };

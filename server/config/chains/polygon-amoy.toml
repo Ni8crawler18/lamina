@@ -1,5 +1,5 @@
 # Polygon Amoy testnet.
-# enabled=false until Lamina contracts (factory + audit_log) are deployed here.
+# enabled=false until Laminaa contracts (factory + audit_log) are deployed here.
 name          = "Polygon Amoy"
 slug          = "polygon-amoy"
 family        = "evm"

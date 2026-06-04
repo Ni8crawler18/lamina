@@ -46,7 +46,7 @@ export default function AppSidebar() {
       <div className="p-5">
         <Link href="/" className="flex items-center gap-2.5">
           <Logo />
-          <span className="font-semibold text-[15px] tracking-tight">Lamina</span>
+          <span className="font-semibold text-[15px] tracking-tight">Laminaa</span>
         </Link>
       </div>
 

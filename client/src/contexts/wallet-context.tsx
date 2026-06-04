@@ -148,7 +148,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (initedRef.current) return;
     initedRef.current = true;
-    const saved = win()?.sessionStorage?.getItem("lamina_auth");
+    const saved = win()?.sessionStorage?.getItem("Laminaa_auth");
     if (saved) {
       try {
         const d = JSON.parse(saved);
@@ -167,11 +167,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     if (typeof window === "undefined") return;
     if (mode) {
       sessionStorage.setItem(
-        "lamina_auth",
+        "Laminaa_auth",
         JSON.stringify({ mode, address, email, name, family, chainId })
       );
     } else {
-      sessionStorage.removeItem("lamina_auth");
+      sessionStorage.removeItem("Laminaa_auth");
     }
   }, [mode, address, email, name, family, chainId]);
 
@@ -223,7 +223,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       const hc = new HashConnect(
         LedgerId.TESTNET,
         WALLETCONNECT_PROJECT_ID,
-        { name: "Lamina", description: "Autonomous RWA Lifecycle Agent", icons: [], url: window.location.origin },
+        { name: "Laminaa", description: "Autonomous RWA Lifecycle Agent", icons: [], url: window.location.origin },
         false
       );
       hc.pairingEvent.on((data: { accountIds: string[] }) => {

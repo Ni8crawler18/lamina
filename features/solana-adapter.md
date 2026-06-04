@@ -1,7 +1,7 @@
 # Solana Adapter (Token-2022 permissioned RWA tokens)
 
 Status: **live on devnet, full lifecycle verified.** `config/chains/solana-devnet.toml`
-→ `enabled = true`; frontend `live: true`. Operator keypair at `~/lamina-sol.json`
+→ `enabled = true`; frontend `live: true`. Operator keypair at `~/Laminaa-sol.json`
 (`SOLANA_KEYPAIR_PATH`), funded with devnet SOL + Circle devnet USDC.
 
 Verified end-to-end on devnet (sample run, asset "Solana Test Bond" / STB,

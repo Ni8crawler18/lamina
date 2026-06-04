@@ -1,5 +1,5 @@
 # Avalanche Fuji C-Chain testnet.
-# enabled=false until Lamina contracts (factory + audit_log) are deployed here.
+# enabled=false until Laminaa contracts (factory + audit_log) are deployed here.
 name          = "Avalanche Fuji"
 slug          = "avalanche-fuji"
 family        = "evm"

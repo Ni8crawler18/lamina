@@ -1,4 +1,4 @@
-# Ethereum Sepolia testnet. Lamina contracts deployed 2026-06-03.
+# Ethereum Sepolia testnet. Laminaa contracts deployed 2026-06-03.
 name          = "Ethereum Sepolia"
 slug          = "ethereum-sepolia"
 family        = "evm"

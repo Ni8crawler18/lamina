@@ -119,7 +119,7 @@ class ReportingService:
                 f"Audit Summary — {period}\n\n"
                 f"Asset: {asset.name} ({asset.symbol})\nToken: {asset.token_id}\n"
                 f"Audit topic: {asset.topic_id}\n\n"
-                f"During {period} the Lamina agent performed {completed} scheduled operations and "
+                f"During {period} the Laminaa agent performed {completed} scheduled operations and "
                 f"enforced compliance on every transfer. All {whitelisted} whitelisted holders passed "
                 f"KYC/AML and OFAC screening. Every agent action was written to the chain's audit log "
                 f"({asset.chain}), providing tamper-proof records verifiable on the block explorer."
@@ -159,7 +159,7 @@ class ReportingService:
         styles.add(ParagraphStyle(name="SmallGray", fontSize=8, textColor=colors.gray))
         story = [
             Paragraph(f"<b>{title} — {period}</b>", styles["Title"]),
-            Paragraph("Lamina — Multi-Chain RWA Lifecycle Agent", styles["SmallGray"]),
+            Paragraph("Laminaa — Multi-Chain RWA Lifecycle Agent", styles["SmallGray"]),
             Paragraph(f"Chain: {asset.chain} · Generated {datetime.utcnow():%Y-%m-%d %H:%M UTC}",
                       styles["SmallGray"]),
             Spacer(1, 20),

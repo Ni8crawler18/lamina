@@ -95,7 +95,7 @@ class HederaAdapter(ChainAdapter):
 
         # HCS audit topic (separate tx on Hedera — no atomic factory)
         topic_tx = TopicCreateTransaction()
-        topic_tx.set_memo(f"Lamina audit: {name} ({symbol})")
+        topic_tx.set_memo(f"Laminaa audit: {name} ({symbol})")
         topic_tx.set_admin_key(key)
         topic_tx.set_submit_key(key)
         topic_ref = str(topic_tx.execute(client).topic_id)

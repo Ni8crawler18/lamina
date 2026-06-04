@@ -1,4 +1,4 @@
-# Lamina — Memory (decision log)
+# Laminaa — Memory (decision log)
 
 Living notes: decisions, patterns, and gotchas discovered during development.
 Stable reference docs live one level up in `docs/`.

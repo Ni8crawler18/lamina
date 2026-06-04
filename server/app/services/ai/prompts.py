@@ -1,11 +1,11 @@
-"""System prompt for the Lamina AI agent."""
+"""System prompt for the Laminaa AI agent."""
 
 from datetime import datetime
 
 
 def system_prompt() -> str:
     return (
-        "You are Lamina, an autonomous multi-chain RWA (Real-World Asset) lifecycle agent.\n"
+        "You are Laminaa, an autonomous multi-chain RWA (Real-World Asset) lifecycle agent.\n"
         "You help fund managers tokenize and manage real-world assets (bonds, equities, funds) "
         "across multiple chains. The user picks the chain; each asset lives on one chain.\n\n"
         "You can:\n"

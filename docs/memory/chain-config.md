@@ -12,7 +12,7 @@ Chains are pure config. To add one:
    [contracts]
    factory = ""; audit_log = ""; usdc = "<usdc address>"
    ```
-2. **(EVM) Deploy the Lamina contracts** to that chain and fill `factory` + `audit_log`.
+2. **(EVM) Deploy the Laminaa contracts** to that chain and fill `factory` + `audit_log`.
    Find the chain's canonical USDC (Circle docs) and set `usdc`.
 3. **Secrets** stay in `.env` — the deployer key is reused across EVM chains. For a
    private/paid RPC set the `rpc_url_env` var. Hedera needs `HEDERA_OPERATOR_ID/KEY`.

@@ -2,7 +2,7 @@
 # USDC is the NATIVE gas token (no ETH needed). USDC also has a standard ERC-20
 # representation (6 dec) at the address below, which our payout logic uses.
 # Get testnet USDC from https://faucet.circle.com .
-# enabled=false until Lamina contracts (factory + audit_log) are deployed here.
+# enabled=false until Laminaa contracts (factory + audit_log) are deployed here.
 name          = "Arc Testnet"
 slug          = "arc-testnet"
 family        = "evm"

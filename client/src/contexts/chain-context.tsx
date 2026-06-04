@@ -41,7 +41,7 @@ async function trySwitchEvmNetwork(chain: ChainBrand) {
           method: "wallet_addEthereumChain",
           params: [{
             chainId: hexId,
-            chainName: `${chain.name} (Lamina testnet)`,
+            chainName: `${chain.name} (Laminaa testnet)`,
             nativeCurrency: { name: chain.nativeSymbol || "ETH", symbol: chain.nativeSymbol || "ETH", decimals: 18 },
             rpcUrls: [chain.rpc],
             blockExplorerUrls: chain.explorer ? [chain.explorer] : undefined,
@@ -62,7 +62,7 @@ export function ChainProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (inited.current) return;
     inited.current = true;
-    const saved = typeof window !== "undefined" ? localStorage.getItem("lamina_chain") : null;
+    const saved = typeof window !== "undefined" ? localStorage.getItem("Laminaa_chain") : null;
     const found = chainBySlug(saved);
     if (found && found.live) setActive(found);
   }, []);
@@ -71,7 +71,7 @@ export function ChainProvider({ children }: { children: ReactNode }) {
     const next = chainBySlug(slug);
     if (!next) return;
     setActive(next);
-    if (typeof window !== "undefined") localStorage.setItem("lamina_chain", slug);
+    if (typeof window !== "undefined") localStorage.setItem("Laminaa_chain", slug);
     void trySwitchEvmNetwork(next);
   }, []);
 

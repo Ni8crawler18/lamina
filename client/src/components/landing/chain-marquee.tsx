@@ -2,7 +2,7 @@
 
 import { CHAINS } from "@/lib/chains";
 
-/** Infinite left-scrolling marquee of the networks Lamina runs on (logos recolored to theme).
+/** Infinite left-scrolling marquee of the networks Laminaa runs on (logos recolored to theme).
  *  Plain <img> on purpose — bypasses the next/image optimizer cache. */
 export function ChainMarquee() {
   const row = [...CHAINS, ...CHAINS];

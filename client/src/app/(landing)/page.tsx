@@ -43,7 +43,7 @@ export default function Landing() {
 }
 
 function Logo({ size = 28 }: { size?: number }) {
-  return <img src="/logo.svg" alt="Lamina" width={size} height={size} style={{ width: size, height: size }} />;
+  return <img src="/logo.svg" alt="Laminaa" width={size} height={size} style={{ width: size, height: size }} />;
 }
 
 function Nav() {
@@ -52,7 +52,7 @@ function Nav() {
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-2.5">
           <Logo />
-          <span className="text-lg font-medium tracking-tight">Lamina</span>
+          <span className="text-lg font-medium tracking-tight">Laminaa</span>
         </Link>
         <div className="hidden items-center gap-9 text-sm text-muted-foreground md:flex">
           <a href="#lifecycle" className="transition-colors hover:text-foreground">Lifecycle</a>
@@ -89,7 +89,7 @@ function Hero() {
           </h1>
 
           <p className="reveal reveal-2 mt-8 max-w-xl text-lg leading-relaxed text-muted-foreground">
-            Lamina is the lifecycle layer for tokenized securities. Issue an{" "}
+            Laminaa is the lifecycle layer for tokenized securities. Issue an{" "}
             <span className="text-foreground">ERC-3643</span> permissioned token, and the agent
             enforces KYC and OFAC SDN screening on every transfer, distributes USDC coupons, updates
             NAV, and settles redemption at maturity — on any EVM network, Hedera, or Solana, with an
@@ -240,7 +240,7 @@ function MultiChain() {
           </h2>
           <p className="mt-7 text-lg leading-relaxed text-muted-foreground">
             Your investors and partners aren&apos;t all on one chain — and you shouldn&apos;t have to
-            rebuild for each. Lamina issues and services the same compliant asset on whichever network
+            rebuild for each. Laminaa issues and services the same compliant asset on whichever network
             you choose, with one workflow and one audit trail, settling in USDC everywhere.
           </p>
           <ul className="mt-8 space-y-4">
@@ -324,7 +324,7 @@ function ArchitectureSVG() {
         {/* ─── labels + logos ─── */}
         {/* group titles */}
         <text x="40" y="52" fill={TXT} fontSize="19">Interfaces</text>
-        <text x="370" y="52" fill={TXT} fontSize="19">Lamina engine</text>
+        <text x="370" y="52" fill={TXT} fontSize="19">Laminaa engine</text>
         <text x="700" y="52" fill={TXT} fontSize="19">Networks · USDC</text>
 
         {/* interfaces */}
@@ -387,7 +387,7 @@ function Surfaces() {
   const s = [
     { logo: "/logo.svg", t: "REST & web console", d: "Issue, onboard, distribute, and settle from a typed API and the operator dashboard." },
     { logo: "/chains/telegram.png", t: "Telegram Bot API", d: "Operate the lifecycle in natural language, with an explicit confirmation step before any state-changing call." },
-    { logo: "/chains/mcp.png", t: "Model Context Protocol", d: "An authenticated, scope-gated MCP server lets other agents and back-office systems drive Lamina." },
+    { logo: "/chains/mcp.png", t: "Model Context Protocol", d: "An authenticated, scope-gated MCP server lets other agents and back-office systems drive Laminaa." },
   ];
   return (
     <section id="surfaces" className="mx-auto max-w-7xl px-6 py-28">
@@ -467,7 +467,7 @@ function Footer() {
         <div>
           <div className="flex items-center gap-2.5">
             <Logo />
-            <span className="text-lg font-medium">Lamina</span>
+            <span className="text-lg font-medium">Laminaa</span>
           </div>
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
             The autonomous lifecycle layer for tokenized real-world assets. Compliant by construction,
@@ -487,7 +487,7 @@ function Footer() {
       </div>
       <div className="border-t border-border/40">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-6 py-6 text-xs text-muted-foreground/70 sm:flex-row">
-          <span>© {new Date().getFullYear()} Lamina. Autonomous RWA lifecycle infrastructure.</span>
+          <span>© {new Date().getFullYear()} Laminaa. Autonomous RWA lifecycle infrastructure.</span>
           <span>EVM · Hedera · Solana · Arbitrum Orbit</span>
         </div>
       </div>

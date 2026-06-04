@@ -20,7 +20,7 @@ export default function PitchPage() {
     <div className="flex flex-col h-[calc(100vh-3.5rem)]">
       {/* Top bar */}
       <div className="flex items-center justify-between px-8 py-3 border-b border-border/30">
-        <span className="text-sm font-medium">Pitch Deck &mdash; 10 Slides</span>
+        <span className="text-sm font-medium">Pitch Deck &mdash; 11 Slides</span>
         <div className="flex items-center gap-2">
           <button
             onClick={goFullscreen}
@@ -44,7 +44,7 @@ export default function PitchPage() {
         <iframe
           ref={iframeRef}
           src="/slides.html"
-          title="Lamina Pitch Slides"
+          title="Laminaa Pitch Slides"
           className="w-full h-full border-0"
           allowFullScreen
         />

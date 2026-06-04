@@ -1,7 +1,7 @@
-# Lamina Architecture
+# Laminaa Architecture
 
-Lamina is a **multi-chain autonomous RWA lifecycle backend**. A fund manager issues
-one instruction; Lamina handles issuance, compliance, payouts, valuation, maturity,
+Laminaa is a **multi-chain autonomous RWA lifecycle backend**. A fund manager issues
+one instruction; Laminaa handles issuance, compliance, payouts, valuation, maturity,
 and reporting across the chain the user selects — driven by an AI agent on top of a
 clean service API.
 

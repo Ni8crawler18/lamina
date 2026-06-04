@@ -1,5 +1,5 @@
 # Robinhood Chain Testnet — Arbitrum Orbit L2 (RWA-focused).
-# Fully deployed: Lamina contracts + Mock USDC live here.
+# Fully deployed: Laminaa contracts + Mock USDC live here.
 name          = "Robinhood Chain Testnet"
 slug          = "robinhood-testnet"
 family        = "evm"
