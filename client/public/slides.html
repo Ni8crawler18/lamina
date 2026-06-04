@@ -4,172 +4,197 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Laminaa — Pitch Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
-
+  /* Laminaa — same theme as the website: near-black ink · iris violet→indigo→cyan · extralight Hanken Grotesk */
   :root {
-    --bg:     #f6f5f2;
-    --ink:    #18181b;
-    --body:   #55555f;
-    --muted:  #8a8a93;
-    --line:   #e6e4dd;
-    --card:   #ffffff;
-    --accent: #5b4bdb;
-    --accent-soft: #efecfd;
-    --green:  #2fa46a;
+    --bg:     240 32% 4%;
+    --ink1:   240 32% 5%;
+    --fg:     233 30% 93%;
+    --card:   236 28% 7%;
+    --muted:  235 12% 62%;
+    --border: 240 22% 14%;
+    --violet: 252 92% 72%;
+    --indigo: 238 90% 66%;
+    --cyan:   192 100% 66%;
   }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    font-family: 'Schibsted Grotesk', -apple-system, sans-serif;
-    background: var(--bg);
-    color: var(--ink);
-    overflow: hidden;
-    height: 100vh; width: 100vw;
+    font-family: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+    background: hsl(var(--bg));
+    color: hsl(var(--fg));
+    overflow: hidden; height: 100vh; width: 100vw;
     -webkit-font-smoothing: antialiased;
+    font-feature-settings: "tnum";
   }
-  .mono { font-family: 'IBM Plex Mono', monospace; }
-  .deck { position: relative; width: 100%; height: 100vh; }
+  /* grain overlay */
+  body::after {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 200; opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
 
+  .deck { position: relative; width: 100%; height: 100vh; }
   .slide {
-    position: absolute; inset: 0;
+    position: absolute; inset: 0; overflow: hidden;
     display: flex; flex-direction: column; justify-content: center;
-    padding: 10vh 9vw;
-    opacity: 0; pointer-events: none;
-    transition: opacity 0.45s ease;
+    padding: 10vh 8vw;
+    opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
   }
   .slide.active { opacity: 1; pointer-events: auto; }
 
-  /* ── Top bar ──────────────────────────────────── */
-  .bar {
-    position: absolute; top: 5vh; left: 9vw; right: 9vw;
-    display: flex; justify-content: space-between; align-items: center;
-    font-size: 0.78rem; color: var(--muted);
+  /* ── atmosphere ── */
+  .vault-grid {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(hsl(233 40% 90% / 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(233 40% 90% / 0.035) 1px, transparent 1px);
+    background-size: 70px 70px;
+    -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 30%, transparent 100%);
+    mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, #000 30%, transparent 100%);
   }
-  .bar .wm { font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
-  .bar .wm b { color: var(--accent); }
-  .bar .sec { font-family: 'IBM Plex Mono', monospace; font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; }
+  .aura { position: absolute; border-radius: 9999px; filter: blur(80px); pointer-events: none; }
+  .aura-violet { background: radial-gradient(circle, hsl(252 92% 66% / 0.22), transparent 70%); }
+  .aura-indigo { background: radial-gradient(circle, hsl(238 90% 60% / 0.18), transparent 70%); }
+  .aura-cyan   { background: radial-gradient(circle, hsl(192 100% 60% / 0.14), transparent 70%); }
 
-  /* ── Reveal ───────────────────────────────────── */
-  .reveal { opacity: 0; transform: translateY(14px); }
+  /* ── typography ── */
+  .iris {
+    background: linear-gradient(100deg, hsl(252 95% 80%) 0%, hsl(238 90% 70%) 45%, hsl(192 100% 70%) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .eyebrow { font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3em; color: hsl(var(--cyan)); margin-bottom: 1.5rem; }
+  h1 { font-weight: 200; font-size: clamp(3rem, 7vw, 6rem); line-height: 1.0; letter-spacing: -0.025em; }
+  h2 { font-weight: 200; font-size: clamp(2.2rem, 5vw, 4.2rem); line-height: 1.04; letter-spacing: -0.025em; }
+  h2 .iris, h1 .iris { font-weight: 300; }
+  .lede { font-size: clamp(1.05rem, 1.4vw, 1.3rem); font-weight: 300; color: hsl(var(--muted)); line-height: 1.6; max-width: 660px; margin-top: 1.6rem; }
+  .lede strong { color: hsl(var(--fg)); font-weight: 500; }
+  .relz { position: relative; z-index: 2; }
+
+  /* ── reveal ── */
+  .reveal { opacity: 0; transform: translateY(22px); }
   .slide.active .reveal {
     opacity: 1; transform: none;
-    transition: opacity 0.6s cubic-bezier(.2,.7,.2,1), transform 0.6s cubic-bezier(.2,.7,.2,1);
-    transition-delay: calc(var(--i, 0) * 70ms);
+    transition: opacity 0.8s cubic-bezier(.22,1,.36,1), transform 0.8s cubic-bezier(.22,1,.36,1);
+    transition-delay: calc(var(--i,0) * 90ms);
   }
 
-  /* ── Type ─────────────────────────────────────── */
-  .eyebrow {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--accent); margin-bottom: 1.4rem; font-weight: 500;
-  }
-  h1 { font-weight: 800; font-size: clamp(3.4rem, 8vw, 7rem); line-height: 0.98; letter-spacing: -0.045em; }
-  h2 { font-weight: 700; font-size: clamp(2.2rem, 4.6vw, 3.8rem); line-height: 1.04; letter-spacing: -0.035em; }
-  h2.accent, .accent { color: var(--accent); }
-  .lede { font-size: clamp(1.05rem, 1.5vw, 1.35rem); color: var(--body); line-height: 1.55; max-width: 640px; font-weight: 400; margin-top: 1.3rem; }
-  .lede strong { color: var(--ink); font-weight: 600; }
-
-  /* ── Layout ───────────────────────────────────── */
+  /* ── layout ── */
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
   .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.2rem; }
-  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.1rem; }
-  .split  { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 4rem; align-items: center; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; }
+  .split  { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 4rem; align-items: center; }
 
-  /* ── Card ─────────────────────────────────────── */
-  .card {
-    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
-    padding: 1.5rem; box-shadow: 0 1px 2px rgba(20,20,30,0.03);
-  }
-  .card h3 { font-size: 0.98rem; font-weight: 600; margin-bottom: 0.4rem; letter-spacing: -0.01em; }
-  .card p  { font-size: 0.85rem; color: var(--body); line-height: 1.5; }
-  .card .n { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--accent); margin-bottom: 0.7rem; }
+  /* ── cards ── */
+  .card { border: 1px solid hsl(var(--border) / 0.6); background: hsl(var(--card) / 0.4); border-radius: 16px; padding: 1.5rem; }
+  .card h3 { font-size: 1rem; font-weight: 400; margin-bottom: 0.45rem; }
+  .card h3.violet { color: hsl(var(--violet)); font-weight: 500; font-size: 0.92rem; }
+  .card p { font-size: 0.84rem; font-weight: 300; color: hsl(var(--muted)); line-height: 1.55; }
+  .card .num { font-size: 0.78rem; color: hsl(var(--violet) / 0.85); font-variant-numeric: tabular-nums; margin-bottom: 0.7rem; }
+  .avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1px solid hsl(var(--violet) / 0.4); box-shadow: 0 0 18px hsl(var(--violet) / 0.18); }
 
-  /* ── Stats ────────────────────────────────────── */
-  .stat-v { font-weight: 800; font-size: clamp(2.2rem,3.8vw,3.4rem); line-height: 1; letter-spacing: -0.04em; color: var(--ink); }
-  .stat-v small { font-size: 0.45em; color: var(--muted); font-weight: 600; }
-  .stat-l { font-size: 0.78rem; color: var(--muted); margin-top: 0.5rem; }
-  .figs { display: flex; flex-direction: column; gap: 1.5rem; }
-  .fig { padding-left: 1.1rem; border-left: 3px solid var(--accent); }
+  /* hairline-separated bordered grid (site lifecycle look) */
+  .cells { display: grid; gap: 1px; background: hsl(var(--border) / 0.4); border: 1px solid hsl(var(--border) / 0.6); border-radius: 18px; overflow: hidden; }
+  .cell { background: hsl(var(--ink1) / 0.85); padding: 1.5rem; position: relative; }
+  .cell .top { display: flex; align-items: baseline; justify-content: space-between; }
+  .cell .t { font-size: 1.5rem; font-weight: 200; }
+  .cell .n { font-size: 0.75rem; color: hsl(var(--violet) / 0.8); font-variant-numeric: tabular-nums; }
+  .cell p { font-size: 0.78rem; font-weight: 300; color: hsl(var(--muted)); line-height: 1.5; margin-top: 0.7rem; }
+  .cell .line { display: block; height: 1px; width: 100%; margin-top: 1rem; transform: scaleX(0); transform-origin: left; transition: transform 0.5s; background: linear-gradient(90deg, hsl(var(--violet)), hsl(var(--cyan)), transparent); }
+  .cell:hover .line { transform: scaleX(1); }
 
-  /* ── Pull ─────────────────────────────────────── */
-  .pull { font-size: clamp(1.15rem,1.9vw,1.55rem); font-weight: 600; line-height: 1.35; letter-spacing: -0.02em; color: var(--ink); max-width: 900px; margin-top: 2rem; }
-  .pull span { color: var(--accent); }
+  /* ── figures / stats ── */
+  .figs { display: flex; flex-direction: column; gap: 1.6rem; }
+  .fig-v { font-weight: 200; font-size: clamp(2.2rem,3.6vw,3.2rem); line-height: 1; font-variant-numeric: tabular-nums; }
+  .fig-v small { font-size: 0.42em; color: hsl(var(--muted)); }
+  .fig-l { font-size: 0.74rem; font-weight: 300; color: hsl(var(--muted)); margin-top: 0.45rem; }
 
-  /* ── Pipeline ─────────────────────────────────── */
-  .pipe { display: flex; gap: 0.7rem; margin-top: 2.4rem; }
-  .pipe-step { flex: 1; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1.2rem 0.9rem; box-shadow: 0 1px 2px rgba(20,20,30,0.03); }
-  .pipe-step .k { font-family: 'IBM Plex Mono', monospace; font-size: 0.66rem; color: var(--accent); }
-  .pipe-step h3 { font-size: 1.05rem; font-weight: 700; margin: 0.4rem 0 0.15rem; letter-spacing: -0.02em; }
-  .pipe-step p { font-size: 0.7rem; color: var(--muted); }
+  /* ── proof row (cover) ── */
+  .proof { display: flex; flex-wrap: wrap; gap: 0.6rem 2rem; font-size: 0.82rem; font-weight: 300; color: hsl(var(--muted)); }
+  .proof b { color: hsl(var(--violet)); font-weight: 500; margin-right: 0.4rem; }
 
-  /* ── Agent terminal (dark focal) ──────────────── */
-  .term { background: #15151c; border-radius: 14px; overflow: hidden; box-shadow: 0 12px 40px rgba(20,20,40,0.16); font-family: 'IBM Plex Mono', monospace; }
-  .term-bar { display: flex; align-items: center; gap: 0.45rem; padding: 0.85rem 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.08); color: #8b8b97; font-size: 0.64rem; letter-spacing: 0.12em; text-transform: uppercase; }
-  .term-bar i { width: 9px; height: 9px; border-radius: 50%; background: #3a3a48; display: inline-block; }
-  .term-bar i.g { background: var(--green); }
-  .term-body { padding: 1.3rem 1.4rem; font-size: 0.86rem; line-height: 2.1; }
+  /* ── pull ── */
+  .pull { font-weight: 300; font-size: clamp(1.15rem,1.9vw,1.55rem); line-height: 1.4; color: hsl(var(--fg)); max-width: 920px; margin-top: 2rem; }
+  .pull .iris { font-weight: 400; }
+
+  /* ── agent terminal (glass) ── */
+  .term { border-radius: 16px; overflow: hidden; border: 1px solid hsl(252 90% 80% / 0.18);
+    background: linear-gradient(135deg, hsl(238 60% 30% / 0.18), hsl(238 40% 14% / 0.06));
+    box-shadow: 0 0 50px hsl(var(--violet) / 0.12), inset 0 1px 0 hsl(var(--violet) / 0.22);
+    font-family: ui-monospace, "JetBrains Mono", "SFMono-Regular", Menlo, monospace; }
+  .term-bar { display: flex; align-items: center; gap: 0.5rem; padding: 0.85rem 1.1rem; border-bottom: 1px solid hsl(var(--border) / 0.6); font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: hsl(var(--muted)); }
+  .term-bar i { width: 8px; height: 8px; border-radius: 50%; background: hsl(var(--cyan)); box-shadow: 0 0 8px hsl(var(--cyan)); }
+  .term-body { padding: 1.3rem 1.4rem; font-size: 0.84rem; line-height: 2.05; }
   .term-body .ln { display: grid; grid-template-columns: 5.4em 1.4em 1fr; gap: 0.7rem; white-space: nowrap; }
-  .term-body .t { color: #56566a; }
-  .term-body .ok { color: var(--green); }
-  .term-body .run { color: #c9b8ff; }
-  .term-body .msg { color: #d9d9e3; }
-  .term-body .msg b { color: #fff; font-weight: 500; }
-  .term-foot { color: #8b8b97; font-style: italic; padding-left: 7.5em; }
+  .term-body .ts { color: hsl(235 12% 45%); }
+  .term-body .ok { color: hsl(var(--cyan)); }
+  .term-body .run { color: hsl(var(--violet)); }
+  .term-body .msg { color: hsl(var(--fg) / 0.92); }
+  .term-body .msg b { color: hsl(var(--cyan)); font-weight: 500; }
+  .term-foot { color: hsl(var(--muted)); font-style: italic; padding-left: 7.5em; }
 
-  /* ── Chain logos ──────────────────────────────── */
-  .chains { display: grid; grid-template-columns: repeat(9,1fr); gap: 0.7rem; margin-top: 0.2rem; }
-  .chip { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem; background: var(--card); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 1px 2px rgba(20,20,30,0.03); }
-  .chip img { height: 28px; width: 28px; object-fit: contain; }
-  .chip span { font-family: 'IBM Plex Mono', monospace; font-size: 0.5rem; color: var(--muted); }
+  /* ── chain tiles ── */
+  .chains { display: grid; grid-template-columns: repeat(9,1fr); gap: 0.7rem; }
+  .tile { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem;
+    border: 1px solid hsl(var(--border) / 0.7); background: hsl(var(--bg)); border-radius: 14px; }
+  .tile img { height: 46px; width: 46px; object-fit: contain; }
+  .tile span { font-size: 0.56rem; color: hsl(var(--muted)); letter-spacing: 0.02em; }
 
-  /* ── Standard cards ───────────────────────────── */
-  .std { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 1.4rem; border-top: 3px solid; box-shadow: 0 1px 2px rgba(20,20,30,0.03); }
-  .std .k { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
-  .std h3 { font-size: 1.2rem; font-weight: 700; margin: 0.3rem 0 0.8rem; letter-spacing: -0.02em; }
+  /* ── standard cards (multichain) ── */
+  .std { border: 1px solid hsl(var(--border) / 0.6); background: hsl(var(--card) / 0.4); border-radius: 16px; padding: 1.5rem; border-top: 2px solid; }
+  .std .k { font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: hsl(var(--muted)); }
+  .std h3 { font-size: 1.4rem; font-weight: 200; margin: 0.35rem 0 0.9rem; }
   .std ul { list-style: none; }
-  .std li { font-size: 0.78rem; color: var(--body); padding: 0.2rem 0 0.2rem 0.9rem; position: relative; line-height: 1.4; }
-  .std li::before { content: '—'; position: absolute; left: 0; color: var(--accent); }
-  .std-v { border-top-color: #7c5cff; } .std-b { border-top-color: #2f8fff; } .std-g { border-top-color: var(--green); }
+  .std li { font-size: 0.78rem; font-weight: 300; color: hsl(var(--muted)); padding: 0.2rem 0 0.2rem 1rem; position: relative; line-height: 1.45; }
+  .std li::before { content: ""; position: absolute; left: 0; top: 0.6rem; width: 5px; height: 5px; border-radius: 50%; background: hsl(var(--cyan)); box-shadow: 0 0 7px hsl(var(--cyan)); }
+  .std-v { border-top-color: hsl(var(--violet) / 0.7); }
+  .std-i { border-top-color: hsl(var(--indigo) / 0.7); }
+  .std-c { border-top-color: hsl(var(--cyan) / 0.7); }
 
-  /* ── Architecture ─────────────────────────────── */
-  .arch { display: flex; flex-direction: column; gap: 0.55rem; margin-top: 1.8rem; }
-  .arch-row { display: grid; grid-template-columns: 6.5rem 1fr; gap: 1rem; align-items: stretch; }
-  .arch-lab { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; }
-  .arch-cells { display: grid; gap: 0.55rem; }
-  .arch-cell { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 0.8rem 1rem; box-shadow: 0 1px 2px rgba(20,20,30,0.03); }
-  .arch-cell h4 { font-size: 0.82rem; font-weight: 600; margin-bottom: 0.1rem; }
-  .arch-cell span { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; color: var(--muted); }
+  /* ── architecture rows ── */
+  .arch { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1.8rem; }
+  .arch-row { display: grid; grid-template-columns: 7rem 1fr; gap: 1rem; align-items: stretch; }
+  .arch-lab { font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: hsl(var(--cyan)); display: flex; align-items: center; }
+  .arch-cells { display: grid; gap: 0.6rem; }
+  .arch-cell { border: 1px solid hsl(var(--border) / 0.6); background: hsl(var(--card) / 0.4); border-radius: 12px; padding: 0.8rem 1rem; }
+  .arch-cell h4 { font-size: 0.82rem; font-weight: 400; margin-bottom: 0.12rem; }
+  .arch-cell span { font-size: 0.62rem; color: hsl(var(--muted)); }
 
-  /* ── Tags ─────────────────────────────────────── */
+  /* ── tags ── */
   .tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-  .tag { font-family: 'IBM Plex Mono', monospace; font-size: 0.64rem; color: var(--body); background: var(--card); border: 1px solid var(--line); padding: 0.35rem 0.7rem; border-radius: 7px; }
-  .badge { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.74rem; font-weight: 600; color: var(--accent); background: var(--accent-soft); border: 1px solid #ddd6fb; padding: 0.45rem 0.9rem; border-radius: 999px; }
+  .tag { font-size: 0.66rem; font-weight: 300; color: hsl(var(--fg) / 0.9); border: 1px solid hsl(var(--border) / 0.7); background: hsl(var(--card) / 0.4); padding: 0.34rem 0.75rem; border-radius: 999px; }
+  .badge { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.72rem; font-weight: 400; color: hsl(var(--violet)); border: 1px solid hsl(var(--violet) / 0.25); background: hsl(var(--violet) / 0.07); padding: 0.42rem 0.9rem; border-radius: 999px; }
 
-  /* ── Cover ────────────────────────────────────── */
-  .cover-foot { margin-top: 2.6rem; }
-  .cover-strip { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
-  .cover-strip img { height: 24px; width: 24px; object-fit: contain; }
-  .cover-strip .lbl { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+  /* ── top bar / brand ── */
+  .bar { position: absolute; top: 5vh; left: 8vw; right: 8vw; display: flex; align-items: center; justify-content: space-between; z-index: 5; }
+  .bar .wm { display: flex; align-items: center; gap: 0.6rem; font-size: 1rem; font-weight: 500; letter-spacing: -0.01em; }
+  .bar .wm img { width: 24px; height: 24px; }
+  .bar .sec { font-size: 0.64rem; letter-spacing: 0.16em; text-transform: uppercase; color: hsl(var(--cyan)); }
 
-  /* ── CTA ──────────────────────────────────────── */
+  /* ── cover ── */
+  .cover-strip { display: flex; align-items: center; gap: 1.4rem; flex-wrap: wrap; margin-top: 2.4rem; }
+  .cover-strip img { height: 23px; width: 23px; object-fit: contain; }
+  .cover-strip .lbl { font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: hsl(var(--muted)); }
+
+  /* ── CTA ── */
   .cta { display: flex; gap: 0.7rem; margin-top: 2.2rem; }
-  .cta a { font-size: 0.85rem; font-weight: 600; text-decoration: none; padding: 0.75rem 1.4rem; border-radius: 10px; transition: all 0.2s; }
-  .cta .p { background: var(--accent); color: #fff; }
-  .cta .p:hover { background: #4a3cc4; }
-  .cta .s { border: 1px solid var(--line); color: var(--ink); background: var(--card); }
-  .cta .s:hover { border-color: var(--accent); color: var(--accent); }
+  .cta a { font-size: 0.85rem; font-weight: 400; text-decoration: none; padding: 0.8rem 1.5rem; border-radius: 999px; transition: all 0.2s; }
+  .cta .p { background: hsl(var(--violet)); color: hsl(240 40% 6%); font-weight: 500; }
+  .cta .p:hover { box-shadow: 0 0 34px hsl(var(--violet) / 0.5); }
+  .cta .s { border: 1px solid hsl(var(--border)); color: hsl(var(--fg)); background: hsl(var(--card) / 0.4); }
+  .cta .s:hover { border-color: hsl(var(--cyan) / 0.5); }
 
-  /* ── Footer ───────────────────────────────────── */
-  .counter { position: fixed; bottom: 1.6rem; right: 2rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.66rem; color: var(--muted); z-index: 100; }
-  .progress { position: fixed; bottom: 0; left: 0; height: 3px; background: var(--accent); transition: width 0.45s ease; z-index: 100; }
+  /* ── footer nav ── */
+  .progress { position: fixed; bottom: 0; left: 0; height: 2px; z-index: 100; background: linear-gradient(90deg, hsl(var(--violet)), hsl(var(--cyan))); transition: width 0.45s ease; }
+  .counter { position: fixed; bottom: 1.6rem; right: 2rem; font-size: 0.64rem; letter-spacing: 0.1em; color: hsl(var(--muted) / 0.7); z-index: 100; font-variant-numeric: tabular-nums; }
 
-  /* ── Print ────────────────────────────────────── */
   @media print {
     body { overflow: visible; height: auto; width: auto; }
+    body::after { display: none; }
     .deck { position: static; height: auto; }
-    .slide { position: static !important; opacity: 1 !important; pointer-events: auto !important; page-break-after: always; page-break-inside: avoid; min-height: 100vh; padding: 8vh 7vw; }
+    .slide { position: static !important; opacity: 1 !important; pointer-events: auto !important; page-break-after: always; page-break-inside: avoid; min-height: 100vh; padding: 8vh 6vw; }
     .slide:last-child { page-break-after: auto; }
     .reveal { opacity: 1 !important; transform: none !important; }
     .progress, .counter { display: none !important; }
@@ -183,90 +208,91 @@
 
   <!-- ░ COVER ░ -->
   <div class="slide active" data-slide="0">
-    <div class="bar"><span class="wm">Laminaa<b>.</b></span><span class="sec">Laminaa.com</span></div>
-    <div class="badge reveal" style="--i:0; align-self:flex-start; margin-bottom:2rem;">★ 3rd place — Hedera Apex Hackathon 2026</div>
-    <h1 class="reveal" style="--i:1;">Laminaa<span class="accent">.</span></h1>
-    <p class="lede reveal" style="--i:2; font-size:clamp(1.3rem,2.2vw,1.9rem); color:var(--ink); font-weight:600; max-width:760px; letter-spacing:-0.02em;">
-      The autonomous lifecycle layer for tokenized real-world assets.
-    </p>
-    <p class="lede reveal" style="--i:3; margin-top:0.9rem;">
-      Issue a compliant security in one command. An AI agent runs the rest of its life —
-      compliance, coupons, NAV, reporting and settlement — across <strong>9 networks</strong>.
-    </p>
-    <div class="cover-foot reveal" style="--i:4;">
-      <div class="cover-strip">
+    <div class="vault-grid"></div>
+    <div class="aura aura-violet" style="left:-12%; top:-18%; width:620px; height:620px;"></div>
+    <div class="aura aura-cyan" style="right:-10%; top:8%; width:480px; height:480px;"></div>
+    <div class="bar"><span class="wm"><img src="logo.svg" alt="">Laminaa</span><span class="sec">laminaa.com</span></div>
+    <div class="relz">
+      <div class="badge reveal" style="--i:0; margin-bottom:2rem;">★ 3rd place — Hedera Apex Hackathon 2026</div>
+      <h1 class="reveal" style="--i:1;">The autonomous<br><span class="iris">back office</span><br>for tokenized assets.</h1>
+      <p class="lede reveal" style="--i:2;">Issue an <strong>ERC-3643</strong> permissioned token in one command, and an AI agent enforces KYC &amp; OFAC on every transfer, pays USDC coupons, updates NAV, and settles at maturity — across <strong>9 networks</strong>.</p>
+      <div class="cover-strip reveal" style="--i:3;">
         <span class="lbl">Settles on</span>
-        <img src="chains/ethereum.png?v=8" alt=""><img src="chains/arbitrum.png?v=8" alt="">
-        <img src="chains/base.png?v=8" alt=""><img src="chains/polygon.png?v=8" alt="">
-        <img src="chains/avalanche.png?v=8" alt=""><img src="chains/arc.png?v=8" alt="">
-        <img src="chains/robinhood.png?v=8" alt=""><img src="chains/hedera.png?v=8" alt="">
-        <img src="chains/solana.png?v=8" alt="">
+        <img src="chains/ethereum.png?v=9" alt=""><img src="chains/arbitrum.png?v=9" alt=""><img src="chains/base.png?v=9" alt=""><img src="chains/polygon.png?v=9" alt=""><img src="chains/avalanche.png?v=9" alt=""><img src="chains/arc.png?v=9" alt=""><img src="chains/robinhood.png?v=9" alt=""><img src="chains/hedera.png?v=9" alt=""><img src="chains/solana.png?v=9" alt="">
+      </div>
+      <div class="proof reveal" style="--i:4; margin-top:2rem;">
+        <span><b>ERC-3643</b>+ HTS + Token-2022</span>
+        <span><b>9</b>networks</span>
+        <span><b>19</b>contract tests, source-verified</span>
       </div>
     </div>
   </div>
 
   <!-- ░ 01 PROBLEM ░ -->
   <div class="slide" data-slide="1">
-    <div class="bar"><span class="wm">Laminaa<b>.</b></span><span class="sec">01 / Problem</span></div>
-    <h2 class="reveal" style="--i:0;">You tokenized the fund.<br>Now you run it — <span class="accent">forever.</span></h2>
-    <div class="split" style="margin-top:2.2rem;">
-      <div class="grid-2" style="gap:1.1rem;">
-        <div class="card reveal" style="--i:1;"><div class="n">01</div><h3>Coupons on the clock</h3><p>Hundreds of holders, paid pro-rata, every month. Miss a date and you breach the prospectus.</p></div>
-        <div class="card reveal" style="--i:2;"><div class="n">02</div><h3>Every transfer is compliance</h3><p>KYC each holder, screen against OFAC, enforce Reg D / Reg S — on every trade.</p></div>
-        <div class="card reveal" style="--i:3;"><div class="n">03</div><h3>NAV &amp; reports</h3><p>Reprice when yields move, file reports regulators trust, quarter after quarter.</p></div>
-        <div class="card reveal" style="--i:4;"><div class="n">04</div><h3>Maturity</h3><p>Redeem principal and retire supply, correctly, at the end.</p></div>
+    <div class="aura aura-violet" style="right:-14%; top:-20%; width:520px; height:520px;"></div>
+    <div class="bar"><span class="wm"><img src="logo.svg" alt="">Laminaa</span><span class="sec">01 / Problem</span></div>
+    <div class="relz">
+      <p class="eyebrow reveal" style="--i:0;">The problem</p>
+      <h2 class="reveal" style="--i:1;">You tokenized the fund.<br>Now you run it — <span class="iris">forever.</span></h2>
+      <div class="split" style="margin-top:2.2rem;">
+        <div class="grid-2" style="gap:1rem;">
+          <div class="card reveal" style="--i:2;"><div class="num">01</div><h3>Coupons on the clock</h3><p>Hundreds of holders, paid pro-rata, every month. Miss a date and you breach the prospectus.</p></div>
+          <div class="card reveal" style="--i:3;"><div class="num">02</div><h3>Every transfer is compliance</h3><p>KYC each holder, screen against OFAC, enforce Reg D / Reg S — on every trade.</p></div>
+          <div class="card reveal" style="--i:4;"><div class="num">03</div><h3>NAV &amp; reports</h3><p>Reprice when yields move, file reports regulators trust, quarter after quarter.</p></div>
+          <div class="card reveal" style="--i:5;"><div class="num">04</div><h3>Maturity</h3><p>Redeem principal and retire supply, correctly, at the end.</p></div>
+        </div>
+        <div class="figs reveal" style="--i:6;">
+          <div><div class="fig-v iris">$16<small>T</small></div><div class="fig-l">Tokenized RWA by 2030 · BCG</div></div>
+          <div><div class="fig-v iris">5–15<small> bps</small></div><div class="fig-l">Manual lifecycle cost on AUM</div></div>
+          <div><div class="fig-v iris">$24<small>B</small></div><div class="fig-l">On-chain RWA today · rwa.xyz</div></div>
+        </div>
       </div>
-      <div class="figs reveal" style="--i:5;">
-        <div class="fig"><div class="stat-v">$16<small>T</small></div><div class="stat-l">Tokenized RWA by 2030 · BCG</div></div>
-        <div class="fig"><div class="stat-v">5–15<small> bps</small></div><div class="stat-l">Manual lifecycle cost on AUM</div></div>
-        <div class="fig"><div class="stat-v">$24<small>B</small></div><div class="stat-l">On-chain RWA today · rwa.xyz</div></div>
-      </div>
+      <p class="pull reveal" style="--i:7;">Issuance is a one-time event. <span class="iris">Lifecycle is the cost that never stops.</span></p>
     </div>
-    <p class="pull reveal" style="--i:6;">Issuance is a one-time event. <span>Lifecycle is the cost that never stops.</span></p>
   </div>
 
   <!-- ░ 02 SOLUTION ░ -->
   <div class="slide" data-slide="2">
-    <div class="bar"><span class="wm">Laminaa<b>.</b></span><span class="sec">02 / Solution</span></div>
-    <div class="eyebrow reveal" style="--i:0;">One instruction · a multi-year mandate</div>
-    <h2 class="reveal" style="--i:1;">One command. <span class="accent">Full autonomy.</span></h2>
-    <p class="lede reveal" style="--i:2;">The fund manager issues an asset once. An AI agent runs its entire life on-chain — no human after issuance.</p>
-    <div class="pipe reveal" style="--i:3;">
-      <div class="pipe-step"><div class="k">01</div><h3>Issue</h3><p>permissioned token</p></div>
-      <div class="pipe-step"><div class="k">02</div><h3>Comply</h3><p>KYC + OFAC</p></div>
-      <div class="pipe-step"><div class="k">03</div><h3>Distribute</h3><p>USDC coupons</p></div>
-      <div class="pipe-step"><div class="k">04</div><h3>Revalue</h3><p>NAV oracle</p></div>
-      <div class="pipe-step"><div class="k">05</div><h3>Report</h3><p>regulator PDFs</p></div>
-      <div class="pipe-step"><div class="k">06</div><h3>Settle</h3><p>redeem + burn</p></div>
-    </div>
-    <div class="grid-3" style="margin-top:1.6rem;">
-      <div class="card reveal" style="--i:4;"><h3>An agent, not a dashboard</h3><p>Claude with tool-use over REST, Telegram and MCP. It decides and executes.</p></div>
-      <div class="card reveal" style="--i:5;"><h3>Autonomous by schedule</h3><p>Coupons, NAV and maturity fire on their own clock. The backend holds the key and signs.</p></div>
-      <div class="card reveal" style="--i:6;"><h3>Compliant by construction</h3><p>KYC and OFAC enforced by the token itself — not bolted on after.</p></div>
+    <div class="aura aura-indigo" style="left:-10%; bottom:-20%; width:560px; height:560px;"></div>
+    <div class="bar"><span class="wm"><img src="logo.svg" alt="">Laminaa</span><span class="sec">02 / Solution</span></div>
+    <div class="relz">
+      <p class="eyebrow reveal" style="--i:0;">One instruction · the full regulated lifecycle</p>
+      <h2 class="reveal" style="--i:1;">One command. <span class="iris">Full autonomy.</span></h2>
+      <p class="lede reveal" style="--i:2;">The fund manager issues an asset once. An AI agent runs its entire life on-chain — no human after issuance.</p>
+      <div class="cells reveal" style="--i:3; grid-template-columns:repeat(3,1fr); margin-top:2.2rem;">
+        <div class="cell"><div class="top"><span class="t">Issue</span><span class="n">01</span></div><p>Deploy an ERC-3643 (T-REX) token + dedicated audit topic in one factory transaction.</p><span class="line"></span></div>
+        <div class="cell"><div class="top"><span class="t">Onboard</span><span class="n">02</span></div><p>Grant on-chain KYC after rapidfuzz OFAC SDN screening of names and wallet addresses.</p><span class="line"></span></div>
+        <div class="cell"><div class="top"><span class="t">Enforce</span><span class="n">03</span></div><p>The token's transfer hook gates KYC, jurisdiction (Reg D / Reg S), lock-ups and holder caps.</p><span class="line"></span></div>
+        <div class="cell"><div class="top"><span class="t">Distribute</span><span class="n">04</span></div><p>Pay coupons pro-rata in USDC — integer 6-decimal micro-units.</p><span class="line"></span></div>
+        <div class="cell"><div class="top"><span class="t">Revalue</span><span class="n">05</span></div><p>Mark NAV to a treasury-yield oracle.</p><span class="line"></span></div>
+        <div class="cell"><div class="top"><span class="t">Settle</span><span class="n">06</span></div><p>Claw back via permanent-delegate, return principal in USDC, burn supply.</p><span class="line"></span></div>
+      </div>
     </div>
   </div>
 
   <!-- ░ 03 THE AGENT ░ -->
   <div class="slide" data-slide="3">
-    <div class="bar"><span class="wm">Laminaa<b>.</b></span><span class="sec">03 / Why it's an agent</span></div>
-    <div class="split" style="gap:3.5rem;">
+    <div class="aura aura-cyan" style="right:-8%; top:18%; width:440px; height:440px;"></div>
+    <div class="bar"><span class="wm"><img src="logo.svg" alt="">Laminaa</span><span class="sec">03 / Why it's an agent</span></div>
+    <div class="relz split" style="gap:3.5rem;">
       <div>
-        <div class="eyebrow reveal" style="--i:0;">Not a query endpoint</div>
-        <h2 class="reveal" style="--i:1;">It acts when <span class="accent">no one is asking.</span></h2>
-        <p class="lede reveal" style="--i:2;">A query endpoint answers when called. Laminaa holds the signing key, runs on its own clock, and takes irreversible on-chain action toward a standing mandate.</p>
+        <p class="eyebrow reveal" style="--i:0;">Not a query endpoint</p>
+        <h2 class="reveal" style="--i:1;">It acts when <span class="iris">no one is asking.</span></h2>
+        <p class="lede reveal" style="--i:2;">A query endpoint answers when called. Laminaa holds the operator key, runs on its own clock, and closes a perceive → decide → act → verify loop on-chain toward a standing mandate.</p>
         <div class="grid-2 reveal" style="--i:3; margin-top:1.6rem; gap:1rem;">
-          <div class="card"><h3>Self-triggering</h3><p>The scheduler fires the coupon because it's due — no human prompt.</p></div>
-          <div class="card"><h3>Settles real state</h3><p>The output is a broadcast transaction with a hash, not a sentence.</p></div>
+          <div class="card"><h3>Self-triggering</h3><p>APScheduler fires coupons hourly, NAV daily, maturity every 6h — no human, no prompt in the loop.</p></div>
+          <div class="card"><h3>Settles real state</h3><p>Signs with the operator key, broadcasts, then verifies the on-chain signature status before writing the audit entry.</p></div>
         </div>
       </div>
       <div class="reveal" style="--i:4;">
         <div class="term">
-          <div class="term-bar"><i class="g"></i> scheduler · coupon_run · 02:00 UTC</div>
+          <div class="term-bar"><i></i> scheduler · coupon_run · 02:00 UTC</div>
           <div class="term-body">
-            <div class="ln"><span class="t">02:00:14</span><span class="run">⟳</span><span class="msg">coupon due · <b>AAPL26</b> · 142 holders</span></div>
-            <div class="ln"><span class="t">02:00:15</span><span class="ok">✓</span><span class="msg">ofac.screen — <b>142/142</b> clear</span></div>
-            <div class="ln"><span class="t">02:00:17</span><span class="ok">✓</span><span class="msg">pay_stable — <b>18,420.00 USDC</b></span></div>
-            <div class="ln"><span class="t">02:00:19</span><span class="ok">✓</span><span class="msg">audit.write — tx <b>5gH2…9kQ</b></span></div>
+            <div class="ln"><span class="ts">02:00:14</span><span class="run">⟳</span><span class="msg">coupon due · <b>AAPL26</b> · 142 holders</span></div>
+            <div class="ln"><span class="ts">02:00:15</span><span class="ok">✓</span><span class="msg">ofac.screen — <b>142/142</b> clear</span></div>
+            <div class="ln"><span class="ts">02:00:17</span><span class="ok">✓</span><span class="msg">pay_stable — <b>18,420.00 USDC</b></span></div>
+            <div class="ln"><span class="ts">02:00:19</span><span class="ok">✓</span><span class="msg">audit.write — tx <b>5gH2…9kQ</b></span></div>
             <div class="term-foot">— no human in the loop —</div>
           </div>
         </div>
@@ -276,104 +302,119 @@
 
   <!-- ░ 04 MULTICHAIN ░ -->
   <div class="slide" data-slide="4">
-    <div class="bar"><span class="wm">Laminaa<b>.</b></span><span class="sec">04 / Multi-chain</span></div>
-    <h2 class="reveal" style="--i:0;">One engine. <span class="accent">Every network.</span></h2>
-    <p class="lede reveal" style="--i:1;">Compliance and lifecycle logic is written once; a thin adapter speaks each chain's native standard. Add a chain with a config entry, not a rewrite.</p>
-    <div class="chains reveal" style="--i:2; margin-top:1.8rem;">
-      <div class="chip"><img src="chains/ethereum.png?v=8" alt=""><span>Ethereum</span></div>
-      <div class="chip"><img src="chains/arbitrum.png?v=8" alt=""><span>Arbitrum</span></div>
-      <div class="chip"><img src="chains/base.png?v=8" alt=""><span>Base</span></div>
-      <div class="chip"><img src="chains/polygon.png?v=8" alt=""><span>Polygon</span></div>
-      <div class="chip"><img src="chains/avalanche.png?v=8" alt=""><span>Avalanche</span></div>
-      <div class="chip"><img src="chains/arc.png?v=8" alt=""><span>Arc</span></div>
-      <div class="chip"><img src="chains/robinhood.png?v=8" alt=""><span>Robinhood</span></div>
-      <div class="chip"><img src="chains/hedera.png?v=8" alt=""><span>Hedera</span></div>
-      <div class="chip"><img src="chains/solana.png?v=8" alt=""><span>Solana</span></div>
-    </div>
-    <div class="grid-3" style="margin-top:1.4rem;">
-      <div class="std std-v reveal" style="--i:3;"><div class="k">EVM · 7 networks</div><h3>ERC-3643</h3><ul><li>Permissioned token + AuditLog</li><li>Source-verified · 19 Foundry tests</li></ul></div>
-      <div class="std std-b reveal" style="--i:4;"><div class="k">Solana · verified on devnet</div><h3>Token-2022</h3><ul><li>Frozen-by-default = whitelist</li><li>Permanent-delegate = clawback</li></ul></div>
-      <div class="std std-g reveal" style="--i:5;"><div class="k">Hedera · native</div><h3>HTS / HCS</h3><ul><li>Native KYC, freeze, wipe keys</li><li>Where Laminaa was born &amp; won</li></ul></div>
+    <div class="bar"><span class="wm"><img src="logo.svg" alt="">Laminaa</span><span class="sec">04 / Multi-chain</span></div>
+    <div class="relz">
+      <p class="eyebrow reveal" style="--i:0;">Reach investors on any chain</p>
+      <h2 class="reveal" style="--i:1;">One engine. <span class="iris">Every network.</span></h2>
+      <p class="lede reveal" style="--i:2;">A family-agnostic <strong>ChainAdapter</strong> speaks opaque token / holder / tx refs, so the core never imports a chain SDK. Adding an EVM network is a TOML entry — not a rewrite.</p>
+      <div class="chains reveal" style="--i:3; margin-top:1.8rem;">
+        <div class="tile"><img src="chains/ethereum.png?v=9" alt=""><span>Ethereum</span></div>
+        <div class="tile"><img src="chains/arbitrum.png?v=9" alt=""><span>Arbitrum</span></div>
+        <div class="tile"><img src="chains/base.png?v=9" alt=""><span>Base</span></div>
+        <div class="tile"><img src="chains/polygon.png?v=9" alt=""><span>Polygon</span></div>
+        <div class="tile"><img src="chains/avalanche.png?v=9" alt=""><span>Avalanche</span></div>
+        <div class="tile"><img src="chains/arc.png?v=9" alt=""><span>Arc</span></div>
+        <div class="tile"><img src="chains/robinhood.png?v=9" alt=""><span>Robinhood</span></div>
+        <div class="tile"><img src="chains/hedera.png?v=9" alt=""><span>Hedera</span></div>
+        <div class="tile"><img src="chains/solana.png?v=9" alt=""><span>Solana</span></div>
+      </div>
+      <div class="grid-3" style="margin-top:1.4rem;">
+        <div class="std std-v reveal" style="--i:4;"><div class="k">EVM · 7 networks</div><h3>ERC-3643</h3><ul><li>T-REX permissioned token + AuditLog</li><li>web3.py · token + audit in one factory tx</li><li>Source-verified · 19 Foundry tests</li></ul></div>
+        <div class="std std-c reveal" style="--i:5;"><div class="k">Solana · verified on devnet</div><h3>Token-2022</h3><ul><li>Frozen-by-default = whitelist</li><li>Permanent-delegate = clawback</li><li>Freeze authority = sanctions · atomic issuance</li></ul></div>
+        <div class="std std-i reveal" style="--i:6;"><div class="k">Hedera · native</div><h3>HTS / HCS</h3><ul><li>Native KYC, freeze, wipe keys</li><li>HCS consensus audit trail</li><li>Where Laminaa was born &amp; won</li></ul></div>
+      </div>
     </div>
   </div>
 
   <!-- ░ 05 ARCHITECTURE ░ -->
   <div class="slide" data-slide="5">
-    <div class="bar"><span class="wm">Laminaa<b>.</b></span><span class="sec">05 / Architecture</span></div>
-    <h2 class="reveal" style="--i:0;">People and agents drive <span class="accent">the same engine.</span></h2>
-    <div class="arch">
-      <div class="arch-row reveal" style="--i:1;">
-        <div class="arch-lab">Interfaces</div>
-        <div class="arch-cells" style="grid-template-columns:repeat(3,1fr);">
-          <div class="arch-cell"><h4>Web console · REST</h4><span>operator dashboard · typed API</span></div>
-          <div class="arch-cell"><h4>Telegram</h4><span>NL ops · write-confirmation</span></div>
-          <div class="arch-cell"><h4>MCP server</h4><span>scope-gated · agents drive it</span></div>
+    <div class="bar"><span class="wm"><img src="logo.svg" alt="">Laminaa</span><span class="sec">05 / Architecture</span></div>
+    <div class="relz">
+      <p class="eyebrow reveal" style="--i:0;">One core, every surface</p>
+      <h2 class="reveal" style="--i:1;">People and agents drive <span class="iris">the same engine.</span></h2>
+      <div class="arch">
+        <div class="arch-row reveal" style="--i:2;">
+          <div class="arch-lab">Interfaces</div>
+          <div class="arch-cells" style="grid-template-columns:repeat(3,1fr);">
+            <div class="arch-cell"><h4>Web console · REST</h4><span>operator dashboard · typed API</span></div>
+            <div class="arch-cell"><h4>Telegram</h4><span>NL ops · write-confirmation</span></div>
+            <div class="arch-cell"><h4>MCP server</h4><span>scope-gated · agents drive it</span></div>
+          </div>
+        </div>
+        <div class="arch-row reveal" style="--i:3;">
+          <div class="arch-lab">Engine</div>
+          <div class="arch-cells" style="grid-template-columns:repeat(4,1fr);">
+            <div class="arch-cell"><h4>Issuance</h4><span>token + audit in one tx</span></div>
+            <div class="arch-cell"><h4>Compliance</h4><span>KYC · OFAC · jurisdiction</span></div>
+            <div class="arch-cell"><h4>Lifecycle</h4><span>coupons · NAV · maturity</span></div>
+            <div class="arch-cell"><h4>Reporting</h4><span>regulator PDFs</span></div>
+          </div>
+        </div>
+        <div class="arch-row reveal" style="--i:4;">
+          <div class="arch-lab">Networks</div>
+          <div class="arch-cells" style="grid-template-columns:repeat(3,1fr);">
+            <div class="arch-cell"><h4>EVM adapter</h4><span>web3.py · ERC-3643</span></div>
+            <div class="arch-cell"><h4>Solana adapter</h4><span>solders · Token-2022</span></div>
+            <div class="arch-cell"><h4>Hedera adapter</h4><span>hiero-sdk · HTS / HCS</span></div>
+          </div>
+        </div>
+        <div class="arch-row reveal" style="--i:5;">
+          <div class="arch-lab">Data</div>
+          <div class="arch-cells" style="grid-template-columns:repeat(4,1fr);">
+            <div class="arch-cell"><h4>Claude</h4><span>NL agent · tool-use</span></div>
+            <div class="arch-cell"><h4>OFAC SDN</h4><span>daily refresh · fuzzy</span></div>
+            <div class="arch-cell"><h4>Treasury yields</h4><span>NAV oracle</span></div>
+            <div class="arch-cell"><h4>USDC · Postgres</h4><span>settlement · state mirror</span></div>
+          </div>
         </div>
       </div>
-      <div class="arch-row reveal" style="--i:2;">
-        <div class="arch-lab">Engine</div>
-        <div class="arch-cells" style="grid-template-columns:repeat(4,1fr);">
-          <div class="arch-cell"><h4>Issuance</h4><span>token + audit in one tx</span></div>
-          <div class="arch-cell"><h4>Compliance</h4><span>KYC · OFAC · jurisdiction</span></div>
-          <div class="arch-cell"><h4>Lifecycle</h4><span>coupons · NAV · maturity</span></div>
-          <div class="arch-cell"><h4>Reporting</h4><span>regulator PDFs</span></div>
-        </div>
-      </div>
-      <div class="arch-row reveal" style="--i:3;">
-        <div class="arch-lab">Chains</div>
-        <div class="arch-cells" style="grid-template-columns:repeat(3,1fr);">
-          <div class="arch-cell"><h4>EVM adapter</h4><span>web3.py · ERC-3643</span></div>
-          <div class="arch-cell"><h4>Solana adapter</h4><span>solders · Token-2022</span></div>
-          <div class="arch-cell"><h4>Hedera adapter</h4><span>hiero-sdk · HTS / HCS</span></div>
-        </div>
-      </div>
-      <div class="arch-row reveal" style="--i:4;">
-        <div class="arch-lab">Data</div>
-        <div class="arch-cells" style="grid-template-columns:repeat(4,1fr);">
-          <div class="arch-cell"><h4>Claude</h4><span>NL agent · tool-use</span></div>
-          <div class="arch-cell"><h4>OFAC SDN</h4><span>daily refresh · fuzzy</span></div>
-          <div class="arch-cell"><h4>Treasury yields</h4><span>NAV oracle</span></div>
-          <div class="arch-cell"><h4>USDC · Postgres</h4><span>settlement · state</span></div>
-        </div>
-      </div>
+      <p class="pull reveal" style="--i:6; font-size:clamp(1rem,1.4vw,1.2rem);">The core never imports a chain SDK — <span class="iris">routes → services → repositories · chains · handlers.</span> Async SQLAlchemy throughout. Nine networks, one product.</p>
     </div>
-    <p class="pull reveal" style="--i:5; font-size:clamp(1rem,1.5vw,1.25rem);">The core logic never imports a chain SDK. <span>Strict layering makes nine networks one product.</span></p>
   </div>
 
   <!-- ░ 06 COMPLIANCE ░ -->
   <div class="slide" data-slide="6">
-    <div class="bar"><span class="wm">Laminaa<b>.</b></span><span class="sec">06 / Compliance</span></div>
-    <h2 class="reveal" style="--i:0;">The right standard <span class="accent">on every chain.</span></h2>
-    <p class="lede reveal" style="--i:1;">Regulators want enforcement and proof. Laminaa builds both into the token.</p>
-    <div class="grid-4" style="margin-top:1.8rem;">
-      <div class="card reveal" style="--i:2;"><h3 class="accent">Permissioned transfers</h3><p>ERC-3643, HTS keys, and Token-2022 frozen-by-default + permanent-delegate.</p></div>
-      <div class="card reveal" style="--i:3;"><h3 class="accent">OFAC SDN screening</h3><p>Names and wallet addresses checked against the U.S. Treasury list before any move.</p></div>
-      <div class="card reveal" style="--i:4;"><h3 class="accent">Immutable audit trail</h3><p>AuditLog on EVM, HCS on Hedera, memo log on Solana — every action recorded.</p></div>
-      <div class="card reveal" style="--i:5;"><h3 class="accent">Verified &amp; tested</h3><p>19-case Foundry suite, source-verified; Solana lifecycle verified on devnet.</p></div>
-    </div>
-    <div class="tags reveal" style="--i:6; margin-top:1.8rem;">
-      <span class="tag">SEC Reg D</span><span class="tag">SEC Reg S</span><span class="tag">MiFID II</span><span class="tag">KYC whitelist</span><span class="tag">Jurisdiction limits</span><span class="tag">Holder caps</span><span class="tag">Lock-ups</span>
+    <div class="aura aura-violet" style="left:-12%; bottom:-22%; width:520px; height:520px;"></div>
+    <div class="bar"><span class="wm"><img src="logo.svg" alt="">Laminaa</span><span class="sec">06 / Compliance</span></div>
+    <div class="relz">
+      <p class="eyebrow reveal" style="--i:0;">Compliance &amp; assurance</p>
+      <h2 class="reveal" style="--i:1;">The right standard <span class="iris">on every chain.</span></h2>
+      <p class="lede reveal" style="--i:2;">Regulators want enforcement and proof. Laminaa builds both into the token.</p>
+      <div class="grid-4" style="margin-top:1.8rem;">
+        <div class="card reveal" style="--i:3;"><h3 class="violet">Permissioned transfers</h3><p>ERC-3643 (T-REX) on EVM, HTS keys on Hedera, Token-2022 frozen-by-default + permanent-delegate on Solana.</p></div>
+        <div class="card reveal" style="--i:4;"><h3 class="violet">OFAC SDN screening</h3><p>rapidfuzz WRatio (~85%) on names + exact match on addresses, against the U.S. Treasury SDN list — refreshed daily.</p></div>
+        <div class="card reveal" style="--i:5;"><h3 class="violet">Immutable audit trail</h3><p>Access-controlled AuditLog (EVM) · HCS (Hedera) · SPL-memo (Solana) — every state change recorded on-chain.</p></div>
+        <div class="card reveal" style="--i:6;"><h3 class="violet">Verified &amp; tested</h3><p>19-case Foundry suite, source-verified on each explorer; Solana lifecycle verified end-to-end on devnet.</p></div>
+      </div>
+      <div class="tags reveal" style="--i:7; margin-top:1.8rem;">
+        <span class="tag">SEC Reg D</span><span class="tag">SEC Reg S</span><span class="tag">MiFID II</span><span class="tag">KYC whitelist</span><span class="tag">Jurisdiction limits</span><span class="tag">Holder caps</span><span class="tag">Lock-ups</span>
+      </div>
     </div>
   </div>
 
   <!-- ░ 07 TRACTION ░ -->
   <div class="slide" data-slide="7">
-    <div class="bar"><span class="wm">Laminaa<b>.</b></span><span class="sec">07 / Traction</span></div>
-    <h2 class="reveal" style="--i:0;">Validated by judges. <span class="accent">Then scaled.</span></h2>
-    <div class="split" style="margin-top:2rem;">
-      <div class="card reveal" style="--i:1; background:linear-gradient(180deg,#fbfaff,#f3f0ff); border-color:#e4ddfb; padding:2rem;">
-        <div class="badge" style="margin-bottom:1.2rem;">★ Hedera Hello Future · Apex 2026</div>
-        <div class="stat-v" style="color:var(--accent); font-size:3rem;">3rd place</div>
-        <div class="stat-l" style="margin-bottom:1.2rem;">DeFi &amp; Tokenization track · $8K</div>
-        <p style="font-size:0.88rem; color:var(--body); line-height:1.55;">Built and judged as a working product on Hedera testnet — issuance, compliance, coupons and maturity, end to end. Then we didn't stop.</p>
-      </div>
-      <div>
-        <p class="eyebrow reveal" style="--i:2;">Since the win — rebuilt chain-agnostic</p>
-        <div class="grid-2" style="gap:1.1rem;">
-          <div class="card reveal" style="--i:3;"><div class="stat-v" style="color:var(--accent);">9</div><div class="stat-l">networks live</div></div>
-          <div class="card reveal" style="--i:4;"><div class="stat-v" style="color:var(--accent);">6</div><div class="stat-l">lifecycle stages automated</div></div>
-          <div class="card reveal" style="--i:5;"><div class="stat-v" style="color:var(--accent);">3</div><div class="stat-l">interfaces · REST · TG · MCP</div></div>
-          <div class="card reveal" style="--i:6;"><div class="stat-v" style="color:var(--accent);">19</div><div class="stat-l">contract tests, verified</div></div>
+    <div class="aura aura-cyan" style="right:-10%; top:-16%; width:460px; height:460px;"></div>
+    <div class="bar"><span class="wm"><img src="logo.svg" alt="">Laminaa</span><span class="sec">07 / Traction</span></div>
+    <div class="relz">
+      <p class="eyebrow reveal" style="--i:0;">Validated, then scaled</p>
+      <h2 class="reveal" style="--i:1;">Judged as a product. <span class="iris">Then rebuilt for scale.</span></h2>
+      <div class="split" style="margin-top:2rem;">
+        <div class="card reveal" style="--i:2; background:hsl(var(--violet) / 0.06); border-color:hsl(var(--violet) / 0.22); padding:2rem;">
+          <div class="badge" style="margin-bottom:1.2rem;">★ Hedera Hello Future · Apex 2026</div>
+          <div style="font-weight:200; font-size:3rem; line-height:1;" class="iris">3rd place</div>
+          <div class="fig-l" style="margin-bottom:1.2rem;">DeFi &amp; Tokenization track · $8K</div>
+          <p style="font-size:0.86rem; font-weight:300; color:hsl(var(--muted)); line-height:1.55;">Built and judged as a working product on Hedera testnet — issuance, compliance, coupons and maturity, end to end. Then we didn't stop.</p>
+        </div>
+        <div>
+          <p class="eyebrow reveal" style="--i:3;">Since the win — rebuilt chain-agnostic</p>
+          <div class="grid-2" style="gap:1rem;">
+            <div class="card reveal" style="--i:4;"><div class="fig-v iris">9</div><div class="fig-l">networks live</div></div>
+            <div class="card reveal" style="--i:5;"><div class="fig-v iris">6</div><div class="fig-l">lifecycle stages automated</div></div>
+            <div class="card reveal" style="--i:6;"><div class="fig-v iris">3</div><div class="fig-l">interfaces · REST · TG · MCP</div></div>
+            <div class="card reveal" style="--i:7;"><div class="fig-v iris">19</div><div class="fig-l">contract tests, verified</div></div>
+          </div>
+          <p class="reveal" style="--i:8; margin-top:1.1rem; font-size:0.78rem; font-weight:300; color:hsl(var(--muted)); line-height:1.5;">Functional across 9 testnets · verifiable on-chain · stage: pre-mainnet, pre-revenue.</p>
         </div>
       </div>
     </div>
@@ -381,55 +422,87 @@
 
   <!-- ░ 08 MARKET ░ -->
   <div class="slide" data-slide="8">
-    <div class="bar"><span class="wm">Laminaa<b>.</b></span><span class="sec">08 / Market &amp; Business</span></div>
-    <h2 class="reveal" style="--i:0;">The <span class="accent">operating system</span> for tokenized assets.</h2>
-    <div class="split" style="margin-top:1.6rem;">
-      <div>
-        <p class="lede reveal" style="--i:1; margin-bottom:1.4rem;">BlackRock BUIDL is multi-billion. Securitize, Archax and Franklin Templeton are issuing. Every asset needs lifecycle management — no one has automated it across chains.</p>
-        <div class="card reveal" style="--i:2; margin-bottom:1rem;"><h3>Revenue model</h3><p>2–5 bps on AUM the agent manages, plus per-asset SaaS. <strong>$1B AUM = $200K–500K / yr.</strong></p></div>
-        <div class="card reveal" style="--i:3;"><h3>Path to $10M ARR</h3><p>At 3 bps, ≈ $33B AUM — a sliver of a $16T market.</p></div>
-      </div>
-      <div>
-        <div class="card reveal" style="--i:4; margin-bottom:1rem;"><h3>Target customers</h3><p>Securitize, Archax, Zoniqx, Tokeny, Franklin Templeton — any institution issuing tokenized funds, bonds or equities.</p></div>
-        <div class="card reveal" style="--i:5; margin-bottom:1rem;"><h3>The moat</h3><p>Issuance is commoditized. Laminaa is the operations layer <em>above</em> any standard, on any chain.</p></div>
-        <div class="card reveal" style="--i:6; background:#f3f0ff; border-color:#e4ddfb;"><h3 class="accent">Why now</h3><p>RWAs are crossing from pilots to production, Token Extensions make Solana compliance-ready, and AI agents can finally run the lifecycle.</p></div>
+    <div class="bar"><span class="wm"><img src="logo.svg" alt="">Laminaa</span><span class="sec">08 / Market &amp; Business</span></div>
+    <div class="relz">
+      <p class="eyebrow reveal" style="--i:0;">Market &amp; business</p>
+      <h2 class="reveal" style="--i:1;">The <span class="iris">operating system</span> for tokenized assets.</h2>
+      <div class="split" style="margin-top:1.6rem;">
+        <div>
+          <p class="lede reveal" style="--i:2; margin-bottom:1.4rem;">BlackRock BUIDL is multi-billion. Securitize, Archax and Franklin Templeton are issuing. Every asset needs lifecycle management — no one has automated it across chains.</p>
+          <div class="card reveal" style="--i:3; margin-bottom:1rem;"><h3>Revenue model</h3><p>Fund admins charge 5–15 bps to do this by hand; the agent does it at 2–5 bps + per-asset SaaS. <strong>$1B AUM ≈ $200K–500K / yr recurring.</strong></p></div>
+          <div class="card reveal" style="--i:4;"><h3>Path to $10M ARR</h3><p>At 3 bps, ≈ $33B AUM under management — a sliver of a $16T market by 2030.</p></div>
+        </div>
+        <div>
+          <div class="card reveal" style="--i:5; margin-bottom:1rem;"><h3>Target customers</h3><p>Securitize, Archax, Zoniqx, Tokeny, Franklin Templeton — any institution issuing tokenized funds, bonds or equities.</p></div>
+          <div class="card reveal" style="--i:6; margin-bottom:1rem;"><h3>The moat</h3><p>Issuance is commoditized. Laminaa is the operations layer <em>above</em> any standard, on any chain.</p></div>
+          <div class="card reveal" style="--i:7; border-color:hsl(var(--violet) / 0.22);"><h3 class="violet">Why now</h3><p>RWAs are crossing from pilots to production, Token Extensions make Solana compliance-ready, and AI agents can finally run the lifecycle.</p></div>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- ░ 09 TEAM ░ -->
   <div class="slide" data-slide="9">
-    <div class="bar"><span class="wm">Laminaa<b>.</b></span><span class="sec">09 / Team</span></div>
-    <div class="eyebrow reveal" style="--i:0;">Founder</div>
-    <h2 class="reveal" style="--i:1;">Venkatesh</h2>
-    <p class="lede reveal" style="--i:2; margin-bottom:1.8rem;">Founding Engineer (AI) — Bluink Labs</p>
-    <div class="split">
-      <div class="grid-2" style="gap:1rem;">
-        <div class="card reveal" style="--i:3;"><div class="n">01</div><h3>AI infrastructure</h3><p>2 years building data pipelines, LLM systems, MCP servers and agentic memory at Bluink Labs (DIPP143482).</p></div>
-        <div class="card reveal" style="--i:4;"><div class="n">02</div><h3>Shipped &amp; validated</h3><p>Built Laminaa solo to 3rd place at the Hedera Apex Hackathon, then re-architected it across 9 networks.</p></div>
-        <div class="card reveal" style="--i:5;"><div class="n">03</div><h3>Thesis</h3><p>AI agents will run asset management — compliant and provable on-chain.</p></div>
-        <div class="card reveal" style="--i:6;"><div class="n">04</div><h3>Bluink Labs</h3><p>DPIIT-recognized AI startup. Intelligent data infrastructure and enterprise tools.</p></div>
+    <div class="aura aura-indigo" style="right:-12%; bottom:-20%; width:520px; height:520px;"></div>
+    <div class="bar"><span class="wm"><img src="logo.svg" alt="">Laminaa</span><span class="sec">09 / Team</span></div>
+    <div class="relz">
+      <p class="eyebrow reveal" style="--i:0;">Team</p>
+      <h2 class="reveal" style="--i:1;">Two founding engineers.</h2>
+      <p class="lede reveal" style="--i:2; margin-bottom:1.8rem;">Built and won together — from Anna University. AI, data engineering, smart contracts and agents under one roof.</p>
+      <div class="grid-2" style="gap:1.2rem; align-items:stretch;">
+        <div class="card reveal" style="--i:3;">
+          <div style="display:flex; align-items:center; gap:1rem; margin-bottom:0.9rem;">
+            <img class="avatar" src="team/venkatesh.jpg" alt="Venkatesh R">
+            <div>
+              <div class="num" style="margin-bottom:0.15rem;">Founding Engineer · AI &amp; Agents</div>
+              <h3 style="font-size:1.4rem; font-weight:200;">Venkatesh R</h3>
+            </div>
+          </div>
+          <p>Transformers &amp; LLM serving, RLHF / alignment, ZK-SNARKs and distributed inference. Architected Laminaa's chain-agnostic agent across 9 networks. 8+ hackathon wins · ₹30L+ in prizes.</p>
+          <div style="display:flex; gap:1.2rem; margin-top:0.9rem; font-size:0.78rem;">
+            <a href="https://www.linkedin.com/in/ni8crawler/" target="_blank" style="color:hsl(var(--cyan)); text-decoration:none;">LinkedIn ↗</a>
+            <a href="https://ni8crawler18.github.io/me/" target="_blank" style="color:hsl(var(--cyan)); text-decoration:none;">Portfolio ↗</a>
+          </div>
+        </div>
+        <div class="card reveal" style="--i:4;">
+          <div style="display:flex; align-items:center; gap:1rem; margin-bottom:0.9rem;">
+            <img class="avatar" src="team/naveen.jpg" alt="Naveen Krishnaa S">
+            <div>
+              <div class="num" style="margin-bottom:0.15rem;">Founding Engineer · Data &amp; ML</div>
+              <h3 style="font-size:1.4rem; font-weight:200;">Naveen Krishnaa S</h3>
+            </div>
+          </div>
+          <p>Production data engineering — ETL, Kafka, Airflow, Elasticsearch — with RAG / GenAI and cloud (Azure, GCP). B.Tech AI &amp; ML, CGPA 9.04. HimaShield GLOF system, awarded ₹5L by MeitY.</p>
+          <div style="display:flex; gap:1.2rem; margin-top:0.9rem; font-size:0.78rem;">
+            <a href="https://www.linkedin.com/in/naveen-krishnaa-074914283/" target="_blank" style="color:hsl(var(--cyan)); text-decoration:none;">LinkedIn ↗</a>
+            <a href="https://naveenkrishnaas.vercel.app/" target="_blank" style="color:hsl(var(--cyan)); text-decoration:none;">Portfolio ↗</a>
+          </div>
+        </div>
       </div>
-      <div class="card reveal" style="--i:7;"><h3>Core stack</h3><div class="tags" style="margin-top:0.8rem;"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">web3.py</span><span class="tag">solders</span><span class="tag">Foundry</span><span class="tag">Claude</span><span class="tag">MCP</span><span class="tag">Postgres</span><span class="tag">Next.js</span></div></div>
+      <div class="card reveal" style="--i:5; margin-top:1.2rem;"><h3>Core stack</h3><div class="tags" style="margin-top:0.8rem;"><span class="tag">Python</span><span class="tag">FastAPI</span><span class="tag">PyTorch</span><span class="tag">web3.py</span><span class="tag">solders</span><span class="tag">Foundry</span><span class="tag">Claude</span><span class="tag">MCP</span><span class="tag">Kafka</span><span class="tag">Airflow</span><span class="tag">Postgres</span><span class="tag">Azure · GCP</span><span class="tag">Next.js</span></div></div>
     </div>
   </div>
 
   <!-- ░ CLOSE ░ -->
   <div class="slide" data-slide="10">
-    <div class="bar"><span class="wm">Laminaa<b>.</b></span><span class="sec">Thank you</span></div>
-    <div class="eyebrow reveal" style="--i:0;">Laminaa.com</div>
-    <h1 class="reveal" style="--i:1; font-size:clamp(2.8rem,6.5vw,5.5rem);">Issuance is solved.<br>Lifecycle is <span class="accent">not.</span></h1>
-    <p class="lede reveal" style="--i:2; font-size:1.2rem;">Hand the operating burden to the agent — compliant, autonomous, and on every chain your investors use.</p>
-    <div class="cta reveal" style="--i:3;">
-      <a class="p" href="https://github.com/Ni8crawler18/lamina" target="_blank">GitHub</a>
-      <a class="s" href="https://Laminaa-agent.vercel.app" target="_blank">Live App</a>
-      <a class="s" href="https://Laminaa-agent.vercel.app/dashboard" target="_top">Dashboard</a>
-    </div>
-    <div class="reveal" style="--i:4; margin-top:3rem; display:flex; gap:3.5rem; flex-wrap:wrap;">
-      <div><div class="stat-v" style="color:var(--accent);">9</div><div class="stat-l">networks</div></div>
-      <div><div class="stat-v" style="color:var(--accent);">6</div><div class="stat-l">lifecycle stages</div></div>
-      <div><div class="stat-v" style="color:var(--accent);">3rd</div><div class="stat-l">Hedera Apex</div></div>
-      <div><div class="stat-v" style="color:var(--accent);">100%</div><div class="stat-l">autonomous</div></div>
+    <div class="vault-grid"></div>
+    <div class="aura aura-violet" style="left:50%; top:50%; width:520px; height:520px; transform:translate(-50%,-50%);"></div>
+    <div class="bar"><span class="wm"><img src="logo.svg" alt="">Laminaa</span><span class="sec">laminaa.com</span></div>
+    <div class="relz">
+      <p class="eyebrow reveal" style="--i:0;">The opportunity</p>
+      <h1 class="reveal" style="--i:1; font-size:clamp(2.6rem,6vw,5rem);">Issuance is solved.<br><span class="iris">Lifecycle operations</span> are not.</h1>
+      <p class="lede reveal" style="--i:2;">Hand the operating burden to the agent — compliant, autonomous, and on every chain your investors use.</p>
+      <div class="cta reveal" style="--i:3;">
+        <a class="p" href="https://laminaa.com" target="_blank">laminaa.com</a>
+        <a class="s" href="https://github.com/Ni8crawler18/lamina" target="_blank">GitHub</a>
+        <a class="s" href="https://laminaa.com/dashboard" target="_top">Launch the agent →</a>
+      </div>
+      <div class="reveal" style="--i:4; margin-top:3rem; display:flex; gap:3.5rem; flex-wrap:wrap;">
+        <div><div class="fig-v iris">9</div><div class="fig-l">networks</div></div>
+        <div><div class="fig-v iris">6</div><div class="fig-l">lifecycle stages</div></div>
+        <div><div class="fig-v iris">3rd</div><div class="fig-l">Hedera Apex</div></div>
+        <div><div class="fig-v iris">100%</div><div class="fig-l">autonomous</div></div>
+      </div>
     </div>
   </div>
 
@@ -443,7 +516,6 @@
   const total = slides.length;
   let current = 0;
   const pad = n => String(n).padStart(2,'0');
-
   function go(n) {
     if (n < 0 || n >= total) return;
     slides[current].classList.remove('active');
@@ -452,7 +524,6 @@
     document.getElementById('progress').style.width = ((current + 1) / total * 100) + '%';
     document.getElementById('counter').textContent = pad(current + 1) + ' / ' + pad(total);
   }
-
   document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(current + 1); }
     if (e.key === 'ArrowLeft') { e.preventDefault(); go(current - 1); }

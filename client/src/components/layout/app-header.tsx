@@ -15,7 +15,6 @@ const PAGE_TITLES: Record<string, string> = {
   "/reports": "Reports",
   "/history": "Audit History",
   "/chat": "Agent",
-  "/pitch": "Pitch Deck",
 };
 
 function shortAddr(a: string) {
