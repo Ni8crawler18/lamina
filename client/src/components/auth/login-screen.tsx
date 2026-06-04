@@ -20,7 +20,7 @@ function GoogleG() {
 }
 
 export default function LoginScreen() {
-  const { connectMetaMask, connectHashPack, connectGoogle, connectDemo, isConnecting, error } = useWallet();
+  const { connectMetaMask, connectHashPack, connectPhantom, connectGoogle, connectDemo, isConnecting, error } = useWallet();
   const [pending, setPending] = useState<string | null>(null);
 
   // clear the per-button spinner when the global connecting flag settles
@@ -78,6 +78,7 @@ export default function LoginScreen() {
             <div className="mt-6 space-y-2.5">
               <Row pkey="mm" onClick={connectMetaMask} primary icon={<img src="/chains/metamask.png" alt="" className="h-6 w-6 object-contain" />} label="MetaMask" sub="EVM networks · browser wallet" />
               <Row pkey="hp" onClick={connectHashPack} icon={<img src="/chains/hedera.png?v=6" alt="" className="h-5 w-5 object-contain" />} label="HashPack" sub="Hedera · HTS / HCS" />
+              <Row pkey="ph" onClick={connectPhantom} icon={<img src="/chains/solana.png" alt="" className="h-6 w-6 object-contain" />} label="Phantom" sub="Solana · Token-2022" />
               <Row pkey="g" onClick={connectGoogle} icon={<GoogleG />} label="Continue with Google" sub="Operator identity · no wallet needed" />
             </div>
 

@@ -10,8 +10,8 @@ import {
   type ReactNode,
 } from "react";
 
-export type AuthMode = "metamask" | "hashpack" | "google" | "demo";
-export type Family = "evm" | "hedera";
+export type AuthMode = "metamask" | "hashpack" | "phantom" | "google" | "demo";
+export type Family = "evm" | "hedera" | "solana";
 
 interface WalletState {
   address: string | null; // EVM 0x… or Hedera 0.0.x (null for Google identity)
@@ -25,6 +25,7 @@ interface WalletState {
   error: string | null;
   connectMetaMask: () => Promise<void>;
   connectHashPack: () => Promise<void>;
+  connectPhantom: () => Promise<void>;
   connectGoogle: () => Promise<void>;
   connectDemo: () => void;
   disconnect: () => void;
@@ -43,6 +44,7 @@ const WalletContext = createContext<WalletState>({
   error: null,
   connectMetaMask: async () => {},
   connectHashPack: async () => {},
+  connectPhantom: async () => {},
   connectGoogle: async () => {},
   connectDemo: noop,
   disconnect: noop,
@@ -267,6 +269,39 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     }
   }, [getHashConnect]);
 
+  // ── Phantom (Solana) ─────────────────────────────────────────
+  const connectPhantom = useCallback(async () => {
+    setError(null);
+    const provider = win()?.phantom?.solana ?? win()?.solana;
+    if (!provider?.isPhantom) {
+      setError("Phantom not detected. Install the Phantom extension and retry.");
+      return;
+    }
+    setIsConnecting(true);
+    try {
+      const resp = await provider.connect();
+      const pubkey = (resp?.publicKey ?? provider.publicKey)?.toString();
+      if (!pubkey) throw new Error("No Solana account returned");
+      setAddress(pubkey);
+      setFamily("solana");
+      setMode("phantom");
+      // live updates
+      provider.removeAllListeners?.("accountChanged");
+      provider.on?.("accountChanged", (pk: { toString(): string } | null) => {
+        if (!pk) reset();
+        else setAddress(pk.toString());
+      });
+      provider.on?.("disconnect", () => reset());
+    } catch (e) {
+      // Phantom user-rejection → code 4001
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const code = (e as any)?.code;
+      setError(code === 4001 ? "Connection request rejected in Phantom." : (e instanceof Error ? e.message : "Phantom connection failed"));
+    } finally {
+      setIsConnecting(false);
+    }
+  }, [reset]);
+
   // ── Google (identity) ────────────────────────────────────────
   const connectGoogle = useCallback(async () => {
     setError(null);
@@ -323,6 +358,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     if (mode === "hashpack" && hashconnectRef.current) {
       try { await hashconnectRef.current.disconnect(); } catch { /* ignore */ }
     }
+    if (mode === "phantom") {
+      try { await (win()?.phantom?.solana ?? win()?.solana)?.disconnect?.(); } catch { /* ignore */ }
+    }
     if (mode === "google" && win()?.google?.accounts?.id) {
       try { win().google.accounts.id.disableAutoSelect(); } catch { /* ignore */ }
     }
@@ -344,6 +382,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         error,
         connectMetaMask,
         connectHashPack,
+        connectPhantom,
         connectGoogle,
         connectDemo,
         disconnect,
