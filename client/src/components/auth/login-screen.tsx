@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useWallet } from "@/contexts/wallet-context";
-import { Zap } from "lucide-react";
+import { Zap, ArrowLeft } from "lucide-react";
 
 function Spinner() {
   return <span className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-foreground" />;
@@ -62,6 +63,13 @@ export default function LoginScreen() {
       {/* grid + aura are masked background layers — kept separate so they don't mask the card */}
       <div className="pointer-events-none absolute inset-0 bg-vault-grid" />
       <div className="aura aura-violet left-1/2 top-[-120px] h-[420px] w-[680px] -translate-x-1/2" />
+      <Link
+        href="/"
+        className="absolute left-5 top-5 z-20 inline-flex items-center gap-1.5 rounded-lg border border-border/50 bg-card/40 px-3 py-2 text-sm text-muted-foreground transition-all hover:border-border hover:text-foreground"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back
+      </Link>
       <div className="relative z-10 mx-auto my-auto w-full max-w-md px-6 py-12">
         <div className="w-full">
           <div className="mb-8 flex items-center justify-center gap-2.5">
