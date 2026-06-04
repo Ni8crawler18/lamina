@@ -66,7 +66,7 @@
     font-size: clamp(1rem, 1.4vw, 1.2rem);
     color: #6b6b80;
     line-height: 1.7;
-    max-width: 640px;
+    max-width: 680px;
   }
 
   .gradient { background: linear-gradient(135deg, #8259ef 0%, #b47aff 50%, #6ec6ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
@@ -75,6 +75,7 @@
   /* Grids */
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.2rem; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
 
   /* Cards */
   .card {
@@ -271,6 +272,17 @@
   .cta-primary:hover { background: #7049d9; }
   .cta-secondary { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); color: #e8e8ef; }
 
+  /* Pull quote */
+  .pull {
+    border-left: 2px solid #8259ef;
+    padding: 0.4rem 0 0.4rem 1.4rem;
+    margin-top: 1.8rem;
+    font-size: clamp(1rem, 1.5vw, 1.3rem);
+    line-height: 1.5;
+    color: #c9c9d6;
+    max-width: 720px;
+  }
+
   /* Orbs */
   .orb {
     position: absolute;
@@ -329,6 +341,16 @@
     border-radius: 6px;
     border: 1px solid rgba(130,89,239,0.12);
   }
+  .badge-win {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    color: #fbbf24;
+    background: rgba(245,158,11,0.08);
+    border: 1px solid rgba(245,158,11,0.22);
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+  }
 
   /* Print / PDF styles */
   @media print {
@@ -346,7 +368,6 @@
     .slide:last-child { page-break-after: auto; }
     .progress, .counter, .hint { display: none !important; }
     .orb { display: none; }
-    /* Fix gradient text in print — use solid color instead of background-clip */
     .gradient, .gradient-blue {
       background: none !important;
       -webkit-background-clip: unset !important;
@@ -358,7 +379,6 @@
     h1, h2, h3, a, span, p, div { text-decoration: none !important; }
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 
-    /* Bigger fonts for print readability */
     .tag { font-size: 0.8rem; }
     h1 { font-size: 3.5rem; white-space: nowrap; }
     h2 { font-size: 2.5rem; }
@@ -376,6 +396,7 @@
     .svc .code { font-size: 0.75rem; }
     .num { font-size: 0.8rem; width: 30px; height: 30px; }
     .cta-link { font-size: 1rem; padding: 0.8rem 1.6rem; }
+    .pull { font-size: 1.3rem; }
   }
 </style>
 </head>
@@ -387,26 +408,295 @@
   <div class="slide active" data-slide="0">
     <div class="orb orb-purple"></div>
     <div class="orb orb-blue"></div>
-    <div class="tag">Hedera &middot; DeFi & Tokenization Track</div>
-    <h1 style="white-space:nowrap;"><span class="gradient">Lamina</span> <span style="font-size:0.55em; font-weight:600; color:#6b6b80;">&mdash; Autonomous RWA Lifecycle Agent</span></h1>
+    <div class="badge-win" style="margin-bottom:1.6rem;">★ 3rd place — Hedera Apex Hackathon 2026 · DeFi &amp; Tokenization</div>
+    <h1 style="white-space:nowrap;"><span class="gradient">Lamina</span> <span style="font-size:0.5em; font-weight:600; color:#6b6b80;">&mdash; Autonomous RWA Lifecycle Agent</span></h1>
     <p class="subtitle" style="margin-top:1.5rem;">
-      One command to tokenize a bond. Zero humans to manage it after.<br>
-      AI-powered lifecycle management on Hedera — from issuance to maturity.
+      One command to tokenize a security. Zero humans to manage it after.<br>
+      Lamina is the autonomous lifecycle layer for tokenized real-world assets —
+      compliance, coupons, NAV, reporting and settlement — running on 9 networks.
     </p>
     <div class="tags" style="margin-top:2.5rem;">
-      <span class="tag-pill">Hedera Token Service</span>
-      <span class="tag-pill">Consensus Service</span>
-      <span class="tag-pill">Mirror Node</span>
-      <span class="tag-pill">HashConnect</span>
-      <span class="tag-pill">Claude AI</span>
-      <span class="tag-pill">OFAC Screening</span>
-      <span class="tag-pill">HOL Agent Registry</span>
+      <span class="tag-pill">ERC-3643</span>
+      <span class="tag-pill">Solana Token-2022</span>
+      <span class="tag-pill">Hedera HTS / HCS</span>
+      <span class="tag-pill">USDC settlement</span>
+      <span class="tag-pill">OFAC SDN screening</span>
+      <span class="tag-pill">Claude AI agent</span>
+      <span class="tag-pill">MCP · Telegram</span>
+      <span class="tag-pill">9 networks</span>
     </div>
   </div>
 
-  <!-- SLIDE 2: Team & Introduction -->
+  <!-- SLIDE 2: Problem — the fund manager's reality -->
   <div class="slide" data-slide="1">
-    <div class="tag">Team & Introduction</div>
+    <div class="tag">The Problem</div>
+    <h2>You tokenized the fund.<br><span class="gradient">Now you have to run it — forever.</span></h2>
+    <div class="two-col" style="margin-top:2rem;">
+      <div class="num-list">
+        <div class="num-item">
+          <div class="num">01</div>
+          <div>
+            <h3>Coupons on the clock</h3>
+            <p>Hundreds of holders, paid pro-rata, on the 15th of every month. Miss a date or miscalculate, and you breach the prospectus.</p>
+          </div>
+        </div>
+        <div class="num-item">
+          <div class="num">02</div>
+          <div>
+            <h3>Every transfer is a compliance event</h3>
+            <p>KYC each new holder, screen names and wallets against OFAC, enforce Reg D / Reg S lock-ups and jurisdiction limits — on every single trade.</p>
+          </div>
+        </div>
+        <div class="num-item">
+          <div class="num">03</div>
+          <div>
+            <h3>NAV, reports, maturity</h3>
+            <p>Reprice when yields move, file quarterly reports regulators will trust, then redeem principal and retire supply at maturity.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="text-align:center; padding:2.4rem;">
+          <div class="stat-value gradient">$16T</div>
+          <div class="stat-label" style="margin-bottom:2.2rem;">Projected tokenized RWA by 2030 · BCG</div>
+          <div class="stat-value" style="font-size:2.2rem;">5&ndash;15 <span style="font-size:1rem; color:#6b6b80;">bps</span></div>
+          <div class="stat-label" style="margin-bottom:2.2rem;">Manual lifecycle cost on AUM — scales with every asset</div>
+          <div class="stat-value" style="font-size:2.2rem;">$24B</div>
+          <div class="stat-label">On-chain RWA today · rwa.xyz</div>
+        </div>
+      </div>
+    </div>
+    <p class="pull">Today this is fund admins, lawyers and compliance officers on spreadsheets and email. Issuance is a one-time event — <span style="color:#fff;">lifecycle is the cost that never stops.</span></p>
+  </div>
+
+  <!-- SLIDE 3: Solution -->
+  <div class="slide" data-slide="2">
+    <div class="tag">The Solution</div>
+    <h2>One command. <span class="gradient">Full autonomy.</span></h2>
+    <p class="subtitle">The fund manager issues an asset once. An AI agent runs its entire life — signing and settling on-chain, with no human after issuance.</p>
+    <div class="pipeline">
+      <div class="pipe-step"><h3>Issue</h3><p>permissioned token</p></div>
+      <div class="pipe-step"><h3>Comply</h3><p>KYC + OFAC</p></div>
+      <div class="pipe-step"><h3>Distribute</h3><p>USDC coupons</p></div>
+      <div class="pipe-step"><h3>Revalue</h3><p>NAV oracle</p></div>
+      <div class="pipe-step"><h3>Report</h3><p>regulator PDFs</p></div>
+      <div class="pipe-step"><h3>Settle</h3><p>redeem + burn</p></div>
+    </div>
+    <div class="grid-3" style="margin-top:2rem;">
+      <div class="card">
+        <h3>An agent, not a dashboard</h3>
+        <p>Claude-powered natural language with tool-use. "Who holds this bond?" "Run the Q1 report." The agent decides and executes — across REST, Telegram and an MCP server.</p>
+      </div>
+      <div class="card">
+        <h3>Autonomous by schedule</h3>
+        <p>Coupons, NAV updates and maturity checks fire on their own. The backend holds the operator key and signs every action — no cron, no human trigger.</p>
+      </div>
+      <div class="card">
+        <h3>Compliant by construction</h3>
+        <p>KYC and OFAC SDN screening on every whitelist and transfer, enforced by the token itself — not bolted on after the fact.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: Multi-chain — one engine, every network -->
+  <div class="slide" data-slide="3">
+    <div class="tag">Multi-chain</div>
+    <h2>One engine. <span class="gradient">Every network.</span></h2>
+    <p class="subtitle" style="margin-bottom:0.5rem;">
+      The compliance, lifecycle and reporting logic is written once; a thin adapter speaks each chain's
+      native standard. Issue the same compliant asset wherever your investors are — and settle in USDC everywhere.
+    </p>
+    <div class="grid-3" style="margin-top:2rem;">
+      <div class="svc svc-purple">
+        <h3>EVM &mdash; ERC-3643</h3>
+        <div class="code">7 NETWORKS</div>
+        <ul>
+          <li>Permissioned T-REX token + AuditLog</li>
+          <li>Arbitrum, Base, Arc, Avalanche</li>
+          <li>Ethereum, Polygon, Robinhood Chain</li>
+          <li>Source-verified · 19 Foundry tests</li>
+        </ul>
+      </div>
+      <div class="svc svc-blue">
+        <h3>Solana &mdash; Token-2022</h3>
+        <div class="code">VERIFIED ON DEVNET</div>
+        <ul>
+          <li>Frozen-by-default = whitelist-by-default</li>
+          <li>Permanent-delegate = issuer clawback</li>
+          <li>Freeze authority = KYC / sanctions</li>
+          <li>On-chain SPL-memo audit log</li>
+        </ul>
+      </div>
+      <div class="svc svc-green">
+        <h3>Hedera &mdash; HTS / HCS</h3>
+        <div class="code">NATIVE</div>
+        <ul>
+          <li>Native KYC, freeze and wipe keys</li>
+          <li>Consensus Service audit trail</li>
+          <li>Mirror Node analytics</li>
+          <li>Where Lamina was born &amp; won</li>
+        </ul>
+      </div>
+    </div>
+    <p class="pull" style="margin-top:1.6rem;">Add a chain with a config entry, not a rewrite. The same KYC, OFAC and lifecycle behaviour — <span style="color:#fff;">the correct on-chain primitive on each network.</span></p>
+  </div>
+
+  <!-- SLIDE 5: Architecture -->
+  <div class="slide" data-slide="4">
+    <div class="tag">Architecture</div>
+    <h2>People and agents drive <span class="gradient">the same engine.</span></h2>
+    <div class="arch">
+      <div class="arch-layer">
+        <div class="arch-label" style="color:#b47aff;">INTERFACES</div>
+        <div class="arch-box layer-ui" style="border-radius:12px 0 0 0;">
+          <h4>Web console &middot; REST</h4>
+          <span>Operator dashboard, typed API, multi-wallet login</span>
+        </div>
+        <div class="arch-box layer-ui">
+          <h4>Telegram</h4>
+          <span>Natural-language ops, write-confirmation on value moves</span>
+        </div>
+        <div class="arch-box layer-ui" style="border-radius:0 12px 0 0;">
+          <h4>MCP server</h4>
+          <span>Authenticated, scope-gated — other agents drive Lamina</span>
+        </div>
+      </div>
+      <div class="arch-layer">
+        <div class="arch-label" style="color:#60a5fa;">ENGINE</div>
+        <div class="arch-box layer-agent">
+          <h4>Issuance</h4>
+          <span>Deploy compliant token + audit trail in one tx</span>
+        </div>
+        <div class="arch-box layer-agent">
+          <h4>Compliance</h4>
+          <span>KYC whitelist, OFAC SDN, jurisdiction rules</span>
+        </div>
+        <div class="arch-box layer-agent">
+          <h4>Lifecycle</h4>
+          <span>Coupons, NAV, maturity redemption</span>
+        </div>
+        <div class="arch-box layer-agent">
+          <h4>Reporting</h4>
+          <span>Regulator PDFs, investor statements</span>
+        </div>
+      </div>
+      <div class="arch-layer">
+        <div class="arch-label" style="color:#34d399;">CHAINS</div>
+        <div class="arch-box layer-hedera">
+          <h4>EVM adapter</h4>
+          <span>web3.py &middot; ERC-3643 / ERC-20</span>
+        </div>
+        <div class="arch-box layer-hedera">
+          <h4>Solana adapter</h4>
+          <span>solders &middot; Token-2022 + extensions</span>
+        </div>
+        <div class="arch-box layer-hedera" style="border-radius:0 0 12px 0;">
+          <h4>Hedera adapter</h4>
+          <span>hiero-sdk &middot; HTS / HCS</span>
+        </div>
+      </div>
+      <div class="arch-layer">
+        <div class="arch-label" style="color:#fbbf24;">DATA</div>
+        <div class="arch-box layer-ext" style="border-radius:0 0 0 12px;">
+          <h4>Claude (Anthropic)</h4>
+          <span>NL agent, tool-use orchestration</span>
+        </div>
+        <div class="arch-box layer-ext">
+          <h4>OFAC SDN list</h4>
+          <span>treasury.gov, daily refresh, fuzzy match</span>
+        </div>
+        <div class="arch-box layer-ext">
+          <h4>Treasury yields</h4>
+          <span>NAV repricing oracle</span>
+        </div>
+        <div class="arch-box layer-ext" style="border-radius:0 0 12px 0;">
+          <h4>USDC &middot; Postgres</h4>
+          <span>settlement rail · state</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: Compliance & trust -->
+  <div class="slide" data-slide="5">
+    <div class="tag">Compliance &amp; Assurance</div>
+    <h2>The right standard <span class="gradient-blue">on every chain.</span></h2>
+    <p class="subtitle" style="margin-bottom:2rem;">Regulators want enforcement and proof. Lamina builds both into the token, on whichever network it runs.</p>
+    <div class="grid-4">
+      <div class="card">
+        <h3 style="color:#b47aff;">Permissioned transfers</h3>
+        <p>ERC-3643 on EVM, HTS keys on Hedera, Token-2022 frozen-by-default + permanent-delegate on Solana.</p>
+      </div>
+      <div class="card">
+        <h3 style="color:#60a5fa;">OFAC SDN screening</h3>
+        <p>Names and digital-currency addresses checked against the U.S. Treasury SDN list before any whitelist or transfer.</p>
+      </div>
+      <div class="card">
+        <h3 style="color:#34d399;">Immutable audit trail</h3>
+        <p>Access-controlled AuditLog on EVM, Hedera HCS, on-chain memo log on Solana. Every agent action recorded where it ran.</p>
+      </div>
+      <div class="card">
+        <h3 style="color:#fbbf24;">Verified &amp; tested</h3>
+        <p>EVM contracts source-verified with a 19-case Foundry suite; Solana lifecycle verified end-to-end on devnet.</p>
+      </div>
+    </div>
+    <div class="tags" style="margin-top:1.8rem;">
+      <span class="tag-pill">SEC Reg D</span>
+      <span class="tag-pill">SEC Reg S</span>
+      <span class="tag-pill">MiFID II</span>
+      <span class="tag-pill">KYC whitelist</span>
+      <span class="tag-pill">Jurisdiction limits</span>
+      <span class="tag-pill">Holder caps</span>
+      <span class="tag-pill">Lock-ups</span>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: Traction & validation -->
+  <div class="slide" data-slide="6">
+    <div class="tag">Traction</div>
+    <h2>Validated by judges. <span class="gradient">Then scaled.</span></h2>
+    <div class="two-col" style="margin-top:2rem;">
+      <div>
+        <div class="card" style="background:rgba(245,158,11,0.05); border-color:rgba(245,158,11,0.2); padding:2.2rem;">
+          <div class="badge-win" style="margin-bottom:1.2rem;">★ Hedera Hello Future Apex Hackathon 2026</div>
+          <div class="stat-value gradient" style="font-size:3rem;">3rd place</div>
+          <div class="stat-label" style="margin-bottom:1.4rem;">DeFi &amp; Tokenization track · $8K</div>
+          <p style="font-size:0.85rem; color:#c9c9d6; line-height:1.6;">
+            Built and judged as a working product on Hedera testnet — issuance, compliance,
+            coupons and maturity, end to end. Then we didn't stop.
+          </p>
+        </div>
+      </div>
+      <div>
+        <p class="subtitle" style="margin-bottom:1.2rem; font-size:0.95rem;">Since the win — rebuilt chain-agnostic:</p>
+        <div class="grid-2">
+          <div class="card stat" style="padding:1.4rem;">
+            <div class="stat-value gradient" style="font-size:2rem;">9</div>
+            <div class="stat-label">networks live</div>
+          </div>
+          <div class="card stat" style="padding:1.4rem;">
+            <div class="stat-value gradient" style="font-size:2rem;">6</div>
+            <div class="stat-label">lifecycle stages automated</div>
+          </div>
+          <div class="card stat" style="padding:1.4rem;">
+            <div class="stat-value gradient" style="font-size:2rem;">3</div>
+            <div class="stat-label">interfaces · REST·TG·MCP</div>
+          </div>
+          <div class="card stat" style="padding:1.4rem;">
+            <div class="stat-value gradient" style="font-size:2rem;">19</div>
+            <div class="stat-label">contract tests, verified</div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:1rem;">
+          <p style="font-size:0.8rem;">Solana Token-2022 lifecycle <strong style="color:#e8e8ef;">verified end-to-end on devnet</strong> — issue → KYC → purchase → coupon → NAV → maturity, all on-chain.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: Team -->
+  <div class="slide" data-slide="7">
+    <div class="tag">Team</div>
     <h2><span class="gradient">Venkatesh</span></h2>
     <p class="subtitle" style="margin-bottom:2rem;">Founding Engineer (AI) — Bluink Labs</p>
     <div class="two-col">
@@ -415,407 +705,80 @@
           <div class="num-item">
             <div class="num">01</div>
             <div>
-              <h3>AI Infrastructure</h3>
-              <p>2 years building data pipelines (Kafka, Spark), LLM integrations (LangChain, LangGraph), MCP servers, and agentic memory systems at Bluink Labs — a DPIIT-recognized startup (DIPP143482).</p>
+              <h3>AI infrastructure</h3>
+              <p>2 years building data pipelines (Kafka, Spark), LLM systems (LangChain, LangGraph), MCP servers and agentic memory at Bluink Labs — a DPIIT-recognized startup (DIPP143482).</p>
             </div>
           </div>
           <div class="num-item">
             <div class="num">02</div>
             <div>
-              <h3>Hedera Ecosystem</h3>
-              <p>Active contributor since DLT Climate Hackathon and Hello Future Hackathon 1.0. Built standalone projects that contribute to the Hedera ecosystem.</p>
+              <h3>Shipped &amp; validated</h3>
+              <p>Built Lamina solo to a 3rd-place finish at the Hedera Apex Hackathon, then re-architected it chain-agnostic and live across 9 networks — EVM, Hedera and Solana.</p>
             </div>
           </div>
           <div class="num-item">
             <div class="num">03</div>
             <div>
               <h3>Thesis</h3>
-              <p>AI-driven agents will transform asset management — reducing operational burden on fund managers while enabling efficient, data-driven decision-making. Lamina is built to prove this on Hedera.</p>
+              <p>AI agents will run asset management — taking the operational burden off fund managers while keeping every action compliant and provable on-chain. Lamina is the proof.</p>
             </div>
           </div>
         </div>
       </div>
       <div>
         <div class="card" style="margin-bottom:1rem;">
-          <h3>Core Skills</h3>
+          <h3>Core stack</h3>
           <p style="line-height:2;">
             <span class="tag-pill">Python</span>
             <span class="tag-pill">FastAPI</span>
-            <span class="tag-pill">LangChain</span>
-            <span class="tag-pill">LangGraph</span>
+            <span class="tag-pill">web3.py</span>
+            <span class="tag-pill">solders</span>
+            <span class="tag-pill">Foundry</span>
+            <span class="tag-pill">Claude</span>
             <span class="tag-pill">MCP</span>
-            <span class="tag-pill">Kafka</span>
-            <span class="tag-pill">Spark</span>
+            <span class="tag-pill">Postgres</span>
             <span class="tag-pill">Next.js</span>
-            <span class="tag-pill">Hedera SDK</span>
           </p>
         </div>
         <div class="card" style="background:rgba(130,89,239,0.04); border-color:rgba(130,89,239,0.15);">
           <h3 style="color:#b47aff;">Bluink Labs</h3>
-          <p>DPIIT-recognized AI startup (DIPP143482). Building intelligent data infrastructure and AI-powered enterprise tools.</p>
+          <p>DPIIT-recognized AI startup (DIPP143482). Intelligent data infrastructure and AI-powered enterprise tools.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- SLIDE 3: Problem -->
-  <div class="slide" data-slide="2" >
-    <div class="tag">The Problem</div>
-    <h2>Tokenizing assets is easy.<br><span class="gradient">Managing them is the bottleneck.</span></h2>
-    <div class="two-col" style="margin-top:2rem;">
-      <div class="num-list">
-        <div class="num-item">
-          <div class="num">01</div>
-          <div>
-            <h3>Manual lifecycle operations</h3>
-            <p>Coupon payments, NAV updates, maturity settlement — all handled by fund admins, lawyers, and compliance officers. Manually.</p>
-          </div>
-        </div>
-        <div class="num-item">
-          <div class="num">02</div>
-          <div>
-            <h3>Compliance overhead</h3>
-            <p>Every transfer requires KYC validation, jurisdiction checks, sanctions screening. One missed check = regulatory action.</p>
-          </div>
-        </div>
-        <div class="num-item">
-          <div class="num">03</div>
-          <div>
-            <h3>No verifiable audit trail</h3>
-            <p>Regulators want cryptographic proof. Current systems run on spreadsheets and emails.</p>
-          </div>
-        </div>
-      </div>
-      <div>
-        <div class="card" style="text-align:center; padding:2.5rem;">
-          <div class="stat-value gradient">$16T</div>
-          <div class="stat-label" style="margin-bottom:2.5rem;">Projected RWA market by 2030</div>
-          <div class="stat-value" style="font-size:2.2rem;">5-15 <span style="font-size:1rem; color:#6b6b80;">bps</span></div>
-          <div class="stat-label" style="margin-bottom:2.5rem;">Manual lifecycle cost on AUM</div>
-          <div class="stat-value" style="font-size:2.2rem;">$33B</div>
-          <div class="stat-label">Current tokenized RWA market</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SLIDE 3: Solution — Pipeline -->
-  <div class="slide" data-slide="3">
-    <div class="tag">The Solution</div>
-    <h2>One command. <span class="gradient">Full autonomy.</span></h2>
-    <p class="subtitle">Fund manager says "Tokenize this bond." Lamina handles everything — for the asset's entire life.</p>
-    <div class="pipeline">
-      <div class="pipe-step">
-        <h3>Issue</h3>
-        <p>HTS token deploy</p>
-      </div>
-      <div class="pipe-step">
-        <h3>Comply</h3>
-        <p>KYC + OFAC screen</p>
-      </div>
-      <div class="pipe-step">
-        <h3>Manage</h3>
-        <p>Coupons + NAV</p>
-      </div>
-      <div class="pipe-step">
-        <h3>Report</h3>
-        <p>Compliance PDFs</p>
-      </div>
-      <div class="pipe-step">
-        <h3>Settle</h3>
-        <p>Redeem + burn</p>
-      </div>
-    </div>
-    <div class="grid-3" style="margin-top:2rem;">
-      <div class="card">
-        <h3>AI-Powered Agent</h3>
-        <p>Natural language commands via Claude API. "Who holds this bond?" "Generate Q1 report." Tool-use orchestration.</p>
-      </div>
-      <div class="card">
-        <h3>Scheduled Automation</h3>
-        <p>APScheduler runs coupon payments, NAV updates, and maturity checks autonomously. No cron, no human trigger.</p>
-      </div>
-      <div class="card">
-        <h3>OFAC Sanctions Screening</h3>
-        <p>Real-time SDN list matching on every whitelist and transfer. Fuzzy name match via rapidfuzz. Daily refresh.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- SLIDE 4: Technical Architecture -->
-  <div class="slide" data-slide="4">
-    <div class="tag">Technical Architecture</div>
-    <h2>System <span class="gradient">overview</span></h2>
-    <div class="arch">
-      <!-- UI Layer -->
-      <div class="arch-layer">
-        <div class="arch-label" style="color:#b47aff;">CLIENT</div>
-        <div class="arch-box layer-ui" style="border-radius:12px 0 0 0;">
-          <h4>Next.js 16 Dashboard</h4>
-          <span>Asset management, holder analytics, event timeline, maturity tracking</span>
-        </div>
-        <div class="arch-box layer-ui">
-          <h4>Chat Interface</h4>
-          <span>Natural language commands, streaming responses, tool-use display</span>
-        </div>
-        <div class="arch-box layer-ui" style="border-radius:0 12px 0 0;">
-          <h4>HashConnect</h4>
-          <span>WalletConnect pairing, HashPack integration, session management</span>
-        </div>
-      </div>
-      <!-- Agent Layer -->
-      <div class="arch-layer">
-        <div class="arch-label" style="color:#60a5fa;">AGENTS</div>
-        <div class="arch-box layer-agent">
-          <h4>Compliance Agent</h4>
-          <span>KYC whitelist, OFAC SDN, jurisdiction rules, transfer validation</span>
-        </div>
-        <div class="arch-box layer-agent">
-          <h4>Lifecycle Agent</h4>
-          <span>Issuance, coupon distribution, NAV updates, maturity settlement</span>
-        </div>
-        <div class="arch-box layer-agent">
-          <h4>Reporting Agent</h4>
-          <span>Compliance reports, investor statements, audit trail PDFs</span>
-        </div>
-        <div class="arch-box layer-agent">
-          <h4>Chat Agent</h4>
-          <span>Claude API, tool_use, NL command parsing</span>
-        </div>
-      </div>
-      <!-- Hedera Layer -->
-      <div class="arch-layer">
-        <div class="arch-label" style="color:#34d399;">HEDERA</div>
-        <div class="arch-box layer-hedera">
-          <h4>Token Service (HTS)</h4>
-          <span>Create, mint, transfer, wipe, burn, KYC grant, freeze</span>
-        </div>
-        <div class="arch-box layer-hedera">
-          <h4>Consensus Service (HCS)</h4>
-          <span>Per-asset topics, immutable action logging, sequence proofs</span>
-        </div>
-        <div class="arch-box layer-hedera" style="border-radius:0 0 12px 0;">
-          <h4>Mirror Node</h4>
-          <span>Balance queries, tx verification, HCS message retrieval</span>
-        </div>
-      </div>
-      <!-- External Layer -->
-      <div class="arch-layer">
-        <div class="arch-label" style="color:#fbbf24;">DATA</div>
-        <div class="arch-box layer-ext" style="border-radius:0 0 0 12px;">
-          <h4>Treasury Yields</h4>
-          <span>US yield curve for bond pricing</span>
-        </div>
-        <div class="arch-box layer-ext">
-          <h4>OFAC SDN List</h4>
-          <span>treasury.gov, daily refresh, fuzzy match</span>
-        </div>
-        <div class="arch-box layer-ext">
-          <h4>FX Rates</h4>
-          <span>Cross-border asset valuation</span>
-        </div>
-        <div class="arch-box layer-ext" style="border-radius:0 0 12px 0;">
-          <h4>Claude API</h4>
-          <span>Anthropic, tool_use, haiku</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SLIDE 5: Hedera Deep Dive -->
-  <div class="slide" data-slide="5">
-    <div class="tag">Hedera Integration</div>
-    <h2>Not a wrapper. <span class="gradient-blue">Native Hedera.</span></h2>
-    <p class="subtitle" style="margin-bottom:2rem;">Every operation goes through Hedera's core services. No smart contracts. No bridges.</p>
-    <div class="grid-3">
-      <div class="svc svc-green">
-        <h3>Hedera Token Service</h3>
-        <div class="code">HTS</div>
-        <ul>
-          <li>Token creation with KYC + freeze keys</li>
-          <li>Mint, transfer, wipe, burn</li>
-          <li>Proportional coupon distribution</li>
-          <li>Maturity redemption & token burn</li>
-          <li>Compliance key enforcement</li>
-        </ul>
-      </div>
-      <div class="svc svc-blue">
-        <h3>Consensus Service</h3>
-        <div class="code">HCS</div>
-        <ul>
-          <li>Per-asset audit topics</li>
-          <li>Every agent action logged immutably</li>
-          <li>Timestamped sequence numbers</li>
-          <li>Cryptographic proof for regulators</li>
-          <li>Verifiable on HashScan</li>
-        </ul>
-      </div>
-      <div class="svc svc-purple">
-        <h3>Mirror Node API</h3>
-        <div class="code">REST</div>
-        <ul>
-          <li>Real-time token balance queries</li>
-          <li>Transaction history verification</li>
-          <li>HCS message retrieval for reports</li>
-          <li>Dashboard data feeds</li>
-          <li>Holder analytics</li>
-        </ul>
-      </div>
-    </div>
-    <div class="tags">
-      <span class="tag-pill">hiero-sdk-python</span>
-      <span class="tag-pill">HashConnect v3</span>
-      <span class="tag-pill">Hedera Testnet</span>
-      <span class="tag-pill">HashScan Explorer</span>
-      <span class="tag-pill">WalletConnect</span>
-      <span class="tag-pill">HCS-10 OpenConvAI</span>
-      <span class="tag-pill">HCS-11 Agent Profile</span>
-      <span class="tag-pill">HOL Registry: 0.0.8343867</span>
-    </div>
-  </div>
-
-  <!-- SLIDE 6: Demo Flow -->
-  <div class="slide" data-slide="6">
-    <div class="tag">Live Demo</div>
-    <h2>End-to-end in <span class="gradient">3 minutes</span></h2>
-    <div class="two-col" style="margin-top:1.5rem;">
-      <div class="num-list">
-        <div class="num-item">
-          <div class="num" style="background:rgba(59,130,246,0.1); color:#60a5fa;">01</div>
-          <div>
-            <h3>Issue a Bond</h3>
-            <p>"Tokenize a $10M 5-year US Treasury bond" — agent deploys HTS token + HCS audit topic</p>
-          </div>
-        </div>
-        <div class="num-item">
-          <div class="num" style="background:rgba(245,158,11,0.1); color:#fbbf24;">02</div>
-          <div>
-            <h3>Investor Onboarding</h3>
-            <p>KYC whitelist + OFAC screening, purchase tokens, all logged to HCS</p>
-          </div>
-        </div>
-        <div class="num-item">
-          <div class="num" style="background:rgba(239,68,68,0.1); color:#f87171;">03</div>
-          <div>
-            <h3>Compliance Block</h3>
-            <p>Restricted party tries to buy — agent blocks, logs reason on-chain</p>
-          </div>
-        </div>
-      </div>
-      <div>
-        <div class="num-list">
-          <div class="num-item">
-            <div class="num" style="background:rgba(16,185,129,0.1); color:#34d399;">04</div>
-            <div>
-              <h3>Autonomous Operations</h3>
-              <p>Coupon distribution, NAV update from treasury yields, report generation</p>
-            </div>
-          </div>
-          <div class="num-item">
-            <div class="num" style="background:rgba(168,85,247,0.1); color:#c084fc;">05</div>
-            <div>
-              <h3>Maturity Settlement</h3>
-              <p>Redeem all tokens, return principal, burn supply, generate final report</p>
-            </div>
-          </div>
-          <div class="num-item">
-            <div class="num" style="background:rgba(130,89,239,0.1); color:#8259ef;">06</div>
-            <div>
-              <h3>Full Audit Trail</h3>
-              <p>Every action on HCS — verifiable on HashScan. Immutable compliance proof.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SLIDE 7: Market -->
-  <div class="slide" data-slide="7">
-    <div class="tag">Market & Vision</div>
+  <!-- SLIDE 9: Market & business -->
+  <div class="slide" data-slide="8">
+    <div class="tag">Market &amp; Vision</div>
     <h2>The <span class="gradient">operating system</span> for tokenized assets</h2>
     <div class="two-col" style="margin-top:2rem;">
       <div>
         <p class="subtitle" style="margin-bottom:2rem;">
-          BlackRock BUIDL: $2.9B. Archax on Hedera: $500M. Every tokenized asset needs lifecycle management. Nobody has automated it.
+          BlackRock BUIDL alone is multi-billion. Securitize, Archax and Franklin Templeton are issuing.
+          Every one of those assets needs lifecycle management — and no one has automated it across chains.
         </p>
         <div class="card" style="margin-bottom:1rem;">
-          <h3>Revenue Model</h3>
-          <p>2-5 basis points on AUM managed by the agent.<br><strong style="color:#e8e8ef;">$1B AUM = $200K-500K/year recurring.</strong></p>
+          <h3>Revenue model</h3>
+          <p>2&ndash;5 bps on AUM the agent manages, plus per-asset SaaS.<br><strong style="color:#e8e8ef;">$1B AUM = $200K&ndash;500K/yr recurring.</strong></p>
         </div>
         <div class="card">
-          <h3>Target Customers</h3>
-          <p>Securitize, Archax, Zoniqx, Franklin Templeton — any institution launching tokenized funds.</p>
+          <h3>Path to $10M ARR</h3>
+          <p>At 3 bps, ≈ $33B AUM under management — a sliver of a $16T market. Land design-partner issuers, prove the agent cuts fund-admin cost, ship to mainnet.</p>
         </div>
       </div>
       <div>
         <div class="card" style="margin-bottom:1rem;">
-          <h3>Chain-Agnostic Core</h3>
-          <p>Compliance, lifecycle, and reporting agents are chain-agnostic. Hedera is the first adapter. Ethereum, Avalanche, Solana next.</p>
+          <h3>Target customers</h3>
+          <p>Securitize, Archax, Zoniqx, Tokeny, Franklin Templeton — any institution issuing tokenized funds, bonds or equities.</p>
         </div>
         <div class="card" style="margin-bottom:1rem;">
-          <h3>Why Hedera First</h3>
-          <p>Native token service — no smart contracts. HCS for immutable audit. $0.001 transactions. Enterprise-grade finality.</p>
+          <h3>The moat</h3>
+          <p>Issuance is solved and commoditized. Lamina is the operations layer that sits <em>above</em> any issuance standard, on any chain — the recurring, AUM-scaling revenue everyone treats as back-office cost.</p>
         </div>
         <div class="card" style="background:rgba(130,89,239,0.04); border-color:rgba(130,89,239,0.15);">
-          <h3 style="color:#b47aff;">Competitive Edge</h3>
-          <p>Deep HTS + HCS + Mirror Node integration. OFAC screening. HashConnect wallet. Real autonomous agent — not a dashboard with buttons.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SLIDE 9: Future Roadmap -->
-  <div class="slide" data-slide="8">
-    <div class="tag">Future Roadmap</div>
-    <h2>Key learnings & <span class="gradient">next steps</span></h2>
-    <div class="two-col" style="margin-top:2rem;">
-      <div>
-        <p class="subtitle" style="margin-bottom:1.5rem;">Learnings from building Lamina</p>
-        <div class="card" style="margin-bottom:1rem;">
-          <h3>OFAC Screening Tuning</h3>
-          <p>Fuzzy matching against 18K+ SDN entries requires careful threshold calibration. Started at 85%, moved to exact match for production reliability. Fuzzy matching works best with longer entity names.</p>
-        </div>
-        <div class="card" style="margin-bottom:1rem;">
-          <h3>Hedera SDK Maturity</h3>
-          <p>hiero-sdk-python is new but capable. Transaction freezing patterns, receipt handling, and mirror node queries all work reliably on testnet.</p>
-        </div>
-        <div class="card">
-          <h3>Agent Orchestration</h3>
-          <p>Claude API with tool_use enables powerful NL command parsing. Structured tool definitions map cleanly to Hedera operations.</p>
-        </div>
-      </div>
-      <div>
-        <p class="subtitle" style="margin-bottom:1.5rem;">Next steps if continued</p>
-        <div class="num-list">
-          <div class="num-item">
-            <div class="num" style="background:rgba(16,185,129,0.1); color:#34d399;">01</div>
-            <div>
-              <h3>Stablecoin Settlements</h3>
-              <p>USDC coupon payments and maturity redemptions via HTS token transfers.</p>
-            </div>
-          </div>
-          <div class="num-item">
-            <div class="num" style="background:rgba(59,130,246,0.1); color:#60a5fa;">02</div>
-            <div>
-              <h3>Multi-Chain Expansion</h3>
-              <p>Chain-agnostic core with thin settlement adapters. Ethereum, Avalanche, Polygon, Solana.</p>
-            </div>
-          </div>
-          <div class="num-item">
-            <div class="num" style="background:rgba(168,85,247,0.1); color:#c084fc;">03</div>
-            <div>
-              <h3>HOL Agent Registry</h3>
-              <p>Register Lamina in the Hashgraph Online agent registry for ecosystem discoverability.</p>
-            </div>
-          </div>
-          <div class="num-item">
-            <div class="num" style="background:rgba(245,158,11,0.1); color:#fbbf24;">04</div>
-            <div>
-              <h3>Institutional Pilot</h3>
-              <p>Partner with Archax, Securitize, or Zoniqx for a production pilot on tokenized fund management.</p>
-            </div>
-          </div>
+          <h3 style="color:#b47aff;">Why now</h3>
+          <p>RWAs are crossing from pilots to production, Token Extensions make Solana compliance-ready, and AI agents can finally run the lifecycle autonomously.</p>
         </div>
       </div>
     </div>
@@ -825,25 +788,28 @@
   <div class="slide" data-slide="9">
     <div class="orb orb-purple"></div>
     <div class="orb orb-blue"></div>
-    <div class="tag">Thank You</div>
-    <h1><span class="gradient">Lamina</span></h1>
-    <p class="subtitle" style="font-size:1.2rem; max-width:560px; margin-top:0.5rem;">
-      Autonomous RWA lifecycle management on Hedera.<br>
-      From issuance to maturity — zero human intervention.
+    <div class="tag">Lamina</div>
+    <h1><span class="gradient">Issuance is solved.</span><br><span style="color:#e8e8ef;">Lifecycle is not.</span></h1>
+    <p class="subtitle" style="font-size:1.2rem; max-width:620px; margin-top:0.5rem;">
+      Hand the operating burden to the agent — compliant, autonomous, and on every chain your investors use.
     </p>
     <div class="cta-links" style="margin-top:2.5rem;">
       <a class="cta-link cta-primary" href="https://github.com/Ni8crawler18/lamina" target="_blank">GitHub</a>
       <a class="cta-link cta-secondary" href="https://lamina-agent.vercel.app" target="_blank">Live App</a>
       <a class="cta-link cta-secondary" href="https://lamina-agent.vercel.app/dashboard" target="_top">Dashboard</a>
     </div>
-    <div style="margin-top:3.5rem; display:flex; gap:4rem;">
+    <div style="margin-top:3.5rem; display:flex; gap:4rem; flex-wrap:wrap;">
       <div class="stat">
-        <div class="stat-value gradient" style="font-size:2.2rem;">4</div>
-        <div class="stat-label">Agent Modules</div>
+        <div class="stat-value gradient" style="font-size:2.2rem;">9</div>
+        <div class="stat-label">Networks</div>
       </div>
       <div class="stat">
-        <div class="stat-value gradient" style="font-size:2.2rem;">3</div>
-        <div class="stat-label">Hedera Services</div>
+        <div class="stat-value gradient" style="font-size:2.2rem;">6</div>
+        <div class="stat-label">Lifecycle Stages</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value gradient" style="font-size:2.2rem;">3rd</div>
+        <div class="stat-label">Hedera Apex</div>
       </div>
       <div class="stat">
         <div class="stat-value gradient" style="font-size:2.2rem;">100%</div>
