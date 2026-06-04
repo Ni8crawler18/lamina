@@ -6,7 +6,7 @@ name          = "Solana Devnet"
 slug          = "solana-devnet"
 family        = "solana"
 chain_id      = 103            # Solana cluster id (devnet); identifier only, non-EVM
-enabled       = false
+enabled       = true
 native_symbol = "SOL"
 
 rpc_url       = "https://api.devnet.solana.com"

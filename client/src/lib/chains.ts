@@ -24,9 +24,9 @@ export const CHAINS: ChainBrand[] = [
   { slug: "ethereum-sepolia", name: "Ethereum", short: "ETH", color: "#7B8CEA", logo: "/chains/ethereum.png", family: "evm", chainId: 11155111, explorer: "https://sepolia.etherscan.io", rpc: "https://ethereum-sepolia-rpc.publicnode.com", nativeSymbol: "ETH", live: true },
   { slug: "hedera-testnet", name: "Hedera", short: "ℏ", color: "#A78BFA", logo: "/chains/hedera.png", family: "hedera", chainId: 296, explorer: "https://hashscan.io/testnet", nativeSymbol: "HBAR", note: "non-EVM · HTS/HCS", live: true },
   { slug: "polygon-amoy", name: "Polygon", short: "POL", color: "#8247E5", logo: "/chains/polygon.png", family: "evm", chainId: 80002, explorer: "https://amoy.polygonscan.com", rpc: "https://rpc-amoy.polygon.technology", nativeSymbol: "POL", note: "Amoy testnet", live: true },
-  // Solana devnet — Token-2022 permissioned RWA tokens. live:false until the
-  // backend SolanaAdapter is devnet-verified (see app/chains/solana/adapter.py).
-  { slug: "solana-devnet", name: "Solana", short: "SOL", color: "#14F195", logo: "/chains/solana.png", family: "solana", chainId: 103, explorer: "https://solscan.io", nativeSymbol: "SOL", note: "Token-2022 · devnet", live: false },
+  // Solana devnet — Token-2022 permissioned RWA tokens. Full lifecycle verified
+  // on devnet (issue/KYC/purchase/coupon/NAV/maturity, on-chain memo audit).
+  { slug: "solana-devnet", name: "Solana", short: "SOL", color: "#14F195", logo: "/chains/solana.png", family: "solana", chainId: 103, explorer: "https://solscan.io", nativeSymbol: "SOL", note: "Token-2022 · devnet", live: true },
 ];
 
 /** Solscan needs ?cluster=devnet/testnet for non-mainnet networks. */

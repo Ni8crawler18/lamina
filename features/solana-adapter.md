@@ -1,7 +1,15 @@
 # Solana Adapter (Token-2022 permissioned RWA tokens)
 
-Status: **scaffolded, disabled by default** (`config/chains/solana-devnet.toml` →
-`enabled = false`). Flip on after the devnet checklist passes.
+Status: **live on devnet, full lifecycle verified.** `config/chains/solana-devnet.toml`
+→ `enabled = true`; frontend `live: true`. Operator keypair at `~/lamina-sol.json`
+(`SOLANA_KEYPAIR_PATH`), funded with devnet SOL + Circle devnet USDC.
+
+Verified end-to-end on devnet (sample run, asset "Solana Test Bond" / STB,
+mint `4LzJYkEMCUFM1BSWWSjsAQgMZXGpULQnmQFTYTpJLdHG`):
+issue → grant_kyc → purchase (`f9q4Dnm5…`) → coupon in USDC (`3CQxaDd8…`) →
+update-nav → maturity (clawback wipe 500 + burn 99500 + 5 USDC principal) →
+10-entry on-chain memo audit trail read back parsed. All verifiable on Solscan
+(`?cluster=devnet`).
 
 ## Why this design is production-viable (not a demo hack)
 

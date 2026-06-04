@@ -116,18 +116,31 @@ class SolanaAdapter(ChainAdapter):
 
     # ── transaction send ─────────────────────────────────────────────────────
     def _send(self, instructions, extra_signers=()) -> str:
-        """Compile, sign (operator + any extra signers), send and confirm."""
+        """Compile, sign (operator + any extra signers), send and confirm.
+
+        Preflight is skipped on purpose: public RPC nodes lag, so simulating
+        against a stale node fails for txs that reference very recently created
+        accounts (e.g. an ATA created in the previous request). Submitting
+        directly lets the leader execute against real cluster state; we then read
+        the signature status and raise on any on-chain error.
+        """
         from solders.message import MessageV0
         from solders.transaction import VersionedTransaction
         from solana.rpc.commitment import Confirmed
+        from solana.rpc.types import TxOpts
 
         client = self._conn()
         payer = self._operator()
         bh = client.get_latest_blockhash().value.blockhash
         msg = MessageV0.try_compile(payer.pubkey(), list(instructions), [], bh)
         tx = VersionedTransaction(msg, [payer, *extra_signers])
-        sig = client.send_transaction(tx).value
+        sig = client.send_transaction(
+            tx, opts=TxOpts(skip_preflight=True, preflight_commitment=Confirmed)
+        ).value
         client.confirm_transaction(sig, commitment=Confirmed)
+        status = client.get_signature_statuses([sig], search_transaction_history=True).value[0]
+        if status and status.err is not None:
+            raise RuntimeError(f"[solana] tx {sig} failed on-chain: {status.err}")
         return str(sig)
 
     def _ata(self, owner: str, mint: str, *, token_2022: bool = True):
@@ -138,8 +151,15 @@ class SolanaAdapter(ChainAdapter):
             self._pubkey(owner), self._pubkey(mint), token_program_id=prog
         )
 
-    def _account_exists(self, pubkey) -> bool:
-        return self._conn().get_account_info(pubkey).value is not None
+    def _ix_create_ata_idempotent(self, owner: str, mint: str, *, token_2022: bool = True):
+        """Idempotent ATA-create instruction — a no-op if the ATA already exists,
+        so it is race-free (no get_account_info pre-check needed)."""
+        from spl.token.instructions import create_idempotent_associated_token_account
+        prog = self._token_2022() if token_2022 else self._token_legacy()
+        return create_idempotent_associated_token_account(
+            payer=self._operator().pubkey(), owner=self._pubkey(owner),
+            mint=self._pubkey(mint), token_program_id=prog,
+        )
 
     # ── extension instruction builders (Token-2022) ──────────────────────────
     def _ix_init_permanent_delegate(self, mint, delegate):
@@ -198,38 +218,52 @@ class SolanaAdapter(ChainAdapter):
         from solders.keypair import Keypair
         from solders.system_program import CreateAccountParams, create_account
         from spl.token.instructions import (
-            InitializeMint2Params, initialize_mint2,
+            InitializeMint2Params, MintToCheckedParams, ThawAccountParams,
+            create_associated_token_account, initialize_mint2, mint_to_checked,
+            thaw_account,
         )
 
         client = self._conn()
         operator = self._operator()
+        op = operator.pubkey()
         mint_kp = Keypair()
         mint = mint_kp.pubkey()
         prog = self._token_2022()
         rent = client.get_minimum_balance_for_rent_exemption(_MINT_WITH_EXT_SIZE).value
 
-        # 1. Create the mint account + initialise extensions, then the mint itself.
-        #    Extension inits MUST precede InitializeMint2.
-        create_ixs = [
+        # Do it all in ONE atomic transaction: create the mint + init extensions
+        # (which MUST precede InitializeMint2) + create the treasury ATA (created
+        # frozen by DefaultAccountState) + thaw it + mint the full supply. A single
+        # tx avoids any cross-transaction RPC-propagation race on the new mint.
+        ixs = [
             create_account(CreateAccountParams(
-                from_pubkey=operator.pubkey(), to_pubkey=mint,
+                from_pubkey=op, to_pubkey=mint,
                 lamports=rent, space=_MINT_WITH_EXT_SIZE, owner=prog,
             )),
-            self._ix_init_permanent_delegate(mint, operator.pubkey()),
+            self._ix_init_permanent_delegate(mint, op),
             self._ix_init_default_account_state_frozen(mint),
             initialize_mint2(InitializeMint2Params(
                 program_id=prog, mint=mint, decimals=decimals,
-                mint_authority=operator.pubkey(), freeze_authority=operator.pubkey(),
+                mint_authority=op, freeze_authority=op,
             )),
         ]
-        self._send(create_ixs, extra_signers=[mint_kp])
-
-        # 2. Mint the full supply to the treasury (operator). Its ATA is created
-        #    frozen (DefaultAccountState) and must be thawed before it can hold.
         if initial_supply > 0:
-            self._mint_to_treasury(str(mint), initial_supply, decimals)
+            ata = self._ata(str(op), str(mint))
+            ixs += [
+                create_associated_token_account(
+                    payer=op, owner=op, mint=mint, token_program_id=prog,
+                ),
+                thaw_account(ThawAccountParams(
+                    program_id=prog, account=ata, mint=mint, authority=op,
+                )),
+                mint_to_checked(MintToCheckedParams(
+                    program_id=prog, mint=mint, dest=ata, mint_authority=op,
+                    amount=initial_supply, decimals=decimals,
+                )),
+            ]
+        self._send(ixs, extra_signers=[mint_kp])
 
-        # 3. Per-asset audit anchor (queryable pubkey tag for the memo log).
+        # Per-asset audit anchor (queryable pubkey tag for the memo log).
         audit_anchor = str(Keypair().pubkey())
         try:
             self.write_audit(audit_anchor, "lifecycle", "asset_issued", {
@@ -244,29 +278,18 @@ class SolanaAdapter(ChainAdapter):
         return TokenDeployment(token_ref=str(mint), audit_topic_ref=audit_anchor)
 
     def _mint_to_treasury(self, token_ref: str, amount: int, decimals: int) -> str:
-        from spl.token.instructions import (
-            MintToCheckedParams, ThawAccountParams,
-            create_associated_token_account, mint_to_checked, thaw_account,
-        )
+        """Mint more supply to the treasury. The treasury ATA was created and
+        thawed at issuance, so an idempotent create here is a no-op."""
+        from spl.token.instructions import MintToCheckedParams, mint_to_checked
         operator = self._operator()
-        prog = self._token_2022()
         ata = self._ata(self.operator_ref(), token_ref)
-        ixs = []
-        if not self._account_exists(ata):
-            ixs.append(create_associated_token_account(
-                payer=operator.pubkey(), owner=operator.pubkey(),
-                mint=self._pubkey(token_ref), token_program_id=prog,
-            ))
-        # thaw the treasury ATA (created frozen by DefaultAccountState)
-        ixs.append(thaw_account(ThawAccountParams(
-            program_id=prog, account=ata, mint=self._pubkey(token_ref),
-            authority=operator.pubkey(),
-        )))
-        ixs.append(mint_to_checked(MintToCheckedParams(
-            program_id=prog, mint=self._pubkey(token_ref), dest=ata,
-            mint_authority=operator.pubkey(), amount=amount, decimals=decimals,
-        )))
-        return self._send(ixs)
+        return self._send([
+            self._ix_create_ata_idempotent(self.operator_ref(), token_ref),
+            mint_to_checked(MintToCheckedParams(
+                program_id=self._token_2022(), mint=self._pubkey(token_ref), dest=ata,
+                mint_authority=operator.pubkey(), amount=amount, decimals=decimals,
+            )),
+        ])
 
     def _decimals(self, token_ref: str) -> int:
         return int(self._conn().get_token_supply(self._pubkey(token_ref)).value.decimals)
@@ -284,27 +307,21 @@ class SolanaAdapter(ChainAdapter):
         ))])
 
     def transfer_token(self, token_ref: str, to_ref: str, amount: int) -> str:
-        from spl.token.instructions import (
-            TransferCheckedParams, create_associated_token_account, transfer_checked,
-        )
+        from spl.token.instructions import TransferCheckedParams, transfer_checked
         operator = self._operator()
-        prog = self._token_2022()
         decimals = self._decimals(token_ref)
         src = self._ata(self.operator_ref(), token_ref)
         dst = self._ata(to_ref, token_ref)
-        ixs = []
-        if not self._account_exists(dst):
-            # NOTE: the destination ATA is created FROZEN; the holder must have
-            # been KYC-granted (thawed) for the transfer to succeed.
-            ixs.append(create_associated_token_account(
-                payer=operator.pubkey(), owner=self._pubkey(to_ref),
-                mint=self._pubkey(token_ref), token_program_id=prog,
-            ))
-        ixs.append(transfer_checked(TransferCheckedParams(
-            program_id=prog, source=src, mint=self._pubkey(token_ref), dest=dst,
-            owner=operator.pubkey(), amount=amount, decimals=decimals,
-        )))
-        return self._send(ixs)
+        # Idempotent create: a KYC'd holder's ATA already exists (thawed), so this
+        # is a no-op. A non-KYC'd holder's ATA would be created FROZEN and the
+        # transfer would (correctly) fail — compliance enforced by the token.
+        return self._send([
+            self._ix_create_ata_idempotent(to_ref, token_ref),
+            transfer_checked(TransferCheckedParams(
+                program_id=self._token_2022(), source=src, mint=self._pubkey(token_ref),
+                dest=dst, owner=operator.pubkey(), amount=amount, decimals=decimals,
+            )),
+        ])
 
     def force_redeem(self, token_ref: str, holder_ref: str, amount: int) -> str:
         """Maturity claw-back: burn from the holder's account using the operator's
@@ -328,23 +345,16 @@ class SolanaAdapter(ChainAdapter):
     def grant_kyc(self, token_ref: str, holder_ref: str) -> str:
         """Whitelist a holder: ensure their ATA exists, then thaw it so they may
         receive/hold the asset (accounts are frozen-by-default)."""
-        from spl.token.instructions import (
-            ThawAccountParams, create_associated_token_account, thaw_account,
-        )
+        from spl.token.instructions import ThawAccountParams, thaw_account
         operator = self._operator()
-        prog = self._token_2022()
         ata = self._ata(holder_ref, token_ref)
-        ixs = []
-        if not self._account_exists(ata):
-            ixs.append(create_associated_token_account(
-                payer=operator.pubkey(), owner=self._pubkey(holder_ref),
-                mint=self._pubkey(token_ref), token_program_id=prog,
-            ))
-        ixs.append(thaw_account(ThawAccountParams(
-            program_id=prog, account=ata, mint=self._pubkey(token_ref),
-            authority=operator.pubkey(),
-        )))
-        return self._send(ixs)
+        return self._send([
+            self._ix_create_ata_idempotent(holder_ref, token_ref),
+            thaw_account(ThawAccountParams(
+                program_id=self._token_2022(), account=ata,
+                mint=self._pubkey(token_ref), authority=operator.pubkey(),
+            )),
+        ])
 
     def revoke_kyc(self, token_ref: str, holder_ref: str) -> str:
         return self.freeze(token_ref, holder_ref)
@@ -369,25 +379,21 @@ class SolanaAdapter(ChainAdapter):
 
     # ── payouts (USDC = legacy SPL Token) ────────────────────────────────────
     def pay_stable(self, to_ref: str, amount_units: int) -> str:
-        from spl.token.instructions import (
-            TransferCheckedParams, create_associated_token_account, transfer_checked,
-        )
+        from spl.token.instructions import TransferCheckedParams, transfer_checked
         operator = self._operator()
         prog = self._token_legacy()
         usdc = self.config.contract("usdc")
         src = self._ata(self.operator_ref(), usdc, token_2022=False)
         dst = self._ata(to_ref, usdc, token_2022=False)
-        ixs = []
-        if not self._account_exists(dst):
-            ixs.append(create_associated_token_account(
-                payer=operator.pubkey(), owner=self._pubkey(to_ref),
-                mint=self._pubkey(usdc), token_program_id=prog,
-            ))
-        ixs.append(transfer_checked(TransferCheckedParams(
-            program_id=prog, source=src, mint=self._pubkey(usdc), dest=dst,
-            owner=operator.pubkey(), amount=amount_units, decimals=_USDC_DECIMALS,
-        )))
-        return self._send(ixs)
+        # Legacy SPL USDC has no frozen-by-default; idempotent create is a no-op
+        # if the recipient already holds USDC, else it opens their USDC account.
+        return self._send([
+            self._ix_create_ata_idempotent(to_ref, usdc, token_2022=False),
+            transfer_checked(TransferCheckedParams(
+                program_id=prog, source=src, mint=self._pubkey(usdc), dest=dst,
+                owner=operator.pubkey(), amount=amount_units, decimals=_USDC_DECIMALS,
+            )),
+        ])
 
     def pay_native(self, to_ref: str, amount_wei: int) -> str:
         """Native SOL transfer. ``amount_wei`` is lamports (SOL's smallest unit)."""
@@ -470,10 +476,12 @@ class SolanaAdapter(ChainAdapter):
         logs = (tx and tx.transaction and tx.transaction.meta
                 and tx.transaction.meta.log_messages) or []
         for line in logs:
-            # Memo program logs: Program log: Memo (len N): "<text>"
+            # Memo program logs: Program log: Memo (len N): "<text>" — the inner
+            # text is debug-escaped, so unescape \" and \\ before returning.
             marker = 'Memo (len'
             if marker in line and '"' in line:
-                return line[line.index('"') + 1: line.rindex('"')]
+                text = line[line.index('"') + 1: line.rindex('"')]
+                return text.replace('\\"', '"').replace('\\\\', '\\')
         return None
 
     # ── helpers (not part of the interface) ──────────────────────────────────
