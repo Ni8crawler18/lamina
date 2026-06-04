@@ -18,15 +18,19 @@ class AssetRepository(BaseRepository):
     async def get(self, asset_id: int) -> Asset | None:
         return await self.session.get(Asset, asset_id)
 
-    async def list(self) -> list[Asset]:
-        res = await self.session.execute(select(Asset).order_by(Asset.id.desc()))
+    async def list(self, chain: str | None = None, owner: str | None = None) -> list[Asset]:
+        """List assets, optionally scoped by chain and/or owner. Legacy assets with
+        no owner (owner IS NULL) remain visible to everyone when an owner is given."""
+        stmt = select(Asset)
+        if chain:
+            stmt = stmt.where(Asset.chain == chain)
+        if owner:
+            stmt = stmt.where((Asset.owner == owner) | (Asset.owner.is_(None)))
+        res = await self.session.execute(stmt.order_by(Asset.id.desc()))
         return list(res.scalars().all())
 
     async def list_by_chain(self, chain: str) -> list[Asset]:
-        res = await self.session.execute(
-            select(Asset).where(Asset.chain == chain).order_by(Asset.id.desc())
-        )
-        return list(res.scalars().all())
+        return await self.list(chain=chain)
 
     async def list_active(self) -> list[Asset]:
         res = await self.session.execute(select(Asset).where(Asset.status == "active"))

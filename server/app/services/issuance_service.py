@@ -34,6 +34,7 @@ class IssuanceService:
         self, *, chain: str, name: str, symbol: str, total_supply: int,
         decimals: int = 2, coupon_rate: float = 0.0, maturity_date: str | None = None,
         jurisdiction: str = "US", investor_type: str = "accredited", asset_type: str = "bond",
+        owner: str | None = None,
     ) -> Asset:
         adapter = get_registry().adapter(chain)  # raises if chain unknown/disabled
 
@@ -45,7 +46,7 @@ class IssuanceService:
         # 2. Persist
         nav = total_supply / (10 ** decimals) if decimals > 0 else float(total_supply)
         asset = await self.assets.create(
-            chain=chain, name=name, symbol=symbol,
+            chain=chain, owner=owner, name=name, symbol=symbol,
             token_id=dep.token_ref, topic_id=dep.audit_topic_ref,
             asset_type=asset_type, total_supply=total_supply, decimals=decimals,
             coupon_rate=coupon_rate, maturity_date=maturity_date, nav=nav,

@@ -12,9 +12,11 @@ router = APIRouter(prefix="/api/assets", tags=["assets"])
 
 
 @router.get("", response_model=list[AssetOut])
-async def list_assets(chain: str | None = None, session: AsyncSession = Depends(get_session)):
-    repo = AssetRepository(session)
-    return await (repo.list_by_chain(chain) if chain else repo.list())
+async def list_assets(
+    chain: str | None = None, owner: str | None = None,
+    session: AsyncSession = Depends(get_session),
+):
+    return await AssetRepository(session).list(chain=chain, owner=owner)
 
 
 @router.get("/{asset_id}", response_model=AssetOut)

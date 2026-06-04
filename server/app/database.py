@@ -73,5 +73,12 @@ async def create_tables() -> None:
     Reintroduce Alembic when the schema needs versioned migrations in production.
     """
     import app.models.orm  # noqa: F401 — register tables on Base.metadata
+    from sqlalchemy import text
+
     async with get_engine().begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        # Additive, idempotent column migrations (Postgres). Keeps existing data
+        # while the schema evolves; reintroduce Alembic for anything non-additive.
+        await conn.execute(
+            text("ALTER TABLE assets ADD COLUMN IF NOT EXISTS owner VARCHAR(128)")
+        )

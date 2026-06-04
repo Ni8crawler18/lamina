@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createAsset } from "@/lib/api";
 import { useChain } from "@/contexts/chain-context";
+import { useWallet } from "@/contexts/wallet-context";
 
 interface CreateAssetFormProps {
   onSuccess: () => void;
@@ -13,6 +14,7 @@ export default function CreateAssetForm({ onSuccess, onClose }: CreateAssetFormP
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { active } = useChain();
+  const { ownerId } = useWallet();
   // Default maturity: 5 years from today
   const defaultMaturity = new Date(Date.now() + 5 * 365.25 * 86400000).toISOString().split("T")[0];
 
@@ -40,6 +42,7 @@ export default function CreateAssetForm({ onSuccess, onClose }: CreateAssetFormP
       await createAsset({
         ...form,
         chain: active.slug,
+        owner: ownerId || undefined,
         total_supply: Number(form.total_supply) * Math.pow(10, form.decimals),
         coupon_rate: Number(form.coupon_rate) / 100,
         maturity_date: form.maturity_date || null,

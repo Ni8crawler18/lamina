@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { getAssets, getHolders, getEvents } from "@/lib/api";
 import { useChain } from "@/contexts/chain-context";
+import { useWallet } from "@/contexts/wallet-context";
 import CouponDistributor from "@/components/payouts/coupon-distributor";
 import MaturityCard from "@/components/payouts/maturity-card";
 import { Badge } from "@/components/ui/badge";
@@ -32,11 +33,12 @@ export default function PayoutsPage() {
   const [payoutHistory, setPayoutHistory] = useState<PayoutEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const { active } = useChain();
+  const { ownerId } = useWallet();
 
   useEffect(() => {
     const load = async () => {
       try {
-        const data = await getAssets(active.slug);
+        const data = await getAssets(active.slug, ownerId || undefined);
         setAssets(data);
         setSelectedAsset(data.length > 0 ? data[0] : null);
       } catch (err) {
@@ -46,7 +48,7 @@ export default function PayoutsPage() {
       }
     };
     load();
-  }, [active.slug]);
+  }, [active.slug, ownerId]);
 
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -124,7 +126,7 @@ export default function PayoutsPage() {
               refreshDetails();
             }} />
             <MaturityCard asset={selectedAsset} onComplete={() => {
-              getAssets(active.slug).then(setAssets);
+              getAssets(active.slug, ownerId || undefined).then(setAssets);
               refreshDetails();
             }} />
           </div>

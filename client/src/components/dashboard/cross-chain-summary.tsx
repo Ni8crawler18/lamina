@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { getAssets } from "@/lib/api";
 import { useChain } from "@/contexts/chain-context";
+import { useWallet } from "@/contexts/wallet-context";
 import { CHAINS, type ChainBrand } from "@/lib/chains";
 
 interface Asset {
@@ -23,20 +24,21 @@ interface ChainAgg {
 /** Portfolio rolled up across every network — the cross-chain view of the engine. */
 export default function CrossChainSummary() {
   const { active, setChain } = useChain();
+  const { ownerId } = useWallet();
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let alive = true;
     const load = () =>
-      getAssets()
+      getAssets(undefined, ownerId || undefined)
         .then((d: Asset[]) => alive && setAssets(d))
         .catch(() => alive && setAssets([]))
         .finally(() => alive && setLoading(false));
     load();
     const interval = setInterval(load, 30000);
     return () => { alive = false; clearInterval(interval); };
-  }, []);
+  }, [ownerId]);
 
   const totalAUM = assets.reduce((s, a) => s + (a.nav || 0), 0);
   const activeCount = assets.filter((a) => a.status === "active").length;

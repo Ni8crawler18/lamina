@@ -20,6 +20,7 @@ interface WalletState {
   family: Family | null;
   chainId: number | null; // EVM numeric chain id reported by the wallet
   mode: AuthMode | null;
+  ownerId: string | null; // issuer identity for asset attribution (address or email)
   isConnected: boolean;
   isConnecting: boolean;
   error: string | null;
@@ -39,6 +40,7 @@ const WalletContext = createContext<WalletState>({
   family: null,
   chainId: null,
   mode: null,
+  ownerId: null,
   isConnected: false,
   isConnecting: false,
   error: null,
@@ -377,6 +379,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         family,
         chainId,
         mode,
+        ownerId: address || email || null,
         isConnected: !!mode,
         isConnecting,
         error,

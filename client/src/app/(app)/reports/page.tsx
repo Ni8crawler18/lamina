@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { getAssets, getReports } from "@/lib/api";
 import { useChain } from "@/contexts/chain-context";
+import { useWallet } from "@/contexts/wallet-context";
 import ReportGenerator from "@/components/reports/report-generator";
 import ReportList from "@/components/reports/report-list";
 
@@ -27,6 +28,7 @@ export default function ReportsPage() {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const { active } = useChain();
+  const { ownerId } = useWallet();
 
   const loadReports = useCallback(async (assetList: Asset[]) => {
     try {
@@ -50,7 +52,7 @@ export default function ReportsPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const data = await getAssets(active.slug);
+        const data = await getAssets(active.slug, ownerId || undefined);
         setAssets(data);
         await loadReports(data);
       } catch (err) {
@@ -60,7 +62,7 @@ export default function ReportsPage() {
       }
     };
     load();
-  }, [loadReports, active.slug]);
+  }, [loadReports, active.slug, ownerId]);
 
   if (loading) {
     return (

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { getAssets, getAuditLog } from "@/lib/api";
 import { useChain } from "@/contexts/chain-context";
+import { useWallet } from "@/contexts/wallet-context";
 import AuditTimeline from "@/components/history/audit-timeline";
 
 interface Asset {
@@ -36,11 +37,12 @@ export default function HistoryPage() {
   const [topicId, setTopicId] = useState<string | undefined>();
   const [loading, setLoading] = useState(true);
   const { active } = useChain();
+  const { ownerId } = useWallet();
 
   useEffect(() => {
     const load = async () => {
       try {
-        const data = await getAssets(active.slug);
+        const data = await getAssets(active.slug, ownerId || undefined);
         setAssets(data);
 
         // Load all audit logs
@@ -88,7 +90,7 @@ export default function HistoryPage() {
     };
     load();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active.slug]);
+  }, [active.slug, ownerId]);
 
   const filtered = allEntries.filter((entry) => {
     if (selectedAssetId != null && entry.asset_id !== selectedAssetId) return false;

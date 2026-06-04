@@ -29,8 +29,13 @@ export const getChains = (enabledOnly = false) =>
   fetchAPI(`/api/chains${enabledOnly ? "?enabled_only=true" : ""}`);
 
 // Assets
-export const getAssets = (chain?: string) =>
-  fetchAPI(`/api/assets${chain ? `?chain=${encodeURIComponent(chain)}` : ""}`);
+export const getAssets = (chain?: string, owner?: string) => {
+  const q = new URLSearchParams();
+  if (chain) q.set("chain", chain);
+  if (owner) q.set("owner", owner);
+  const qs = q.toString();
+  return fetchAPI(`/api/assets${qs ? `?${qs}` : ""}`);
+};
 export const getAsset = (id: number) => fetchAPI(`/api/assets/${id}`);
 export const createAsset = (data: Record<string, unknown>) =>
   fetchAPI("/api/assets", { method: "POST", body: JSON.stringify(data) });

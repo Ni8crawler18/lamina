@@ -29,7 +29,7 @@ interface Asset {
 }
 
 export default function Dashboard() {
-  const { address, email } = useWallet();
+  const { address, email, ownerId } = useWallet();
   const { active } = useChain();
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +42,7 @@ export default function Dashboard() {
         await checkHealth();
         if (!alive) return;
         setBackendUp(true);
-        const data = await getAssets(active.slug);
+        const data = await getAssets(active.slug, ownerId || undefined);
         if (alive) setAssets(data);
       } catch {
         if (alive) setBackendUp(false);
@@ -53,7 +53,7 @@ export default function Dashboard() {
     load();
     const interval = setInterval(load, 30000);
     return () => { alive = false; clearInterval(interval); };
-  }, [active.slug]);
+  }, [active.slug, ownerId]);
 
   const explorer = address ? explorerAddressUrl(active, address) : null;
 
