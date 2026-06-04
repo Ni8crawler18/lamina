@@ -26,7 +26,7 @@ export default function Landing() {
 
       <section className="relative mx-auto max-w-7xl px-6 pb-14">
         <p className="mb-6 text-center text-[11px] uppercase tracking-[0.32em] text-muted-foreground">
-          Deployed across 8 networks · every major EVM chain and Hedera
+          Deployed across 9 networks · every major EVM chain, Hedera and Solana
         </p>
         <ChainMarquee />
       </section>
@@ -92,7 +92,7 @@ function Hero() {
             Lamina is the lifecycle layer for tokenized securities. Issue an{" "}
             <span className="text-foreground">ERC-3643</span> permissioned token, and the agent
             enforces KYC and OFAC SDN screening on every transfer, distributes USDC coupons, updates
-            NAV, and settles redemption at maturity — on any EVM network or Hedera, with an
+            NAV, and settles redemption at maturity — on any EVM network, Hedera, or Solana, with an
             access-controlled on-chain audit trail.
           </p>
 
@@ -115,8 +115,8 @@ function Hero() {
           </div>
 
           <div className="reveal reveal-4 mt-11 flex flex-wrap items-center gap-x-8 gap-y-3 text-xs tracking-wide text-muted-foreground">
-            <Proof value="ERC-3643" label="+ Hedera HTS" />
-            <Proof value="8" label="networks" />
+            <Proof value="ERC-3643" label="+ HTS + Token-2022" />
+            <Proof value="9" label="networks" />
             <Proof value="19" label="contract tests, source-verified" />
           </div>
         </div>
@@ -175,7 +175,7 @@ function Stats() {
   const stats = [
     { v: "$24B", l: "tokenized RWA on-chain", s: "≈5× in 3 years · rwa.xyz" },
     { v: "$16T", l: "tokenized RWA by 2030", s: "BCG estimate" },
-    { v: "8", l: "networks, one engine", s: "EVM + non-EVM Hedera" },
+    { v: "9", l: "networks, one engine", s: "EVM · Hedera · Solana" },
     { v: "6", l: "lifecycle stages automated", s: "issuance → redemption" },
   ];
   return (
@@ -265,6 +265,7 @@ function MultiChain() {
 function ArchitectureSVG() {
   const evm = CHAINS.filter((c) => c.family === "evm");
   const hedera = CHAINS.filter((c) => c.family === "hedera")[0];
+  const solana = CHAINS.filter((c) => c.family === "solana")[0];
 
   // Excalidraw-style monochrome "pen" — colour comes only from the logos.
   const PEN = "hsl(233 14% 70%)";
@@ -297,7 +298,7 @@ function ArchitectureSVG() {
           <g stroke={PEN} strokeOpacity="0.45" strokeWidth="1.4">
             <rect x="40" y="70" width="220" height="374" rx="10" />
             <rect x="370" y="70" width="220" height="424" rx="10" />
-            <rect x="700" y="70" width="220" height="356" rx="10" />
+            <rect x="700" y="70" width="220" height="384" rx="10" />
           </g>
           {/* inner boxes */}
           <g stroke={PEN} strokeOpacity="0.7" strokeWidth="1.3">
@@ -307,8 +308,9 @@ function ArchitectureSVG() {
             {modules.map((_, i) => (
               <rect key={i} x="390" y={116 + i * 94} width="180" height="72" rx="7" />
             ))}
-            <rect x="720" y="96" width="180" height="170" rx="7" />
-            <rect x="720" y="290" width="180" height="110" rx="7" />
+            <rect x="720" y="96" width="180" height="150" rx="7" />
+            <rect x="720" y="262" width="180" height="78" rx="7" />
+            <rect x="720" y="356" width="180" height="78" rx="7" />
           </g>
           {/* straight arrows */}
           <g stroke={PEN} strokeOpacity="0.8" strokeWidth="1.6" strokeLinecap="round">
@@ -350,18 +352,28 @@ function ArchitectureSVG() {
         })}
 
         {/* networks */}
-        <text x="810" y="122" fill={MUT} fontSize="13" textAnchor="middle">EVM · ERC-3643</text>
+        <text x="810" y="118" fill={MUT} fontSize="13" textAnchor="middle">EVM · ERC-3643</text>
         {evm.map((c, i) => {
           const col = i % 4;
           const row = Math.floor(i / 4);
           return (
-            <image key={c.slug} href={`${c.logo}?v=6`} x={730 + col * 42} y={146 + row * 56} width="38" height="38">
+            <image key={c.slug} href={`${c.logo}?v=6`} x={730 + col * 42} y={138 + row * 46} width="38" height="38">
               <title>{c.name}</title>
             </image>
           );
         })}
-        <text x="810" y="318" fill={MUT} fontSize="13" textAnchor="middle">Hedera · HTS / HCS</text>
-        {hedera && <image href={`${hedera.logo}?v=6`} x="786" y="336" width="48" height="48" />}
+        <text x="810" y="284" fill={MUT} fontSize="13" textAnchor="middle">Hedera · HTS / HCS</text>
+        {hedera && (
+          <image href={`${hedera.logo}?v=6`} x="790" y="296" width="40" height="40">
+            <title>{hedera.name}</title>
+          </image>
+        )}
+        <text x="810" y="378" fill={MUT} fontSize="13" textAnchor="middle">Solana · Token-2022</text>
+        {solana && (
+          <image href={`${solana.logo}?v=6`} x="790" y="390" width="40" height="40">
+            <title>{solana.name}</title>
+          </image>
+        )}
 
         {/* arrow labels */}
         <text x="313" y={MID - 12} fill={MUT} fontSize="13" textAnchor="middle">commands</text>
@@ -397,10 +409,10 @@ function Surfaces() {
 
 function Trust() {
   const items: [string, string][] = [
-    ["Permissioned transfers", "ERC-3643 (T-REX) on EVM networks; native Hedera Token Service KYC, freeze and wipe keys on Hedera — the correct primitive on each chain."],
+    ["Permissioned transfers", "ERC-3643 (T-REX) on EVM networks; native Hedera Token Service KYC/freeze/wipe keys on Hedera; Solana Token-2022 with frozen-by-default accounts, permanent-delegate and freeze authority — the correct primitive on each chain."],
     ["OFAC SDN screening", "Investor names and digital-currency addresses checked against the U.S. Treasury Specially Designated Nationals list before any whitelist or transfer."],
-    ["Immutable audit trail", "Access-controlled on-chain AuditLog on EVM; Hedera Consensus Service (HCS) on Hedera. Every agent action is recorded on the network it ran on."],
-    ["Verified & tested", "Contracts source-verified on each network's block explorer; a 19-case Foundry suite covers compliance gating and access control."],
+    ["Immutable audit trail", "Access-controlled on-chain AuditLog on EVM; Hedera Consensus Service (HCS) on Hedera; on-chain SPL memo log on Solana. Every agent action is recorded on the network it ran on."],
+    ["Verified & tested", "EVM contracts source-verified on each block explorer with a 19-case Foundry suite; Solana Token-2022 lifecycle verified end-to-end on devnet."],
   ];
   return (
     <section id="trust" className="border-y border-border/50 bg-card/15 py-28">
@@ -447,7 +459,7 @@ function Footer() {
   const cols: [string, string[]][] = [
     ["Platform", ["Lifecycle", "Networks", "Integrations", "Compliance"]],
     ["Developers", ["Contracts on Arbiscan", "MCP server", "REST API", "Audit trail"]],
-    ["Standards", ["ERC-3643 · ERC-20", "Hedera HTS / HCS", "OFAC SDN", "Reg D · Reg S"]],
+    ["Standards", ["ERC-3643 · ERC-20", "Hedera HTS / HCS", "Solana Token-2022", "OFAC SDN", "Reg D · Reg S"]],
   ];
   return (
     <footer className="border-t border-border/50 bg-ink-1/40">
@@ -476,7 +488,7 @@ function Footer() {
       <div className="border-t border-border/40">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-6 py-6 text-xs text-muted-foreground/70 sm:flex-row">
           <span>© {new Date().getFullYear()} Lamina. Autonomous RWA lifecycle infrastructure.</span>
-          <span>EVM · Hedera · Arbitrum Orbit</span>
+          <span>EVM · Hedera · Solana · Arbitrum Orbit</span>
         </div>
       </div>
     </footer>
