@@ -33,7 +33,7 @@ export default function ChatPanel() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "I'm Laminaa, your RWA lifecycle agent on Hedera. I can tokenize assets, manage compliance, distribute coupons, generate reports, and execute purchases. What would you like to do?",
+      content: "I'm Laminaa, your autonomous RWA lifecycle agent. I can tokenize assets, manage compliance, distribute coupons in USDC, generate reports, and execute purchases across every supported network. What would you like to do?",
     },
   ]);
   const [input, setInput] = useState("");

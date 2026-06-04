@@ -1,16 +1,23 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-async function fetchAPI(path: string, options?: RequestInit) {
+async function fetchAPI(path: string, options?: RequestInit, timeoutMs = 120_000) {
   let res: Response;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
     res = await fetch(`${API_URL}${path}`, {
+      signal: ctrl.signal,
       headers: { "Content-Type": "application/json", ...options?.headers },
       ...options,
     });
   } catch (err) {
     throw new Error(
-      `Cannot connect to backend (${API_URL}). Make sure the server is running.`
+      err instanceof DOMException && err.name === "AbortError"
+        ? `Backend timed out (${API_URL}). It may be down or cold-starting — try again in a moment.`
+        : `Cannot connect to backend (${API_URL}). Make sure the server is running.`
     );
+  } finally {
+    clearTimeout(timer);
   }
   if (!res.ok) {
     const error = await res.json().catch(() => ({ detail: res.statusText }));
