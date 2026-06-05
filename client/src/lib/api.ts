@@ -13,8 +13,8 @@ async function fetchAPI(path: string, options?: RequestInit, timeoutMs = 120_000
   } catch (err) {
     throw new Error(
       err instanceof DOMException && err.name === "AbortError"
-        ? `Backend timed out (${API_URL}). It may be down or cold-starting — try again in a moment.`
-        : `Cannot connect to backend (${API_URL}). Make sure the server is running.`
+        ? "The server is taking too long to respond. Please try again in a moment."
+        : "Server error (500). Please try again shortly."
     );
   } finally {
     clearTimeout(timer);
