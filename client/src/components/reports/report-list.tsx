@@ -4,6 +4,16 @@ import { FileText, Download } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+// Backend may return timestamps with a timezone offset (Postgres timestamptz →
+// "…+00:00") or naive (SQLite → "…"). Only treat naive ones as UTC; appending
+// "Z" to an already-offset string yields an Invalid Date.
+function formatGenerated(s?: string): string {
+  if (!s) return "—";
+  const hasTz = /[zZ]$|[+-]\d{2}:?\d{2}$/.test(s);
+  const d = new Date(hasTz ? s : `${s}Z`);
+  return isNaN(d.getTime()) ? "—" : d.toLocaleString();
+}
+
 interface Report {
   id: number;
   asset_id?: number;
@@ -47,7 +57,7 @@ export default function ReportList({ reports }: { reports: Report[] }) {
               </td>
               <td className="px-4 py-3 text-sm text-muted-foreground">{report.period}</td>
               <td className="px-4 py-3 text-xs text-muted-foreground">
-                {report.generated_at ? new Date(report.generated_at + "Z").toLocaleString() : "—"}
+                {formatGenerated(report.generated_at)}
               </td>
               <td className="px-4 py-3 text-right">
                 <button
