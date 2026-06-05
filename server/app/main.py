@@ -75,7 +75,7 @@ app = FastAPI(title="Laminaa API", version="0.2.0", lifespan=lifespan)
 app.add_middleware(RequestContextMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[get_settings().frontend_url, "http://localhost:3000"],
+    allow_origins=[*get_settings().frontend_origins, "http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

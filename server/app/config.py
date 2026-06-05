@@ -59,7 +59,12 @@ class Settings(BaseSettings):
     # -- server ---------------------------------------------------------------
     backend_host: str = "0.0.0.0"
     backend_port: int = 8000
-    frontend_url: str = "http://localhost:3000"
+    frontend_url: str = "http://localhost:3000"  # comma-separated list of allowed CORS origins
+
+    @property
+    def frontend_origins(self) -> list[str]:
+        """Allowed CORS origins, parsed from the comma-separated frontend_url."""
+        return [o.strip() for o in self.frontend_url.split(",") if o.strip()]
 
     model_config = SettingsConfigDict(
         env_file=str(_ENV_FILE),
