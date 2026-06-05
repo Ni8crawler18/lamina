@@ -38,12 +38,15 @@ export default function Dashboard() {
   useEffect(() => {
     let alive = true;
     const load = async () => {
+      // Health probe is advisory only — it must never gate the data load
+      // (ad-blockers/Brave Shields sometimes block /health as telemetry).
+      checkHealth()
+        .then(() => alive && setBackendUp(true))
+        .catch(() => {});
       try {
-        await checkHealth();
-        if (!alive) return;
-        setBackendUp(true);
         const data = await getAssets(active.slug, ownerId || undefined);
-        if (alive) setAssets(data);
+        // A successful asset fetch is itself proof the backend is up.
+        if (alive) { setAssets(data); setBackendUp(true); }
       } catch {
         if (alive) setBackendUp(false);
       } finally {
