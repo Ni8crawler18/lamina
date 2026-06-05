@@ -3,7 +3,7 @@
 import os
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_session
@@ -37,7 +37,24 @@ async def generate_report(
 @router.get("/api/reports/{report_id}/download")
 async def download_report(report_id: int, session: AsyncSession = Depends(get_session)):
     report = await ReportRepository(session).get(report_id)
-    if not report or not os.path.exists(report.file_path):
+    if not report:
         raise HTTPException(404, "Report not found")
-    return FileResponse(report.file_path, media_type="application/pdf",
-                        filename=os.path.basename(report.file_path))
+
+    # Prefer the durable DB copy; fall back to the on-disk cache; otherwise
+    # re-render on the fly (handles rows created before PDFs were stored in the
+    # DB, whose files were wiped by an ephemeral-disk redeploy).
+    content = report.content
+    if not content and report.file_path and os.path.exists(report.file_path):
+        with open(report.file_path, "rb") as fh:
+            content = fh.read()
+    if not content:
+        try:
+            content = await ReportingService(session).rerender_report(report)
+        except ReportingError:
+            raise HTTPException(404, "Report not found")
+
+    filename = os.path.basename(report.file_path) if report.file_path else f"report-{report.id}.pdf"
+    return Response(
+        content, media_type="application/pdf",
+        headers={"Content-Disposition": f'inline; filename="{filename}"'},
+    )

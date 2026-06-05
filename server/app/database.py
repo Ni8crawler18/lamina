@@ -82,3 +82,6 @@ async def create_tables() -> None:
         await conn.execute(
             text("ALTER TABLE assets ADD COLUMN IF NOT EXISTS owner VARCHAR(128)")
         )
+        await conn.execute(
+            text("ALTER TABLE reports ADD COLUMN IF NOT EXISTS content BYTEA")
+        )

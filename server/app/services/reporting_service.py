@@ -89,12 +89,13 @@ class ReportingService:
 
         narrative = self._narrative(asset, holders, events, period, report_type, cfg)
         os.makedirs(REPORTS_DIR, exist_ok=True)
-        filepath = self._render_pdf(
+        filepath, content = self._render_pdf(
             asset, holders, events, narrative, period, report_type, adapter, cfg
         )
 
         report = await self.reports.create(
-            asset_id=asset_id, report_type=report_type, period=period, file_path=filepath
+            asset_id=asset_id, report_type=report_type, period=period,
+            file_path=filepath, content=content,
         )
         await self.audit.record(
             adapter, asset.topic_id, asset.id, "reporting", "report_generated",
@@ -105,6 +106,33 @@ class ReportingService:
             "report_type": report_type, "period": period, "file_path": filepath,
             "narrative_preview": narrative[:400],
         }
+
+    async def rerender_report(self, report) -> bytes:
+        """Re-render an existing report whose PDF bytes were lost (e.g. ephemeral
+        disk wiped on redeploy). Uses the deterministic fallback narrative so a
+        download never blocks on, or costs, an LLM call. Backfills the row."""
+        asset = await self.assets.get(report.asset_id)
+        if not asset:
+            raise ReportingError("Asset not found")
+        holders = await self.holders.list_for_asset(report.asset_id)
+        events = await self.events.list_for_asset(report.asset_id)
+        registry = get_registry()
+        adapter = registry.adapter(asset.chain)
+        try:
+            cfg = registry.get_config(asset.chain)
+        except Exception:
+            cfg = None
+        narrative = self._fallback_narrative(
+            asset, holders, events, report.period, report.report_type
+        )
+        os.makedirs(REPORTS_DIR, exist_ok=True)
+        filepath, content = self._render_pdf(
+            asset, holders, events, narrative, report.period, report.report_type, adapter, cfg
+        )
+        report.content = content
+        report.file_path = filepath
+        await self.session.flush()
+        return content
 
     # ── narrative ────────────────────────────────────────────────────────────
     def _narrative(self, asset, holders, events, period, report_type, cfg) -> str:
@@ -160,7 +188,9 @@ class ReportingService:
     # ── PDF ──────────────────────────────────────────────────────────────────
     def _render_pdf(
         self, asset, holders, events, narrative, period, report_type, adapter, cfg
-    ) -> str:
+    ) -> tuple[str, bytes]:
+        import io
+
         from reportlab.lib.colors import HexColor
         from reportlab.lib.enums import TA_JUSTIFY
         from reportlab.lib.pagesizes import A4
@@ -196,10 +226,11 @@ class ReportingService:
 
         fname = f"{report_no}.pdf"
         filepath = os.path.join(REPORTS_DIR, fname)
+        buf = io.BytesIO()
 
         LEFT = 0.85 * inch
         doc = SimpleDocTemplate(
-            filepath, pagesize=A4,
+            buf, pagesize=A4,
             leftMargin=LEFT, rightMargin=0.85 * inch,
             topMargin=1.45 * inch, bottomMargin=1.0 * inch,
             title=f"{title} — {asset.name}", author="Laminaa",
@@ -568,4 +599,11 @@ class ReportingService:
             f'<font face="Courier" size="8" color="#141420">{integrity}</font>', cell_s))
 
         doc.build(story, canvasmaker=NumberedCanvas)
-        return filepath
+        pdf_bytes = buf.getvalue()
+        # Best-effort local cache; the DB copy is the durable source of truth.
+        try:
+            with open(filepath, "wb") as fh:
+                fh.write(pdf_bytes)
+        except OSError:
+            pass
+        return filepath, pdf_bytes

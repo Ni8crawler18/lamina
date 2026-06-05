@@ -17,6 +17,7 @@ from sqlalchemy import (
     Float,
     ForeignKey,
     Integer,
+    LargeBinary,
     String,
     Text,
     UniqueConstraint,
@@ -108,6 +109,9 @@ class Report(Base):
     report_type: Mapped[str] = mapped_column(String(32))
     period: Mapped[str] = mapped_column(String(32))
     file_path: Mapped[str] = mapped_column(Text)
+    # Durable copy of the rendered PDF — local disk is ephemeral on the host, so
+    # the bytes live in the DB and survive redeploys. file_path is best-effort cache.
+    content: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)
     generated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
