@@ -155,7 +155,7 @@ class ReportingService:
             f"Write the narrative analysis section of a regulatory "
             f"{report_type.replace('_', ' ')} for the reporting period {period}. "
             f"Security: {asset.name} ({asset.symbol}), a tokenized {asset.asset_type} settled "
-            f"on {network}. NAV ${asset.nav:,.2f}, coupon {asset.coupon_rate:.2f}% per annum, "
+            f"on {network}. NAV ${asset.nav:,.2f}, coupon {asset.coupon_rate * 100:.2f}% per annum, "
             f"jurisdiction {asset.jurisdiction}, eligible investors: {asset.investor_type}. "
             f"{whitelisted} of {len(holders)} holders are whitelisted following KYC/AML and OFAC "
             f"screening; {completed} lifecycle events executed. Every agent action is written to an "
@@ -178,7 +178,7 @@ class ReportingService:
             f"restricted to verified, whitelisted investors, and {whitelisted} of {len(holders)} "
             f"registered holders satisfied identity-verification and sanctions-screening controls.\n\n"
             f"The instrument carried a Net Asset Value of ${asset.nav:,.2f} and an annual coupon rate "
-            f"of {asset.coupon_rate:.2f}%. {completed} scheduled lifecycle events were executed during "
+            f"of {asset.coupon_rate * 100:.2f}%. {completed} scheduled lifecycle events were executed during "
             f"the period, each subject to automated pre-transfer compliance validation.\n\n"
             f"Every state-changing action was recorded to an immutable on-chain audit log and mirrored "
             f"in the operator's system of record, providing an independently verifiable, tamper-evident "
@@ -198,7 +198,8 @@ class ReportingService:
         from reportlab.lib.units import inch
         from reportlab.pdfgen import canvas as pdfcanvas
         from reportlab.platypus import (
-            HRFlowable, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle,
+            HRFlowable, KeepTogether, Paragraph, SimpleDocTemplate, Spacer, Table,
+            TableStyle,
         )
 
         title, code = REPORT_META.get(report_type, ("Report", "RPT"))
@@ -420,7 +421,7 @@ class ReportingService:
             ("Settlement Network", network),
             ("Total Supply", f"{asset.total_supply:,} units"),
             ("Net Asset Value (NAV)", f"${asset.nav:,.2f}"),
-            ("Coupon / Distribution Rate", f"{asset.coupon_rate:.2f}% per annum"),
+            ("Coupon / Distribution Rate", f"{asset.coupon_rate * 100:.2f}% per annum"),
             ("Maturity Date", asset.maturity_date or "—"),
             ("Lifecycle Status", asset.status.title()),
             ("Eligible Investors", (asset.investor_type or "accredited").replace("_", " ").title()),
@@ -558,14 +559,15 @@ class ReportingService:
                 story.append(Paragraph(para.strip().replace("\n", "<br/>"), body))
                 story.append(Spacer(1, 6))
 
-        # §8 Attestation & Authorised Signature
-        story += sec("8.", "Attestation & Authorised Signature")
-        story.append(Paragraph(
+        # §8 Attestation & Authorised Signature — kept together so the signature
+        # block and the integrity fingerprint never split across a page break.
+        sec8 = sec("8.", "Attestation & Authorised Signature")
+        sec8.append(Paragraph(
             "The undersigned attests that, to the best of the operator's knowledge and based on the "
             "on-chain records and the operator's system of record, the information set out in this "
             "report is accurate and complete as at the date of issue. This document carries the "
             "SHA-256 integrity fingerprint below; any alteration invalidates the fingerprint.", body))
-        story.append(Spacer(1, 18))
+        sec8.append(Spacer(1, 18))
 
         line = HRFlowable(width="80%", thickness=0.8, color=HexColor(INK),
                           hAlign="LEFT", spaceAfter=3)
@@ -592,11 +594,13 @@ class ReportingService:
         sig = Table([[sig_left, sig_right_inner]], colWidths=[0.58 * W, 0.42 * W])
         sig.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"),
                                  ("LEFTPADDING", (0, 0), (0, 0), 0)]))
-        story.append(sig)
-        story.append(Spacer(1, 14))
-        story.append(Paragraph("DOCUMENT INTEGRITY FINGERPRINT (SHA-256)", sig_lbl))
-        story.append(Paragraph(
-            f'<font face="Courier" size="8" color="#141420">{integrity}</font>', cell_s))
+        sec8 += [
+            sig,
+            Spacer(1, 14),
+            Paragraph("DOCUMENT INTEGRITY FINGERPRINT (SHA-256)", sig_lbl),
+            Paragraph(f'<font face="Courier" size="8" color="#141420">{integrity}</font>', cell_s),
+        ]
+        story.append(KeepTogether(sec8))
 
         doc.build(story, canvasmaker=NumberedCanvas)
         pdf_bytes = buf.getvalue()
