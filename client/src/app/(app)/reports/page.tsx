@@ -85,7 +85,7 @@ export default function ReportsPage() {
         </div>
         <div className="lg:col-span-2">
           <h3 className="text-sm font-semibold mb-4">Generated Reports</h3>
-          <ReportList reports={reports} />
+          <ReportList reports={reports} onDeleted={() => loadReports(assets)} />
         </div>
       </div>
     </div>

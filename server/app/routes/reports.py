@@ -23,6 +23,13 @@ async def list_reports(asset_id: int, session: AsyncSession = Depends(get_sessio
     ]
 
 
+@router.delete("/api/reports/{report_id}")
+async def delete_report(report_id: int, session: AsyncSession = Depends(get_session)):
+    if not await ReportRepository(session).delete(report_id):
+        raise HTTPException(404, "Report not found")
+    return {"deleted": report_id}
+
+
 @router.post("/api/assets/{asset_id}/reports")
 async def generate_report(
     asset_id: int, report_type: str = "compliance", period: str = "Q1 2026",
