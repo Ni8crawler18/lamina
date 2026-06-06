@@ -82,8 +82,6 @@ export const getReports = (assetId: number) =>
   fetchAPI(`/api/assets/${assetId}/reports`);
 export const generateReport = (assetId: number, reportType = "compliance", period = "Q1 2026") =>
   fetchAPI(`/api/assets/${assetId}/reports?report_type=${reportType}&period=${period}`, { method: "POST" });
-export const deleteReport = (reportId: number) =>
-  fetchAPI(`/api/reports/${reportId}`, { method: "DELETE" });
 
 // Purchase
 export const purchaseTokens = (assetId: number, accountId: string, amount: number) =>

@@ -6,6 +6,7 @@ one driver (asyncpg). Schema lives in `app/models/orm.py`; migrations in Alembic
 
 from __future__ import annotations
 
+import logging
 from collections.abc import AsyncIterator
 
 from sqlalchemy.ext.asyncio import (
@@ -16,6 +17,8 @@ from sqlalchemy.ext.asyncio import (
 from sqlalchemy.orm import DeclarativeBase
 
 from app.config import get_settings
+
+logger = logging.getLogger(__name__)
 
 
 class Base(DeclarativeBase):
@@ -72,10 +75,18 @@ async def create_tables() -> None:
     Used at startup instead of Alembic — the schema is single-version for now.
     Reintroduce Alembic when the schema needs versioned migrations in production.
     """
+    import os
+
     import app.models.orm  # noqa: F401 — register tables on Base.metadata
     from sqlalchemy import text
 
     async with get_engine().begin() as conn:
+        # One-shot maintenance wipe (audit-relevant data is never deletable from
+        # the app/UI — cleanup is backend-only and gated by an env flag). Set
+        # RESET_DB=true on the host, restart once to wipe, then unset it.
+        if os.environ.get("RESET_DB", "").lower() in ("1", "true", "yes"):
+            logger.warning("RESET_DB set — dropping all tables before recreate")
+            await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
         # Additive, idempotent column migrations (Postgres). Keeps existing data
         # while the schema evolves; reintroduce Alembic for anything non-additive.

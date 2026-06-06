@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { FileText, Download, Trash2 } from "lucide-react";
-import { deleteReport } from "@/lib/api";
+import { FileText, Download } from "lucide-react";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -26,28 +24,7 @@ interface Report {
   download_url?: string;
 }
 
-export default function ReportList({
-  reports,
-  onDeleted,
-}: {
-  reports: Report[];
-  onDeleted?: () => void;
-}) {
-  const [deleting, setDeleting] = useState<number | null>(null);
-
-  const handleDelete = async (id: number) => {
-    if (!confirm("Delete this report? This cannot be undone.")) return;
-    setDeleting(id);
-    try {
-      await deleteReport(id);
-      onDeleted?.();
-    } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to delete report");
-    } finally {
-      setDeleting(null);
-    }
-  };
-
+export default function ReportList({ reports }: { reports: Report[] }) {
   if (reports.length === 0) {
     return (
       <div className="rounded-xl border border-border/40 bg-card/20 p-12 text-center">
@@ -83,24 +60,13 @@ export default function ReportList({
                 {formatGenerated(report.generated_at)}
               </td>
               <td className="px-4 py-3 text-right">
-                <div className="inline-flex items-center gap-3">
-                  <button
-                    onClick={() => window.open(`${API_URL}${report.download_url || `/api/reports/${report.id}/download`}`, "_blank")}
-                    className="text-xs text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1"
-                  >
-                    <Download className="w-3 h-3" />
-                    Download
-                  </button>
-                  <button
-                    onClick={() => handleDelete(report.id)}
-                    disabled={deleting === report.id}
-                    title="Delete report"
-                    className="text-xs text-muted-foreground hover:text-red-400 transition-colors inline-flex items-center gap-1 disabled:opacity-50"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                    {deleting === report.id ? "Deleting…" : "Delete"}
-                  </button>
-                </div>
+                <button
+                  onClick={() => window.open(`${API_URL}${report.download_url || `/api/reports/${report.id}/download`}`, "_blank")}
+                  className="text-xs text-primary hover:text-primary/80 transition-colors inline-flex items-center gap-1"
+                >
+                  <Download className="w-3 h-3" />
+                  Download
+                </button>
               </td>
             </tr>
           ))}
