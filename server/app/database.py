@@ -88,3 +88,9 @@ async def create_tables() -> None:
         await conn.execute(
             text("ALTER TABLE assets ADD COLUMN IF NOT EXISTS issuer_name VARCHAR(255)")
         )
+        # Normalise coupon rates to the canonical fraction form (0.04 == 4%).
+        # Idempotent: once a 4.0 row becomes 0.04 it is <= 1 and is skipped.
+        # No real coupon exceeds 100%, so >1 reliably flags whole-percent rows.
+        await conn.execute(
+            text("UPDATE assets SET coupon_rate = coupon_rate / 100 WHERE coupon_rate > 1")
+        )

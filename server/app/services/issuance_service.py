@@ -38,6 +38,12 @@ class IssuanceService:
     ) -> Asset:
         adapter = get_registry().adapter(chain)  # raises if chain unknown/disabled
 
+        # Canonical coupon_rate is a fraction (0.04 == 4%). The UI form already
+        # divides by 100; normalise other callers (AI agent / API) that pass a
+        # whole-percent value so a 4% coupon never persists as 4.0 (→ 400%).
+        if coupon_rate and coupon_rate > 1:
+            coupon_rate = coupon_rate / 100
+
         # 1. Deploy token + audit topic on-chain
         dep = await run_chain(
             adapter.deploy_asset_token, name, symbol, decimals, total_supply, asset_type, jurisdiction
