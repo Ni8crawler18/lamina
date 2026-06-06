@@ -34,6 +34,7 @@ class Asset(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     chain: Mapped[str] = mapped_column(String(64), index=True)  # chain slug
     owner: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)  # issuer identity (wallet addr / email); agent still signs
+    issuer_name: Mapped[str | None] = mapped_column(String(255), nullable=True)  # legal entity name of the issuer (for filings)
     name: Mapped[str] = mapped_column(String(255))
     symbol: Mapped[str] = mapped_column(String(32))
     token_id: Mapped[str | None] = mapped_column(String(128), nullable=True)   # token_ref

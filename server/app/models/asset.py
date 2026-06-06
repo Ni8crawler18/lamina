@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field
 class AssetCreate(BaseModel):
     chain: str = Field(description="Chain slug the asset is issued on, e.g. 'robinhood-testnet'")
     owner: str | None = Field(default=None, description="Issuer identity (connected wallet addr / email); the agent still signs on-chain")
+    issuer_name: str | None = Field(default=None, description="Legal entity name of the issuer, shown on regulatory filings")
     name: str
     symbol: str
     asset_type: str = "bond"
@@ -27,6 +28,7 @@ class AssetOut(BaseModel):
     id: int
     chain: str
     owner: str | None
+    issuer_name: str | None
     name: str
     symbol: str
     token_id: str | None

@@ -21,6 +21,7 @@ export default function CreateAssetForm({ onSuccess, onClose }: CreateAssetFormP
   const [form, setForm] = useState({
     name: "",
     symbol: "",
+    issuer_name: "",
     asset_type: "bond",
     total_supply: "",
     decimals: 2,
@@ -43,6 +44,7 @@ export default function CreateAssetForm({ onSuccess, onClose }: CreateAssetFormP
         ...form,
         chain: active.slug,
         owner: ownerId || undefined,
+        issuer_name: form.issuer_name || null,
         total_supply: Number(form.total_supply) * Math.pow(10, form.decimals),
         coupon_rate: Number(form.coupon_rate) / 100,
         maturity_date: form.maturity_date || null,
@@ -78,6 +80,16 @@ export default function CreateAssetForm({ onSuccess, onClose }: CreateAssetFormP
             className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/40"
           />
         </div>
+      </div>
+
+      <div>
+        <label className="text-[11px] text-muted-foreground uppercase tracking-wider block mb-1.5">Issuer Legal Entity <span className="text-muted-foreground/60 normal-case">(optional, shown on filings)</span></label>
+        <input
+          value={form.issuer_name}
+          onChange={(e) => update("issuer_name", e.target.value)}
+          placeholder="Acme Capital Partners LLC"
+          className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/40"
+        />
       </div>
 
       <div className="grid grid-cols-3 gap-4">
