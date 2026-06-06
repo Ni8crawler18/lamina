@@ -16,17 +16,21 @@ class AssetTypeHandler(ABC):
     periods_per_year: int
 
     @abstractmethod
-    def period_payout_units(self, balance: int, token_decimals: int, annual_rate_pct: float) -> int:
+    def period_payout_units(self, balance: int, token_decimals: int, annual_rate: float) -> int:
         """USDC micro-units owed to a holder for one payout period.
 
         Face value of a holding = balance / 10^token_decimals (1 token unit = $1 face).
+        `annual_rate` is the canonical fractional rate (0.0485 == 4.85%).
         """
 
 
 class _RateHandler(AssetTypeHandler):
-    """Shared: payout = face_value * (annual_rate% / periods_per_year), in USDC units."""
+    """Shared: payout = face_value * (annual_rate / periods_per_year), in USDC units.
 
-    def period_payout_units(self, balance: int, token_decimals: int, annual_rate_pct: float) -> int:
+    annual_rate is a fraction (0.0485 == 4.85%) — the canonical storage form.
+    """
+
+    def period_payout_units(self, balance: int, token_decimals: int, annual_rate: float) -> int:
         face_value = balance / (10 ** token_decimals)
-        per_period_usd = face_value * (annual_rate_pct / 100) / self.periods_per_year
+        per_period_usd = face_value * annual_rate / self.periods_per_year
         return int(round(per_period_usd * (10 ** USDC_DECIMALS)))
