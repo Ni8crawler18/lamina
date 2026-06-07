@@ -41,7 +41,7 @@ hedera = [
     "hiero-sdk-python>=0.2.0",
 ]
 sui = [
-    "pysui==0.99.1",
+    "pysui==0.84.0",
 ]
 dev = [
     "ruff>=0.6.0",
