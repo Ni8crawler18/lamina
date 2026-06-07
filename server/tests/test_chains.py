@@ -26,7 +26,23 @@ def test_registry_loads_chains():
 
 def test_chain_families_known():
     reg = _registry()
-    assert {c.family for c in reg.list_all()} <= {"evm", "hedera", "solana"}
+    assert {c.family for c in reg.list_all()} <= {"evm", "hedera", "solana", "sui"}
+
+
+def test_sui_chain_configured():
+    reg = _registry()
+    cfg = reg.get_config("sui-testnet")
+    assert cfg.family == "sui" and cfg.enabled
+    # the published package + caps the adapter needs must be present
+    for key in ("package", "policy", "policy_cap", "treasury_cap", "operator_cap", "usdc"):
+        assert cfg.contract(key)
+
+
+def test_sui_adapter_conforms():
+    from app.chains.sui.adapter import SuiAdapter
+    reg = _registry()
+    adapter = SuiAdapter(reg.get_config("sui-testnet"))
+    assert isinstance(adapter, ChainAdapter)
 
 
 def test_evm_adapter_conforms():

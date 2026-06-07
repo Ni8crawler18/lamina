@@ -40,6 +40,10 @@ class Settings(BaseSettings):
     solana_keypair_path: str = ""
     solana_operator_key: str = ""
 
+    # Sui (non-EVM family) — operator key for the closed-loop RWA Move package.
+    # A Sui ed25519/secp256k1 private key in bech32 (suiprivkey1…) or flagged base64.
+    sui_operator_key: str = ""
+
     # -- AI -------------------------------------------------------------------
     anthropic_api_key: str = ""
 

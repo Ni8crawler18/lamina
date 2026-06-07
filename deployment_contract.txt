@@ -122,3 +122,14 @@ Operator acct : 0.0.8003096
 
 
 Source of truth: server/config/chains/*.toml
+
+— Sui Testnet (Move, non-EVM) — published 2026-06-07, package lamina_rwa —
+Operator (publisher) : 0x70b2d6e827e3690eefb9f0912b92a7c9309fba2b8f26cff88dfc5c51900e91d9
+Package (lamina_rwa) : 0x536b168e3784d71e5f93775ec5ca6ee9b54f85b9a47e492ef901dd3310ca3dbe
+  https://suiscan.xyz/testnet/object/0x536b168e3784d71e5f93775ec5ca6ee9b54f85b9a47e492ef901dd3310ca3dbe
+TokenPolicy<RWA>     : 0x161e1033d03d131b8d36939daf56c28617dbb0797f9782c8b64a5f61601eec8d (shared, v349181718)
+TokenPolicyCap<RWA>  : 0x19a8043b75092027cbe61f7cc0f3aa80d7b1413a6a1f90cdf3a83594ef1f4602
+TreasuryCap<RWA>     : 0x042e35fdbc6e68285da80a893691be33fa3c141e028850699380f0d830247594
+OperatorCap          : 0x6efe70e4689c43becddf933d83b3a47f2fb7f96b2ab6eb4537f0946610244d4c
+UpgradeCap           : 0x30fd0cdbd404aa5016d845b81bde041076a8dc45bebd3e43016627db1382ef07
+USDC (Circle testnet): 0xa1ec7fc00a6f40db9693ad1415d0c193ad3906494428cf252621037bd7117e29::usdc::USDC (6 dec)

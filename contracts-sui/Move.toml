@@ -1,0 +1,13 @@
+[package]
+name = "lamina_rwa"
+edition = "2024.beta"
+# Laminaa RWA — closed-loop permissioned real-world-asset token for Sui.
+# Mirrors the EVM contracts (LaminaRWAToken / LaminaFactory / AuditLog) but built
+# the Sui-native way: a sui::token Closed-Loop Token whose TokenPolicy + allowlist
+# rule enforce KYC at the type level, a per-asset on-chain ledger, and an audit log.
+
+[dependencies]
+Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "framework/testnet" }
+
+[addresses]
+lamina_rwa = "0x0"
