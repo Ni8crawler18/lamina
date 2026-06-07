@@ -14,7 +14,7 @@ export function ChainMarquee() {
       <div className="flex w-max items-center gap-12 [animation:ticker_42s_linear_infinite] hover:[animation-play-state:paused]">
         {row.map((c, i) => (
           <div key={`${c.slug}-${i}`} className="flex shrink-0 items-center gap-3 opacity-75 transition-opacity hover:opacity-100">
-            <img src={`${c.logo}?v=6`} alt={c.name} className={`h-7 w-7 object-contain ${c.slug === "hedera-testnet" ? "scale-[0.82]" : ""}`} />
+            <img src={`${c.logo}?v=7`} alt={c.name} className={`h-7 w-7 object-contain ${c.slug === "hedera-testnet" ? "scale-[0.82]" : ""}`} />
             <span className="whitespace-nowrap text-base font-light tracking-tight text-foreground/85">{c.name}</span>
           </div>
         ))}

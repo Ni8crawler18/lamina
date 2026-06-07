@@ -23,7 +23,7 @@ export default function ChainToggle() {
         onClick={() => setOpen((o) => !o)}
         className="flex items-center gap-2 rounded-lg border border-border/60 bg-card/40 px-2.5 py-1.5 text-xs transition-colors hover:border-border hover:bg-card/70"
       >
-        <img src={`${active.logo}?v=6`} alt="" className={`h-4 w-4 object-contain ${active.family === "hedera" ? "scale-[0.82]" : ""}`} />
+        <img src={`${active.logo}?v=7`} alt="" className={`h-4 w-4 object-contain ${active.family === "hedera" ? "scale-[0.82]" : ""}`} />
         <span className="font-medium">{active.name}</span>
         <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
@@ -37,7 +37,7 @@ export default function ChainToggle() {
               onClick={() => { setChain(c.slug); setOpen(false); }}
               className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm transition-colors hover:bg-card/70"
             >
-              <img src={`${c.logo}?v=6`} alt="" className={`h-4 w-4 object-contain ${c.family === "hedera" ? "scale-[0.82]" : ""}`} />
+              <img src={`${c.logo}?v=7`} alt="" className={`h-4 w-4 object-contain ${c.family === "hedera" ? "scale-[0.82]" : ""}`} />
               <span className="flex-1">
                 <span className="block leading-tight">{c.name}</span>
                 {c.note && <span className="block text-[10px] leading-tight text-muted-foreground/70">{c.note}</span>}

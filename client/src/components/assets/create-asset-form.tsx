@@ -185,7 +185,7 @@ export default function CreateAssetForm({ onSuccess, onClose }: CreateAssetFormP
 
       <div className="flex items-center justify-between gap-3 pt-2">
         <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-          <img src={`${active.logo}?v=6`} alt="" className={`h-3.5 w-3.5 object-contain ${active.family === "hedera" ? "scale-[0.82]" : ""}`} />
+          <img src={`${active.logo}?v=7`} alt="" className={`h-3.5 w-3.5 object-contain ${active.family === "hedera" ? "scale-[0.82]" : ""}`} />
           Deploying on <span className="text-foreground">{active.name}</span>
         </span>
         <div className="flex gap-3">
