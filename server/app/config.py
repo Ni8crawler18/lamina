@@ -44,10 +44,6 @@ class Settings(BaseSettings):
     # A Sui ed25519/secp256k1 private key in bech32 (suiprivkey1…) or flagged base64.
     sui_operator_key: str = ""
 
-    # One-shot maintenance: CSV of asset ids to purge (with dependent rows) at
-    # startup. Set, deploy, verify, then UNSET — no destructive path stays live.
-    purge_asset_ids: str = ""
-
     # -- AI -------------------------------------------------------------------
     anthropic_api_key: str = ""
 

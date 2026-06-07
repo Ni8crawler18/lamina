@@ -97,15 +97,3 @@ async def create_tables() -> None:
         await conn.execute(
             text("UPDATE assets SET coupon_rate = coupon_rate / 100 WHERE coupon_rate > 1")
         )
-
-        # One-shot, env-gated maintenance purge of specific test assets + their
-        # dependent rows (no FK cascade, so delete children first). Runs only when
-        # PURGE_ASSET_IDS is set; unset it after to leave no destructive path live.
-        purge = [int(x) for x in get_settings().purge_asset_ids.split(",") if x.strip()]
-        if purge:
-            for tbl in ("holders", "scheduled_events", "audit_log", "reports", "screening_results"):
-                await conn.execute(
-                    text(f"DELETE FROM {tbl} WHERE asset_id = ANY(:ids)"), {"ids": purge}
-                )
-            await conn.execute(text("DELETE FROM assets WHERE id = ANY(:ids)"), {"ids": purge})
-            logger.warning("PURGE_ASSET_IDS: deleted assets %s and dependent rows", purge)
