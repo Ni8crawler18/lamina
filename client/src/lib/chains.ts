@@ -6,7 +6,7 @@ export type ChainBrand = {
   short: string;
   color: string;
   logo: string;
-  family: "evm" | "hedera" | "solana";
+  family: "evm" | "hedera" | "solana" | "sui";
   chainId?: number; // EVM numeric chain id (for MetaMask network switching)
   explorer?: string; // block explorer base url
   rpc?: string; // public RPC (for wallet_addEthereumChain)
@@ -27,6 +27,9 @@ export const CHAINS: ChainBrand[] = [
   // Solana devnet — Token-2022 permissioned RWA tokens. Full lifecycle verified
   // on devnet (issue/KYC/purchase/coupon/NAV/maturity, on-chain memo audit).
   { slug: "solana-devnet", name: "Solana", short: "SOL", color: "#14F195", logo: "/chains/solana.png", family: "solana", chainId: 103, explorer: "https://solscan.io", nativeSymbol: "SOL", note: "Token-2022 · devnet", live: true },
+  // Sui testnet — Move closed-loop permissioned RWA tokens. Compliance is a
+  // sui::token TokenPolicy + allowlist (KYC) rule; full lifecycle verified on-chain.
+  { slug: "sui-testnet", name: "Sui", short: "SUI", color: "#4DA2FF", logo: "/chains/sui.png", family: "sui", explorer: "https://suiscan.xyz/testnet", nativeSymbol: "SUI", note: "Move · closed-loop token", live: true },
 ];
 
 /** Solscan needs ?cluster=devnet/testnet for non-mainnet networks. */
@@ -47,6 +50,7 @@ export function explorerAddressUrl(chain: ChainBrand | undefined, address: strin
   if (!chain?.explorer || !address) return null;
   if (chain.family === "hedera") return `${chain.explorer}/account/${address}`;
   if (chain.family === "solana") return `${chain.explorer}/account/${address}${solanaCluster(chain)}`;
+  if (chain.family === "sui") return `${chain.explorer}/account/${address}`;
   return `${chain.explorer}/address/${address}`;
 }
 
@@ -55,6 +59,8 @@ export function explorerTokenUrl(chain: ChainBrand | undefined, token: string): 
   if (!chain?.explorer || !token) return null;
   if (chain.family === "hedera") return `${chain.explorer}/token/${token}`;
   if (chain.family === "solana") return `${chain.explorer}/token/${token}${solanaCluster(chain)}`;
+  // On Sui an asset is a shared object, not a coin type → /object.
+  if (chain.family === "sui") return `${chain.explorer}/object/${token}`;
   return `${chain.explorer}/address/${token}`;
 }
 
@@ -63,6 +69,7 @@ export function explorerTxUrl(chain: ChainBrand | undefined, tx: string): string
   if (!chain?.explorer || !tx || tx === "-") return null;
   if (chain.family === "hedera") return `${chain.explorer}/transaction/${tx}`;
   if (chain.family === "solana") return `${chain.explorer}/tx/${tx}${solanaCluster(chain)}`;
+  if (chain.family === "sui") return `${chain.explorer}/tx/${tx}`; // digest, no 0x prefix
   const h = tx.startsWith("0x") ? tx : `0x${tx}`;
   return `${chain.explorer}/tx/${h}`;
 }

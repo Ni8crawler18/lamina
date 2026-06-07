@@ -42,6 +42,11 @@ solana = [
 hedera = [
     "hiero-sdk-python>=0.2.0",
 ]
+sui = [
+    # Pinned to the stable JSON-RPC client API (0.99+ migrated to GraphQL/gRPC).
+    "pysui==0.84.0",
+    "betterproto2==0.9.0",  # avoids a transitive compiler/runtime version clash
+]
 dev = [
     "ruff>=0.6.0",
     "mypy>=1.10.0",

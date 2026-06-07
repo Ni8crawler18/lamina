@@ -30,6 +30,9 @@ def _build_adapter(config: ChainConfig) -> ChainAdapter:
     if config.family == "solana":
         from app.chains.solana.adapter import SolanaAdapter
         return SolanaAdapter(config)
+    if config.family == "sui":
+        from app.chains.sui.adapter import SuiAdapter
+        return SuiAdapter(config)
     raise ValueError(f"Unknown chain family '{config.family}' for chain '{config.slug}'")
 
 
