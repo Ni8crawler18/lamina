@@ -43,9 +43,12 @@ hedera = [
     "hiero-sdk-python>=0.2.0",
 ]
 sui = [
-    # Pinned to the stable JSON-RPC client API (0.99+ migrated to GraphQL/gRPC).
+    # Pinned to the stable JSON-RPC client API (0.99+ migrated to GraphQL/gRPC,
+    # which drags in a gRPC/betterproto2 stack with no clean wheels). 0.84.0
+    # installs from pure-Python/wheeled deps on Python 3.11 — keep the runtime at
+    # 3.11 (PYTHON_VERSION on Render); 3.14 has no wheel for a transitive dep and
+    # falls back to a Rust/maturin source build that fails on read-only CI disks.
     "pysui==0.84.0",
-    "betterproto2==0.9.0",  # avoids a transitive compiler/runtime version clash
 ]
 dev = [
     "ruff>=0.6.0",
