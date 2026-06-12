@@ -189,7 +189,8 @@ async def execute_tool(session, name: str, args: dict) -> dict:
         return {**res, "explorer_url": _explorer(res["chain"])}
 
     if name == "distribute_coupon":
-        return await PayoutService(session).distribute_coupon(args["asset_id"])
+        res = await PayoutService(session).distribute_coupon(args["asset_id"])
+        return {**res, "explorer_url": _explorer(res["chain"])}
 
     if name == "update_nav":
         svc = LifecycleService(session)
@@ -198,7 +199,8 @@ async def execute_tool(session, name: str, args: dict) -> dict:
         return await svc.update_nav_from_oracle(args["asset_id"])
 
     if name == "execute_maturity":
-        return await LifecycleService(session).execute_maturity(args["asset_id"])
+        res = await LifecycleService(session).execute_maturity(args["asset_id"])
+        return {**res, "explorer_url": _explorer(res["chain"])}
 
     if name == "generate_report":
         res = await ReportingService(session).generate_report(
