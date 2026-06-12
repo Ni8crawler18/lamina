@@ -136,7 +136,7 @@
   .term-foot { color: hsl(var(--muted)); font-style: italic; padding-left: 7.5em; }
 
   /* ── chain tiles ── */
-  .chains { display: grid; grid-template-columns: repeat(9,1fr); gap: 0.7rem; }
+  .chains { display: grid; grid-template-columns: repeat(10,1fr); gap: 0.6rem; }
   .tile { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem;
     border: 1px solid hsl(var(--border) / 0.7); background: hsl(var(--bg)); border-radius: 14px; }
   .tile img { height: 46px; width: 46px; object-fit: contain; }
@@ -216,14 +216,14 @@
     <div class="relz">
       <div class="badge reveal" style="--i:0; margin-bottom:2rem;">★ 3rd place — Hedera Apex Hackathon 2026</div>
       <h1 class="reveal" style="--i:1;">The autonomous<br><span class="iris">back office</span><br>for tokenized assets.</h1>
-      <p class="lede reveal" style="--i:2;">Issue an <strong>ERC-3643</strong> permissioned token in one command, and an AI agent enforces KYC &amp; OFAC on every transfer, pays USDC coupons, updates NAV, and settles at maturity — across <strong>9 networks</strong>.</p>
+      <p class="lede reveal" style="--i:2;">Issue an <strong>ERC-3643</strong> permissioned token in one command, and an AI agent enforces KYC &amp; OFAC on every transfer, pays USDC coupons, updates NAV, and settles at maturity — across <strong>10 networks</strong>.</p>
       <div class="cover-strip reveal" style="--i:3;">
         <span class="lbl">Settles on</span>
-        <img src="chains/ethereum.png?v=9" alt=""><img src="chains/arbitrum.png?v=9" alt=""><img src="chains/base.png?v=9" alt=""><img src="chains/polygon.png?v=9" alt=""><img src="chains/avalanche.png?v=9" alt=""><img src="chains/arc.png?v=9" alt=""><img src="chains/robinhood.png?v=9" alt=""><img src="chains/hedera.png?v=9" alt=""><img src="chains/solana.png?v=9" alt="">
+        <img src="chains/ethereum.png?v=9" alt=""><img src="chains/arbitrum.png?v=9" alt=""><img src="chains/base.png?v=9" alt=""><img src="chains/polygon.png?v=9" alt=""><img src="chains/avalanche.png?v=9" alt=""><img src="chains/arc.png?v=9" alt=""><img src="chains/robinhood.png?v=9" alt=""><img src="chains/hedera.png?v=9" alt=""><img src="chains/solana.png?v=9" alt=""><img src="chains/sui.png?v=9" alt="">
       </div>
       <div class="proof reveal" style="--i:4; margin-top:2rem;">
-        <span><b>ERC-3643</b>+ HTS + Token-2022</span>
-        <span><b>9</b>networks</span>
+        <span><b>ERC-3643</b>+ HTS · Token-2022 · Move</span>
+        <span><b>10</b>networks</span>
         <span><b>19</b>contract tests, source-verified</span>
       </div>
     </div>
@@ -318,11 +318,13 @@
         <div class="tile"><img src="chains/robinhood.png?v=9" alt=""><span>Robinhood</span></div>
         <div class="tile"><img src="chains/hedera.png?v=9" alt=""><span>Hedera</span></div>
         <div class="tile"><img src="chains/solana.png?v=9" alt=""><span>Solana</span></div>
+        <div class="tile"><img src="chains/sui.png?v=9" alt=""><span>Sui</span></div>
       </div>
-      <div class="grid-3" style="margin-top:1.4rem;">
+      <div class="grid-4" style="margin-top:1.4rem;">
         <div class="std std-v reveal" style="--i:4;"><div class="k">EVM · 7 networks</div><h3>ERC-3643</h3><ul><li>T-REX permissioned token + AuditLog</li><li>web3.py · token + audit in one factory tx</li><li>Source-verified · 19 Foundry tests</li></ul></div>
         <div class="std std-c reveal" style="--i:5;"><div class="k">Solana · verified on devnet</div><h3>Token-2022</h3><ul><li>Frozen-by-default = whitelist</li><li>Permanent-delegate = clawback</li><li>Freeze authority = sanctions · atomic issuance</li></ul></div>
         <div class="std std-i reveal" style="--i:6;"><div class="k">Hedera · native</div><h3>HTS / HCS</h3><ul><li>Native KYC, freeze, wipe keys</li><li>HCS consensus audit trail</li><li>Where Laminaa was born &amp; won</li></ul></div>
+        <div class="std std-v reveal" style="--i:7;"><div class="k">Sui · Move · on testnet</div><h3>Closed-loop Token</h3><ul><li>TokenPolicy + allowlist rule = KYC</li><li>Non-KYC transfer is type-impossible</li><li>Atomic issuance in one PTB</li></ul></div>
       </div>
     </div>
   </div>
@@ -353,10 +355,11 @@
         </div>
         <div class="arch-row reveal" style="--i:4;">
           <div class="arch-lab">Networks</div>
-          <div class="arch-cells" style="grid-template-columns:repeat(3,1fr);">
+          <div class="arch-cells" style="grid-template-columns:repeat(4,1fr);">
             <div class="arch-cell"><h4>EVM adapter</h4><span>web3.py · ERC-3643</span></div>
             <div class="arch-cell"><h4>Solana adapter</h4><span>solders · Token-2022</span></div>
             <div class="arch-cell"><h4>Hedera adapter</h4><span>hiero-sdk · HTS / HCS</span></div>
+            <div class="arch-cell"><h4>Sui adapter</h4><span>pysui · Move closed-loop</span></div>
           </div>
         </div>
         <div class="arch-row reveal" style="--i:5;">
@@ -369,7 +372,7 @@
           </div>
         </div>
       </div>
-      <p class="pull reveal" style="--i:6; font-size:clamp(1rem,1.4vw,1.2rem);">The core never imports a chain SDK — <span class="iris">routes → services → repositories · chains · handlers.</span> Async SQLAlchemy throughout. Nine networks, one product.</p>
+      <p class="pull reveal" style="--i:6; font-size:clamp(1rem,1.4vw,1.2rem);">The core never imports a chain SDK — <span class="iris">routes → services → repositories · chains · handlers.</span> Async SQLAlchemy throughout. Ten networks, one product.</p>
     </div>
   </div>
 
@@ -382,10 +385,10 @@
       <h2 class="reveal" style="--i:1;">The right standard <span class="iris">on every chain.</span></h2>
       <p class="lede reveal" style="--i:2;">Regulators want enforcement and proof. Laminaa builds both into the token.</p>
       <div class="grid-4" style="margin-top:1.8rem;">
-        <div class="card reveal" style="--i:3;"><h3 class="violet">Permissioned transfers</h3><p>ERC-3643 (T-REX) on EVM, HTS keys on Hedera, Token-2022 frozen-by-default + permanent-delegate on Solana.</p></div>
+        <div class="card reveal" style="--i:3;"><h3 class="violet">Permissioned transfers</h3><p>ERC-3643 (T-REX) on EVM, HTS keys on Hedera, Token-2022 frozen-by-default on Solana, Move closed-loop Token on Sui.</p></div>
         <div class="card reveal" style="--i:4;"><h3 class="violet">OFAC SDN screening</h3><p>rapidfuzz WRatio (~85%) on names + exact match on addresses, against the U.S. Treasury SDN list — refreshed daily.</p></div>
-        <div class="card reveal" style="--i:5;"><h3 class="violet">Immutable audit trail</h3><p>Access-controlled AuditLog (EVM) · HCS (Hedera) · SPL-memo (Solana) — every state change recorded on-chain.</p></div>
-        <div class="card reveal" style="--i:6;"><h3 class="violet">Verified &amp; tested</h3><p>19-case Foundry suite, source-verified on each explorer; Solana lifecycle verified end-to-end on devnet.</p></div>
+        <div class="card reveal" style="--i:5;"><h3 class="violet">Immutable audit trail</h3><p>Access-controlled AuditLog (EVM) · HCS (Hedera) · SPL-memo (Solana) · AuditLog object (Sui) — every state change on-chain.</p></div>
+        <div class="card reveal" style="--i:6;"><h3 class="violet">Verified &amp; tested</h3><p>19-case Foundry suite, source-verified on each explorer; Solana &amp; Sui lifecycles verified end-to-end on devnet / testnet.</p></div>
       </div>
       <div class="tags reveal" style="--i:7; margin-top:1.8rem;">
         <span class="tag">SEC Reg D</span><span class="tag">SEC Reg S</span><span class="tag">MiFID II</span><span class="tag">KYC whitelist</span><span class="tag">Jurisdiction limits</span><span class="tag">Holder caps</span><span class="tag">Lock-ups</span>
@@ -410,12 +413,12 @@
         <div>
           <p class="eyebrow reveal" style="--i:3;">Since the win — rebuilt chain-agnostic</p>
           <div class="grid-2" style="gap:1rem;">
-            <div class="card reveal" style="--i:4;"><div class="fig-v iris">9</div><div class="fig-l">networks live</div></div>
+            <div class="card reveal" style="--i:4;"><div class="fig-v iris">10</div><div class="fig-l">networks live</div></div>
             <div class="card reveal" style="--i:5;"><div class="fig-v iris">6</div><div class="fig-l">lifecycle stages automated</div></div>
             <div class="card reveal" style="--i:6;"><div class="fig-v iris">3</div><div class="fig-l">interfaces · REST · TG · MCP</div></div>
             <div class="card reveal" style="--i:7;"><div class="fig-v iris">19</div><div class="fig-l">contract tests, verified</div></div>
           </div>
-          <p class="reveal" style="--i:8; margin-top:1.1rem; font-size:0.78rem; font-weight:300; color:hsl(var(--muted)); line-height:1.5;">Functional across 9 testnets · verifiable on-chain · stage: pre-mainnet, pre-revenue.</p>
+          <p class="reveal" style="--i:8; margin-top:1.1rem; font-size:0.78rem; font-weight:300; color:hsl(var(--muted)); line-height:1.5;">Functional across 10 testnets · verifiable on-chain · stage: pre-mainnet, pre-revenue.</p>
         </div>
       </div>
     </div>
@@ -459,7 +462,7 @@
               <h3 style="font-size:1.4rem; font-weight:200;">Venkatesh R</h3>
             </div>
           </div>
-          <p>Transformers &amp; LLM serving, RLHF / alignment, ZK-SNARKs and distributed inference. Architected Laminaa's chain-agnostic agent across 9 networks. 8+ hackathon wins · ₹30L+ in prizes.</p>
+          <p>Transformers &amp; LLM serving, RLHF / alignment, ZK-SNARKs and distributed inference. Architected Laminaa's chain-agnostic agent across 10 networks. 8+ hackathon wins · ₹30L+ in prizes.</p>
           <div style="display:flex; gap:1.2rem; margin-top:0.9rem; font-size:0.78rem;">
             <a href="https://www.linkedin.com/in/ni8crawler/" target="_blank" style="color:hsl(var(--cyan)); text-decoration:none;">LinkedIn ↗</a>
             <a href="https://ni8crawler18.github.io/me/" target="_blank" style="color:hsl(var(--cyan)); text-decoration:none;">Portfolio ↗</a>
@@ -499,7 +502,7 @@
         <a class="s" href="https://laminaa.com/dashboard" target="_top">Launch the agent →</a>
       </div>
       <div class="reveal" style="--i:4; margin-top:3rem; display:flex; gap:3.5rem; flex-wrap:wrap;">
-        <div><div class="fig-v iris">9</div><div class="fig-l">networks</div></div>
+        <div><div class="fig-v iris">10</div><div class="fig-l">networks</div></div>
         <div><div class="fig-v iris">6</div><div class="fig-l">lifecycle stages</div></div>
         <div><div class="fig-v iris">3rd</div><div class="fig-l">Hedera Apex</div></div>
         <div><div class="fig-v iris">100%</div><div class="fig-l">autonomous</div></div>
