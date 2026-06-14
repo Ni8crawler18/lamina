@@ -11,6 +11,9 @@ from datetime import datetime
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
+import httpx
+
+from app.config import get_settings
 from app.database import get_sessionmaker
 from app.integrations.ofac.sdn import OFACScreener
 from app.repositories.assets import AssetRepository
@@ -69,6 +72,28 @@ async def refresh_ofac() -> None:
         logger.error("OFAC refresh failed: %s", e)
 
 
+async def heartbeat() -> None:
+    """Self-ping our own public /health so the free host doesn't spin the instance
+    down on inactivity. Only inbound HTTP resets the idle timer, so this must hit
+    the external URL — an internal timer alone would not keep us awake. Logs the
+    health payload (enabled chains + OFAC status), so it doubles as a liveness probe.
+    """
+    base = get_settings().render_external_url.rstrip("/")
+    if not base:
+        return  # local dev — nothing to keep warm
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            r = await client.get(f"{base}/health")
+        data = r.json() if r.headers.get("content-type", "").startswith("application/json") else {}
+        logger.info(
+            "heartbeat %s → %s (chains=%d, ofac=%s)",
+            base, r.status_code,
+            len(data.get("chains_enabled", [])), data.get("ofac_loaded"),
+        )
+    except Exception as e:
+        logger.warning("heartbeat ping failed: %s", e)
+
+
 def start_scheduler() -> AsyncIOScheduler:
     global _scheduler
     if _scheduler:
@@ -78,9 +103,18 @@ def start_scheduler() -> AsyncIOScheduler:
     sched.add_job(run_nav_updates, "interval", hours=24, id="nav")
     sched.add_job(check_maturities, "interval", hours=6, id="maturities")
     sched.add_job(refresh_ofac, "interval", hours=24, id="ofac")
+
+    settings = get_settings()
+    hb = "off"
+    if settings.render_external_url:
+        mins = max(1, settings.heartbeat_minutes)
+        sched.add_job(heartbeat, "interval", minutes=mins, id="heartbeat",
+                      next_run_time=datetime.utcnow())
+        hb = f"{mins}m"
+
     sched.start()
     _scheduler = sched
-    logger.info("Scheduler started (coupons 1h, nav 24h, maturities 6h, ofac 24h)")
+    logger.info("Scheduler started (coupons 1h, nav 24h, maturities 6h, ofac 24h, heartbeat %s)", hb)
     return sched
 
 

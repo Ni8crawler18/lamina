@@ -65,6 +65,15 @@ class Settings(BaseSettings):
     backend_port: int = 8000
     frontend_url: str = "http://localhost:3000"  # comma-separated list of allowed CORS origins
 
+    # -- heartbeat ------------------------------------------------------------
+    # Free hosting (Render) spins the instance down after ~15 min without INBOUND
+    # HTTP traffic. A periodic self-ping to our own public /health keeps it warm so
+    # the API never cold-starts mid-demo. render_external_url is injected by Render
+    # automatically (e.g. https://lamina-4ivt.onrender.com); when empty (local dev)
+    # the heartbeat is a no-op.
+    render_external_url: str = ""
+    heartbeat_minutes: int = 5          # ping cadence; keep < 15 (Render's idle limit)
+
     @property
     def frontend_origins(self) -> list[str]:
         """Allowed CORS origins, parsed from the comma-separated frontend_url."""
