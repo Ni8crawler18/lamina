@@ -465,10 +465,27 @@ function CTA() {
 }
 
 function Footer() {
-  const cols: [string, string[]][] = [
-    ["Platform", ["Lifecycle", "Networks", "Integrations", "Compliance"]],
-    ["Developers", ["Contracts on Arbiscan", "MCP server", "REST API", "Audit trail"]],
-    ["Standards", ["ERC-3643 · ERC-20", "Hedera HTS / HCS", "Solana Token-2022", "Sui Move · closed-loop", "OFAC SDN", "Reg D · Reg S"]],
+  const cols: [string, [string, string][]][] = [
+    ["Platform", [
+      ["Lifecycle", "#lifecycle"],
+      ["Networks", "#chains"],
+      ["Integrations", "#surfaces"],
+      ["Compliance", "#trust"],
+    ]],
+    ["Developers", [
+      ["Contracts on Arbiscan", "https://sepolia.arbiscan.io/address/0x8610E57f1357a41c2991ba64764c2Fdc8b2DD33e"],
+      ["MCP server", "https://modelcontextprotocol.io"],
+      ["REST API", "https://lamina-4ivt.onrender.com/docs"],
+      ["Audit trail", "https://sepolia.arbiscan.io/address/0x2721b95C0fF4756D71Ab6357A38C35e458627595"],
+    ]],
+    ["Standards", [
+      ["ERC-3643 · ERC-20", "https://eips.ethereum.org/EIPS/eip-3643"],
+      ["Hedera HTS / HCS", "https://docs.hedera.com/hedera/sdks-and-apis/sdks/token-service"],
+      ["Solana Token-2022", "https://spl.solana.com/token-2022"],
+      ["Sui Move · closed-loop", "https://docs.sui.io/standards/closed-loop-token"],
+      ["OFAC SDN", "https://ofac.treasury.gov/specially-designated-nationals-and-blocked-persons-list-sdn-human-readable-lists"],
+      ["Reg D · Reg S", "https://www.sec.gov/resources-small-businesses/exempt-offerings"],
+    ]],
   ];
   return (
     <footer className="border-t border-border/50 bg-ink-1/40">
@@ -487,9 +504,20 @@ function Footer() {
           <div key={h}>
             <div className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground/70">{h}</div>
             <ul className="mt-4 space-y-2.5 text-sm text-muted-foreground">
-              {items.map((it) => (
-                <li key={it} className="transition-colors hover:text-foreground">{it}</li>
-              ))}
+              {items.map(([label, href]) => {
+                const external = href.startsWith("http");
+                return (
+                  <li key={label}>
+                    <a
+                      href={href}
+                      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                      className="transition-colors hover:text-foreground"
+                    >
+                      {label}
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ))}
