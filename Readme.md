@@ -1,6 +1,8 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/Networks-8_testnets-8259ef?style=flat-square" />
+  <img src="https://img.shields.io/badge/Networks-10_testnets-8259ef?style=flat-square" />
+  <img src="https://img.shields.io/badge/Families-EVM·Hedera·Solana·Sui-6d4bd6?style=flat-square" />
   <img src="https://img.shields.io/badge/Standard-ERC--3643-4B6BFB?style=flat-square" />
+  <img src="https://img.shields.io/badge/Settlement-USDC-2775CA?style=flat-square" />
   <img src="https://img.shields.io/badge/Python-FastAPI-009688?style=flat-square" />
   <img src="https://img.shields.io/badge/Next.js-16-000?style=flat-square" />
   <img src="https://img.shields.io/badge/AI-Claude-d97706?style=flat-square" />
@@ -20,7 +22,7 @@ Tokenizing an asset takes minutes. Managing it takes years.
 
 Every tokenized bond needs: coupon payments on schedule, KYC checks on every transfer, OFAC sanctions screening, NAV updates from price feeds, quarterly reports for regulators, and maturity redemption at the end. Today, fund admins and lawyers do this manually — costing 5–15 basis points on AUM.
 
-Tokenized RWAs are ~$24B on-chain today and projected at $16T by 2030 (BCG). Every single asset needs lifecycle management. Nobody has automated it — across chains.
+Tokenized RWAs are ~$25B on-chain today and projected at $16T by 2030 (BCG). Every single asset needs lifecycle management. Nobody has automated it — across chains.
 
 ## How It Works
 
@@ -31,9 +33,11 @@ Laminaa:
 ├── Maps asset type → regulatory framework (SEC Reg D / Reg S, MiFID II)
 ├── Configures KYC whitelist + OFAC SDN sanctions screening
 ├── Deploys a compliant token on the chosen chain
-│     • EVM  → ERC-3643 permissioned token via LaminaFactory
+│     • EVM    → ERC-3643 permissioned token via LaminaFactory
 │     • Hedera → native HTS token
-├── Opens an immutable audit trail (AuditLog contract / HCS topic)
+│     • Solana → Token-2022 permissioned mint
+│     • Sui    → Move closed-loop token (TokenPolicy + KYC rule)
+├── Opens an immutable audit trail (AuditLog contract / HCS topic / SPL memo)
 ├── Schedules coupon payments, NAV updates and maturity
 ├── Validates every transfer against the compliance rules
 ├── Settles coupons & principal in USDC
@@ -46,18 +50,23 @@ The compliance, lifecycle and reporting logic is written once; a thin per-chain 
 
 ## Networks
 
-Deployed and live on 8 testnets — 7 EVM + non-EVM Hedera. Contract addresses & explorer links: [`deployment_contract.txt`](./deployment_contract.txt).
+Deployed and live on **10 testnets** across 4 families — 7 EVM + Hedera + Solana + Sui.
+USDC settles on 9 of them with genuine Circle USDC (Robinhood, an Arbitrum Orbit demo
+chain, uses a public-mint Mock USDC). Full addresses, explorer links and per-chain
+notes: [`deployment_contract.txt`](./deployment_contract.txt) · [`docs/DEPLOYMENTS.md`](./docs/DEPLOYMENTS.md).
 
-| Network | Chain ID | Family | Settlement |
-|---------|---------:|--------|-----------|
-| Arbitrum Sepolia *(source-verified)* | 421614 | EVM · ERC-3643 | USDC |
-| Robinhood Chain (Arbitrum Orbit) | 46630 | EVM · ERC-3643 | USDC |
-| Base Sepolia | 84532 | EVM · ERC-3643 | USDC |
-| Arc (Circle L1, USDC = gas) | 5042002 | EVM · ERC-3643 | USDC |
-| Avalanche Fuji | 43113 | EVM · ERC-3643 | USDC |
-| Ethereum Sepolia | 11155111 | EVM · ERC-3643 | USDC |
-| Polygon Amoy | 80002 | EVM · ERC-3643 | USDC |
-| Hedera Testnet | 296 | Hedera · HTS / HCS | USDC |
+| Network | Chain ID | Family | Token model | Settlement |
+|---------|---------:|--------|-------------|-----------|
+| Arbitrum Sepolia *(source-verified)* | 421614 | EVM | ERC-3643 | USDC |
+| Robinhood Chain (Arbitrum Orbit) | 46630 | EVM | ERC-3643 | USDC (Mock) |
+| Base Sepolia | 84532 | EVM | ERC-3643 | USDC |
+| Arc (Circle L1, USDC = gas) | 5042002 | EVM | ERC-3643 | USDC + EURC |
+| Avalanche Fuji | 43113 | EVM | ERC-3643 | USDC |
+| Ethereum Sepolia | 11155111 | EVM | ERC-3643 | USDC |
+| Polygon Amoy | 80002 | EVM | ERC-3643 | USDC |
+| Hedera Testnet | 296 | Hedera | HTS / HCS | USDC |
+| Solana Devnet | 103 | Solana | Token-2022 | USDC |
+| Sui Testnet | — | Sui (Move) | Closed-loop token | USDC |
 
 ## Agent Modules
 
@@ -81,26 +90,34 @@ People **and** agents drive the same engine:
 
 ```
  Interfaces                 Laminaa engine (AI agent)            Networks
- ───────────                ────────────────────────           ────────────────────
+ ───────────                ────────────────────────           ──────────────────────────
  REST / Web console   ──▶   Issuance · Compliance        ──▶   EVM adapter (web3.py)
  Telegram             ──▶   Lifecycle · Reporting               → ERC-3643 / ERC-20
- MCP server           ──▶   Claude · PostgreSQL · OFAC          Hedera adapter
-                            scheduler · yield oracle            → HTS / HCS
+ MCP server           ──▶   Claude · PostgreSQL · OFAC          Hedera adapter → HTS / HCS
+ Chat (NL)            ──▶   scheduler · yield oracle            Solana adapter → Token-2022
+                                                                Sui adapter    → Move token
                                                                 deploy · settle · audit (USDC)
 ```
 
-A `ChainAdapter` interface abstracts the chain; a `ChainRegistry` loads one TOML per network. Adding an EVM chain is a config entry — not a rewrite.
+A single **`ChainAdapter`** interface abstracts every chain behind opaque string refs
+(`token_ref` / `holder_ref` / `tx_ref`), so the EVM, Hedera, Solana and Sui adapters all
+satisfy one contract — the core business logic never imports a chain SDK. A `ChainRegistry`
+loads one TOML per network. Adding an EVM chain is a config entry; a new family is one
+adapter — never a rewrite of the lifecycle, compliance or reporting code.
 
 ## Stack
 
 ```
 Backend     Python · FastAPI · SQLAlchemy (async) · PostgreSQL · APScheduler
-Chains      web3.py (EVM) · hiero-sdk-python (Hedera) · per-chain TOML registry
-Contracts   Solidity 0.8.20 · Foundry · OpenZeppelin · ERC-3643 · AuditLog · LaminaFactory
+Chains      web3.py (EVM) · hiero-sdk-python (Hedera) · solders/solana-py (Solana) · pysui (Sui)
+            — per-chain TOML registry behind one ChainAdapter interface
+Contracts   EVM: Solidity 0.8.20 · Foundry · OpenZeppelin · ERC-3643 · AuditLog · LaminaFactory
+            Sui: Move · sui::token closed-loop package (contracts-sui/)
 Frontend    Next.js 16 · TypeScript · TailwindCSS · shadcn/ui
 AI          Claude (Anthropic) — chat agent with tool use; shared tool layer (REST · MCP · Telegram)
 Screening   OFAC SDN list · rapidfuzz fuzzy matching · daily refresh
-Wallets     MetaMask (EVM) · HashPack (Hedera) · Google sign-in
+Settlement  USDC (Circle) on 9 chains · Mock USDC on Robinhood · EURC on Arc
+Wallets     MetaMask (EVM) · HashPack (Hedera) · Phantom (Solana) · Sui Wallet · Google sign-in
 ```
 
 ## Quick Start
@@ -113,7 +130,7 @@ docker compose up -d
 
 # 2. backend
 python -m venv venv && source venv/bin/activate
-pip install -e server/                 # optional chains: pip install -e "server/[solana,hedera]"
+pip install -e server/                 # optional chains: pip install -e "server/[solana,hedera,sui]"
 cp server/.env.example server/.env     # add RPC URLs, deployer key, Anthropic key
 
 # 3. frontend
@@ -165,7 +182,9 @@ Laminaa/
 │   │   ├── main.py               # app init, routers, lifespan
 │   │   ├── chains/               # ChainAdapter interface + registry
 │   │   │   ├── evm/              #   web3.py adapter (ERC-3643 / ERC-20)
-│   │   │   └── hedera/           #   hiero-sdk adapter (HTS / HCS)
+│   │   │   ├── hedera/           #   hiero-sdk adapter (HTS / HCS)
+│   │   │   ├── solana/           #   solders adapter (Token-2022)
+│   │   │   └── sui/              #   pysui adapter (Move closed-loop token)
 │   │   ├── services/             # issuance, compliance, lifecycle, payout, reporting, ai
 │   │   ├── routes/               # REST endpoints
 │   │   ├── channels/             # Telegram bot
@@ -174,11 +193,13 @@ Laminaa/
 │   │   └── models/               # SQLAlchemy ORM
 │   └── config/chains/*.toml      # one config per network
 ├── contracts/                    # Solidity (Foundry) — ERC-3643 token, AuditLog, factory
+├── contracts-sui/                # Move — sui::token closed-loop RWA package (lamina_rwa)
 ├── client/                       # Next.js 16 frontend
 │   ├── src/app/                  # dashboard, assets, liquidity, payouts, reports, history, agent
 │   ├── src/components/           # UI, login, chain toggle
 │   └── src/lib/chains.ts         # network registry (frontend)
-├── deployment_contract.txt       # deployed addresses + explorer links (all 8 chains)
+├── docs/DEPLOYMENTS.md           # per-chain deployment guide (all 10 chains)
+├── deployment_contract.txt       # deployed addresses + explorer links (all 10 chains)
 └── CLAUDE.md                     # project spec
 ```
 

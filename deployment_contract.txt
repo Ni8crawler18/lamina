@@ -1,22 +1,41 @@
-Lamina — Deployed Contracts (all 8 networks)
-============================================
-Last updated: 2026-06-04
+Laminaa — Deployed Contracts (all 10 networks)
+==============================================
+Last updated: 2026-06-16
 
-Deployer / operator (all EVM chains): 0xFa3e5d58ea338A274B7d739117AFfAe80168A429
-Hedera operator account:              0.0.8003096
+Lamina is live on 10 testnets across 4 chain families:
+  7 EVM   — Arbitrum Sepolia, Robinhood Chain, Base Sepolia, Arc, Avalanche Fuji,
+            Ethereum Sepolia, Polygon Amoy
+  1 Hedera — Hedera Testnet (native HTS/HCS)
+  1 Solana — Solana Devnet (Token-2022)
+  1 Sui    — Sui Testnet (Move closed-loop token)
+
+Operators (hold the keys, sign every on-chain action)
+-----------------------------------------------------
+  EVM (all chains): 0xFa3e5d58ea338A274B7d739117AFfAe80168A429
+  Hedera account  : 0.0.8003096
+  Sui operator    : 0x70b2d6e827e3690eefb9f0912b92a7c9309fba2b8f26cff88dfc5c51900e91d9
+  Solana operator : keypair in SOLANA_OPERATOR_KEY / SOLANA_KEYPAIR_PATH (not a fixed address)
 
 Contract roles
 --------------
-  LaminaFactory  — deploys a compliant RWA token + an audit topic in one tx
-  AuditLog       — access-controlled, append-only on-chain audit trail
+  LaminaFactory  — deploys a compliant RWA token + an audit topic in one tx (EVM)
+  AuditLog       — access-controlled, append-only on-chain audit trail (EVM)
   LaminaRWAToken — ERC-3643-style permissioned compliance token
                    (deployed per asset at runtime via the factory; not a fixed address)
-  USDC           — settlement asset for coupons & principal
+  USDC           — settlement asset for coupons & principal (all chains)
 
 Note: Base, Arc, Avalanche and Ethereum Sepolia share the same Factory/AuditLog
 addresses. This is expected — they were deployed by the same operator at the same
 nonce, so CREATE produces identical addresses across chains (deterministic).
 
+Dune decoding (analytics): LaminaFactory + AuditLog submitted for decoding on
+Ethereum Sepolia under project "laminaa" (tables laminaa_sepolia.*). Dashboard:
+https://dune.com/cinnamon125169/laminaa
+
+
+╔══════════════════════════════════════════════════════════════════════╗
+║  EVM CHAINS (ERC-3643 token · LaminaFactory · AuditLog · USDC)        ║
+╚══════════════════════════════════════════════════════════════════════╝
 
 ========================================================================
 1) ARBITRUM SEPOLIA   (chainId 421614)   — source-verified on Arbiscan
@@ -56,7 +75,7 @@ USDC (Circle) : 0x036CbD53842c5426634e7929541eC2318f3dCF7e
 
 
 ========================================================================
-4) ARC TESTNET   (chainId 5042002)   — USDC is the native gas token
+4) ARC TESTNET   (chainId 5042002)   — Circle's stablecoin L1; USDC is gas
    explorer: https://testnet.arcscan.app
 ========================================================================
 LaminaFactory : 0x45a36ea47577A4415cAc75256F78ccD66bC29E2c
@@ -65,6 +84,8 @@ AuditLog      : 0xca7f1c8BC559F0E20c3F12085A7Fa426397977f7
   https://testnet.arcscan.app/address/0xca7f1c8BC559F0E20c3F12085A7Fa426397977f7
 USDC (native, : 0x3600000000000000000000000000000000000000
  ERC-20, 6dp)   https://testnet.arcscan.app/address/0x3600000000000000000000000000000000000000
+EURC (6dp)    : 0x89B50855Aa3bE2F677cD6303Cec089B5F319D72a
+  https://testnet.arcscan.app/address/0x89B50855Aa3bE2F677cD6303Cec089B5F319D72a
 
 
 ========================================================================
@@ -80,7 +101,7 @@ USDC (Circle) : 0x5425890298aed601595a70AB815c96711a31Bc65
 
 
 ========================================================================
-6) ETHEREUM SEPOLIA   (chainId 11155111)
+6) ETHEREUM SEPOLIA   (chainId 11155111)   — Dune-decoded (laminaa_sepolia.*)
    explorer: https://sepolia.etherscan.io
 ========================================================================
 LaminaFactory : 0x45a36ea47577A4415cAc75256F78ccD66bC29E2c
@@ -107,13 +128,17 @@ USDC (Circle) : 0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582
     https://amoy.polygonscan.com/address/0x8a3722aD41072d9c39b1CB4a7fEF05B8b5DE42C9
 
 
+╔══════════════════════════════════════════════════════════════════════╗
+║  NON-EVM CHAINS (native token models; no fixed factory address)       ║
+╚══════════════════════════════════════════════════════════════════════╝
+
 ========================================================================
 8) HEDERA TESTNET   (chainId 296 — identifier only; non-EVM)
    explorer: https://hashscan.io/testnet
 ========================================================================
 No fixed Factory/AuditLog contracts on Hedera. Lamina uses Hedera-native
 services: each asset is an HTS token and its audit trail is an HCS topic,
-both created at runtime by the operator (so addresses are per-asset, not fixed).
+both created at runtime by the operator (so IDs are per-asset, not fixed).
 
 USDC (Circle  : 0.0.429274
  testnet HTS)   https://hashscan.io/testnet/token/0.0.429274
@@ -121,15 +146,39 @@ Operator acct : 0.0.8003096
   https://hashscan.io/testnet/account/0.0.8003096
 
 
-Source of truth: server/config/chains/*.toml
+========================================================================
+9) SOLANA DEVNET   (cluster id 103 — identifier only; non-EVM)
+   explorer: https://solscan.io  (append ?cluster=devnet)
+========================================================================
+No factory/audit program: each asset is a native Token-2022 mint created at
+runtime by the operator (permissioned via Token-2022 extensions); the audit
+trail is on-chain SPL memos anchored per asset. (Production audit upgrade =
+an Anchor program; its program id would live in the chain TOML as audit_log.)
 
-— Sui Testnet (Move, non-EVM) — published 2026-06-07, package lamina_rwa —
-Operator (publisher) : 0x70b2d6e827e3690eefb9f0912b92a7c9309fba2b8f26cff88dfc5c51900e91d9
-Package (lamina_rwa) : 0x536b168e3784d71e5f93775ec5ca6ee9b54f85b9a47e492ef901dd3310ca3dbe
+USDC (Circle  : 4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU
+ devnet mint)   https://solscan.io/token/4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU?cluster=devnet
+Operator      : keypair from SOLANA_OPERATOR_KEY / SOLANA_KEYPAIR_PATH
+
+
+========================================================================
+10) SUI TESTNET   (identifier only; non-EVM)   — Move closed-loop RWA token
+    explorer: https://suiscan.xyz/testnet
+    package: lamina_rwa, published 2026-06-07 (source in contracts-sui/)
+========================================================================
+Compliance is enforced by a sui::token TokenPolicy<RWA> + allowlist (KYC) rule;
+each asset is a shared Asset ledger object. Operator holds the capability objects.
+
+Operator      : 0x70b2d6e827e3690eefb9f0912b92a7c9309fba2b8f26cff88dfc5c51900e91d9
+  https://suiscan.xyz/testnet/account/0x70b2d6e827e3690eefb9f0912b92a7c9309fba2b8f26cff88dfc5c51900e91d9
+Package       : 0x536b168e3784d71e5f93775ec5ca6ee9b54f85b9a47e492ef901dd3310ca3dbe
   https://suiscan.xyz/testnet/object/0x536b168e3784d71e5f93775ec5ca6ee9b54f85b9a47e492ef901dd3310ca3dbe
-TokenPolicy<RWA>     : 0x161e1033d03d131b8d36939daf56c28617dbb0797f9782c8b64a5f61601eec8d (shared, v349181718)
-TokenPolicyCap<RWA>  : 0x19a8043b75092027cbe61f7cc0f3aa80d7b1413a6a1f90cdf3a83594ef1f4602
-TreasuryCap<RWA>     : 0x042e35fdbc6e68285da80a893691be33fa3c141e028850699380f0d830247594
-OperatorCap          : 0x6efe70e4689c43becddf933d83b3a47f2fb7f96b2ab6eb4537f0946610244d4c
-UpgradeCap           : 0x30fd0cdbd404aa5016d845b81bde041076a8dc45bebd3e43016627db1382ef07
-USDC (Circle testnet): 0xa1ec7fc00a6f40db9693ad1415d0c193ad3906494428cf252621037bd7117e29::usdc::USDC (6 dec)
+TokenPolicy<RWA>    (shared) : 0x161e1033d03d131b8d36939daf56c28617dbb0797f9782c8b64a5f61601eec8d
+TokenPolicyCap<RWA>         : 0x19a8043b75092027cbe61f7cc0f3aa80d7b1413a6a1f90cdf3a83594ef1f4602
+TreasuryCap<RWA>            : 0x042e35fdbc6e68285da80a893691be33fa3c141e028850699380f0d830247594
+OperatorCap                : 0x6efe70e4689c43becddf933d83b3a47f2fb7f96b2ab6eb4537f0946610244d4c
+UpgradeCap                 : 0x30fd0cdbd404aa5016d845b81bde041076a8dc45bebd3e43016627db1382ef07
+USDC (Circle testnet)      : 0xa1ec7fc00a6f40db9693ad1415d0c193ad3906494428cf252621037bd7117e29::usdc::USDC (6 dec)
+
+
+Source of truth: server/config/chains/*.toml
+Human-readable deployment guide: docs/DEPLOYMENTS.md
