@@ -59,3 +59,6 @@ CLAUDE.md
 .claude/
 
 workflow-docs/
+# local-only working dirs
+demos/
+descriptions/
