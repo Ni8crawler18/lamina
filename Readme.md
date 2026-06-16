@@ -5,7 +5,6 @@
   <img src="https://img.shields.io/badge/Settlement-USDC-2775CA?style=flat-square" />
   <img src="https://img.shields.io/badge/Python-FastAPI-009688?style=flat-square" />
   <img src="https://img.shields.io/badge/Next.js-16-000?style=flat-square" />
-  <img src="https://img.shields.io/badge/AI-Claude-d97706?style=flat-square" />
 </p>
 
 # Laminaa
