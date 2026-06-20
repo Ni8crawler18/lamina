@@ -133,6 +133,30 @@ def _explorer(chain: str) -> str:
         return ""
 
 
+def _resolve_chain(chain: str | None) -> str | None:
+    """Map a loosely-typed chain reference to a real registry slug.
+
+    The agent (and humans) say 'Sui', 'sui', 'ethereum' etc.; the registry slugs are
+    'sui-testnet', 'ethereum-sepolia', … . Resolve exact slug first, then a slug
+    prefix/substring, then chain display name / native symbol. Falls back to the raw
+    input so an unknown value still surfaces as an empty/early error rather than a crash.
+    """
+    if not chain:
+        return chain
+    cl = chain.strip().lower()
+    chains = get_registry().list_all()
+    for c in chains:  # exact slug
+        if c.slug.lower() == cl:
+            return c.slug
+    for c in chains:  # slug prefix / substring (sui -> sui-testnet)
+        if c.slug.lower().startswith(cl) or cl in c.slug.lower():
+            return c.slug
+    for c in chains:  # display name / native symbol
+        if cl in c.name.lower() or cl == (c.native_symbol or "").lower():
+            return c.slug
+    return chain
+
+
 def _holder_dict(h) -> dict:
     return {"account_id": h.account_id, "name": h.name, "balance": h.balance,
             "kyc_status": h.kyc_status, "whitelisted": h.whitelisted,
@@ -165,6 +189,10 @@ async def execute_tool(session, name: str, args: dict) -> dict:
         return {"confirmation_required": True, "tool": name, "args": args,
                 "message": f"This will run '{name}', which moves value/changes state. Confirm to proceed."}
 
+    # Normalize loosely-typed chain refs ('sui' -> 'sui-testnet') before dispatch.
+    if args.get("chain"):
+        args = {**args, "chain": _resolve_chain(args["chain"])}
+
     if name == "list_chains":
         return {"chains": [
             {"slug": c.slug, "name": c.name, "native_symbol": c.native_symbol,
@@ -186,11 +214,11 @@ async def execute_tool(session, name: str, args: dict) -> dict:
     if name == "purchase_tokens":
         res = await IssuanceService(session).purchase(
             args["asset_id"], args["account_id"], args["amount"])
-        return {**res, "explorer_url": _explorer(res["chain"])}
+        return {**res, "explorer_url": _explorer(res.get("chain", ""))}
 
     if name == "distribute_coupon":
         res = await PayoutService(session).distribute_coupon(args["asset_id"])
-        return {**res, "explorer_url": _explorer(res["chain"])}
+        return {**res, "explorer_url": _explorer(res.get("chain", ""))}
 
     if name == "update_nav":
         svc = LifecycleService(session)
@@ -200,7 +228,7 @@ async def execute_tool(session, name: str, args: dict) -> dict:
 
     if name == "execute_maturity":
         res = await LifecycleService(session).execute_maturity(args["asset_id"])
-        return {**res, "explorer_url": _explorer(res["chain"])}
+        return {**res, "explorer_url": _explorer(res.get("chain", ""))}
 
     if name == "generate_report":
         res = await ReportingService(session).generate_report(

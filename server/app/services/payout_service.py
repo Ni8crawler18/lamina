@@ -44,7 +44,8 @@ class PayoutService:
         handler = get_handler(asset.asset_type)
         holders = await self.holders.holders_with_balance(asset_id, exclude=adapter.operator_ref())
         if not holders:
-            return {"asset_id": asset_id, "message": "No eligible holders", "payments": []}
+            return {"asset_id": asset_id, "chain": asset.chain,
+                    "message": "No eligible holders", "payments": []}
 
         payments = []
         for h in holders:
