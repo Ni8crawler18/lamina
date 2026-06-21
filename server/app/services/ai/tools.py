@@ -9,6 +9,7 @@ from __future__ import annotations
 import contextvars
 
 from app.chains.registry import get_registry
+from app.config import get_settings
 from app.integrations.ofac.sdn import OFACScreener
 from app.repositories.assets import AssetRepository
 from app.repositories.holders import HolderRepository
@@ -233,7 +234,13 @@ async def execute_tool(session, name: str, args: dict) -> dict:
     if name == "generate_report":
         res = await ReportingService(session).generate_report(
             args["asset_id"], args.get("period", "Q1 2026"), args.get("report_type", "compliance"))
-        res["download_url"] = f"/api/reports/{res['report_id']}/download"
+        # Drop the server-local file_path (it tempted the agent to fabricate a
+        # filename-based URL on a non-existent domain). Return ONE absolute,
+        # working download URL built from the public base (Render injects
+        # render_external_url; empty locally → relative path still works there).
+        res.pop("file_path", None)
+        base = get_settings().render_external_url.rstrip("/")
+        res["download_url"] = f"{base}/api/reports/{res['report_id']}/download"
         return res
 
     if name == "list_assets":

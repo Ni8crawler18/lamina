@@ -1,6 +1,6 @@
 # Sui Testnet — Move closed-loop permissioned RWA tokens (non-EVM family).
 # Compliance is enforced by a sui::token TokenPolicy + allowlist (KYC) rule; each
-# asset is a shared `Asset` ledger object. Package + caps published 2026-06-07
+# asset is a shared `Asset` ledger object. Package + caps re-published 2026-06-21
 # (see deployment_contract.txt and contracts-sui/). Operator key in SUI_OPERATOR_KEY.
 name          = "Sui Testnet"
 slug          = "sui-testnet"
@@ -15,10 +15,12 @@ explorer_url  = "https://suiscan.xyz/testnet"
 
 [contracts]
 # Published lamina_rwa package and the operator-held capability objects.
-package      = "0x536b168e3784d71e5f93775ec5ca6ee9b54f85b9a47e492ef901dd3310ca3dbe"
-policy       = "0x161e1033d03d131b8d36939daf56c28617dbb0797f9782c8b64a5f61601eec8d"  # shared TokenPolicy<RWA>
-policy_cap   = "0x19a8043b75092027cbe61f7cc0f3aa80d7b1413a6a1f90cdf3a83594ef1f4602"  # TokenPolicyCap<RWA>
-treasury_cap = "0x042e35fdbc6e68285da80a893691be33fa3c141e028850699380f0d830247594"  # TreasuryCap<RWA>
-operator_cap = "0x6efe70e4689c43becddf933d83b3a47f2fb7f96b2ab6eb4537f0946610244d4c"  # OperatorCap
+# Re-published 2026-06-21 (fresh package id so SuiVision indexes it); init mints
+# the caps to the operator. Previous package: 0x536b168e3784…3dbe.
+package      = "0xc661a0bd13e523652d3c49fea3ca810e6c182a41a8c584272656fa137314c7be"
+policy       = "0xf789d4bb56b908c0d996613ce9cb6ac9d37773c382d3024215ebe3d16fcf59d5"  # shared TokenPolicy<RWA>
+policy_cap   = "0x7035b8a553e22e4dfa5d494545cbbdc3cfdaaff82cef17793ee1b8c75c74d7ce"  # TokenPolicyCap<RWA>
+treasury_cap = "0x748034279e0377a2578d4c3928e6055472e20386d5e4e09ec392722581915b60"  # TreasuryCap<RWA>
+operator_cap = "0xda1088347a96448ee3f322229456c3c1881a14da340fe0c3f79e5fa6e35d94df"  # OperatorCap
 # Circle's official USDC on Sui testnet (6 decimals) — coupons/principal settle here.
 usdc         = "0xa1ec7fc00a6f40db9693ad1415d0c193ad3906494428cf252621037bd7117e29::usdc::USDC"
