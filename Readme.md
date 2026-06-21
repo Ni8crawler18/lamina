@@ -54,27 +54,27 @@ USDC settles on 9 of them with genuine Circle USDC (Robinhood, an Arbitrum Orbit
 chain, uses a public-mint Mock USDC). Full addresses, explorer links and per-chain
 notes: [`deployment_contract.txt`](./deployment_contract.txt) · [`docs/DEPLOYMENTS.md`](./docs/DEPLOYMENTS.md).
 
-| Network | Chain ID | Family | Token model | Settlement |
-|---------|---------:|--------|-------------|-----------|
-| Arbitrum Sepolia *(source-verified)* | 421614 | EVM | ERC-3643 | USDC |
-| Robinhood Chain (Arbitrum Orbit) | 46630 | EVM | ERC-3643 | USDC (Mock) |
-| Base Sepolia | 84532 | EVM | ERC-3643 | USDC |
-| Arc (Circle L1, USDC = gas) | 5042002 | EVM | ERC-3643 | USDC + EURC |
-| Avalanche Fuji | 43113 | EVM | ERC-3643 | USDC |
-| Ethereum Sepolia | 11155111 | EVM | ERC-3643 | USDC |
-| Polygon Amoy | 80002 | EVM | ERC-3643 | USDC |
-| Hedera Testnet | 296 | Hedera | HTS / HCS | USDC |
-| Solana Devnet | 103 | Solana | Token-2022 | USDC |
-| Sui Testnet | — | Sui (Move) | Closed-loop token | USDC |
+| Network                             | Chain ID | Family     | Token model       | Settlement  |
+| ----------------------------------- | -------: | ---------- | ----------------- | ----------- |
+| Arbitrum Sepolia*(source-verified)* |   421614 | EVM        | ERC-3643          | USDC        |
+| Robinhood Chain (Arbitrum Orbit)    |    46630 | EVM        | ERC-3643          | USDC (Mock) |
+| Base Sepolia                        |    84532 | EVM        | ERC-3643          | USDC        |
+| Arc (Circle L1, USDC = gas)         |  5042002 | EVM        | ERC-3643          | USDC + EURC |
+| Avalanche Fuji                      |    43113 | EVM        | ERC-3643          | USDC        |
+| Ethereum Sepolia                    | 11155111 | EVM        | ERC-3643          | USDC        |
+| Polygon Amoy                        |    80002 | EVM        | ERC-3643          | USDC        |
+| Hedera Testnet                      |      296 | Hedera     | HTS / HCS         | USDC        |
+| Solana Devnet                       |      103 | Solana     | Token-2022        | USDC        |
+| Sui Testnet                         |       — | Sui (Move) | Closed-loop token | USDC        |
 
 ## Agent Modules
 
-| Module | What it does |
-|--------|-------------|
-| **Issuance** | Deploys a compliant token + audit trail in one transaction, on the selected chain |
+| Module               | What it does                                                                                                                      |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **Issuance**   | Deploys a compliant token + audit trail in one transaction, on the selected chain                                                 |
 | **Compliance** | KYC whitelist, OFAC SDN screening (fuzzy name + address match), jurisdiction enforcement (Reg D/S, MiFID II), transfer validation |
-| **Lifecycle** | Scheduled coupon distribution (USDC), NAV updates from treasury yields, maturity redemption & burn |
-| **Reporting** | Quarterly compliance reports, investor statements, audit-trail compilation — downloadable PDFs |
+| **Lifecycle**  | Scheduled coupon distribution (USDC), NAV updates from treasury yields, maturity redemption & burn                                |
+| **Reporting**  | Quarterly compliance reports, investor statements, audit-trail compilation — downloadable PDFs                                   |
 
 ## Interfaces
 
@@ -157,24 +157,25 @@ Every step appears in **Audit History** with a one-click explorer link to its on
 
 ## API
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/api/chains` | List configured networks |
-| `GET` | `/api/assets?chain=<slug>` | List assets (chain-scoped) |
-| `POST` | `/api/assets` | Issue a new asset (`chain` in body) |
-| `POST` | `/api/assets/{id}/whitelist` | Add to KYC whitelist (OFAC-screened) |
-| `POST` | `/api/assets/{id}/purchase` | Compliant primary-market purchase |
-| `POST` | `/api/assets/{id}/distribute-coupon` | Distribute coupon in USDC |
-| `POST` | `/api/assets/{id}/update-nav` | Update NAV (oracle or manual) |
-| `POST` | `/api/assets/{id}/mature` | Execute maturity & redemption |
-| `GET` | `/api/assets/{id}/audit-log` | On-chain audit trail |
-| `POST` | `/api/assets/{id}/reports` | Generate a report PDF |
-| `POST` | `/api/ofac/screen` | OFAC sanctions check |
-| `POST` | `/api/chat` | Natural-language agent |
+| Method   | Endpoint                               | Description                           |
+| -------- | -------------------------------------- | ------------------------------------- |
+| `GET`  | `/api/chains`                        | List configured networks              |
+| `GET`  | `/api/assets?chain=<slug>`           | List assets (chain-scoped)            |
+| `POST` | `/api/assets`                        | Issue a new asset (`chain` in body) |
+| `POST` | `/api/assets/{id}/whitelist`         | Add to KYC whitelist (OFAC-screened)  |
+| `POST` | `/api/assets/{id}/purchase`          | Compliant primary-market purchase     |
+| `POST` | `/api/assets/{id}/distribute-coupon` | Distribute coupon in USDC             |
+| `POST` | `/api/assets/{id}/update-nav`        | Update NAV (oracle or manual)         |
+| `POST` | `/api/assets/{id}/mature`            | Execute maturity & redemption         |
+| `GET`  | `/api/assets/{id}/audit-log`         | On-chain audit trail                  |
+| `POST` | `/api/assets/{id}/reports`           | Generate a report PDF                 |
+| `POST` | `/api/ofac/screen`                   | OFAC sanctions check                  |
+| `POST` | `/api/chat`                          | Natural-language agent                |
 
 ## Project Structure
 
 ```
+
 Laminaa/
 ├── server/                       # Python FastAPI backend
 │   ├── app/
