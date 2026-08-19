@@ -19,8 +19,9 @@ dependencies = [
     "web3>=7.0.0",
     # AI
     "anthropic>=0.40.0",
-    # MCP server
-    "mcp>=1.2.0",
+    # MCP server — pinned below 2.0 (2.0.0 rewrote the low-level Server API:
+    # dropped @Server.list_tools()/@Server.call_tool(), which app/mcp/server.py uses)
+    "mcp>=1.2.0,<2.0.0",
     # messaging channels
     "telegramify-markdown>=1.1.5",
     # jobs / integrations
