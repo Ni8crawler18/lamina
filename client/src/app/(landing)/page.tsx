@@ -81,7 +81,17 @@ function Hero() {
 
       <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-6 pb-20 pt-24 lg:grid-cols-[1.02fr_0.98fr] lg:pt-32">
         <div>
-          <h1 className="reveal reveal-1 text-6xl font-extralight leading-[1.02] tracking-tight sm:text-7xl lg:text-[5rem]">
+          <a
+            href="https://hedera.com/blog/these-are-the-winners-of-the-hello-future-apex-hackathon/"
+            target="_blank"
+            rel="noreferrer"
+            className="reveal reveal-1 mb-6 inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/30 px-3.5 py-1.5 text-xs text-muted-foreground transition-colors hover:border-violet/40 hover:text-foreground"
+          >
+            <img src="/chains/hedera.png" alt="Hedera" className="h-3.5 w-3.5" />
+            Backed by Hedera — 3rd place, Hello Future: APEX Hackathon
+          </a>
+
+          <h1 className="reveal reveal-2 text-6xl font-extralight leading-[1.02] tracking-tight sm:text-7xl lg:text-[5rem]">
             The autonomous
             <br />
             <span className="text-iris font-light">back office</span>
@@ -89,7 +99,7 @@ function Hero() {
             for tokenized assets.
           </h1>
 
-          <p className="reveal reveal-2 mt-8 max-w-xl text-lg leading-relaxed text-muted-foreground">
+          <p className="reveal reveal-3 mt-8 max-w-xl text-lg leading-relaxed text-muted-foreground">
             Laminaa is the lifecycle layer for tokenized securities. Issue an{" "}
             <span className="text-foreground">ERC-3643</span> permissioned token, and the agent
             enforces KYC and OFAC SDN screening on every transfer, distributes USDC coupons, updates
@@ -97,7 +107,7 @@ function Hero() {
             with an access-controlled on-chain audit trail.
           </p>
 
-          <div className="reveal reveal-3 mt-9 flex flex-wrap items-center gap-3">
+          <div className="reveal reveal-4 mt-9 flex flex-wrap items-center gap-3">
             <Link
               href="/dashboard"
               className="group rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-all hover:shadow-[0_0_34px_hsl(var(--violet)/0.5)]"
@@ -115,7 +125,7 @@ function Hero() {
             </a>
           </div>
 
-          <div className="reveal reveal-4 mt-11 flex flex-wrap items-center gap-x-8 gap-y-3 text-xs tracking-wide text-muted-foreground">
+          <div className="reveal reveal-5 mt-11 flex flex-wrap items-center gap-x-8 gap-y-3 text-xs tracking-wide text-muted-foreground">
             <Proof value="ERC-3643" label="+ HTS + Token-2022" />
             <Proof value="10" label="networks" />
             <Proof value="19" label="contract tests, source-verified" />
@@ -499,6 +509,11 @@ function Footer() {
             The autonomous lifecycle layer for tokenized real-world assets. Compliant by construction,
             across every network.
           </p>
+          <div className="mt-5 flex items-center gap-4 text-sm text-muted-foreground">
+            <a href="https://www.linkedin.com/company/laminaa/" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">LinkedIn</a>
+            <a href="https://www.crunchbase.com/organization/laminaa" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">Crunchbase</a>
+            <a href="https://x.com/laminaalabs" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">X</a>
+          </div>
         </div>
         {cols.map(([h, items]) => (
           <div key={h}>
