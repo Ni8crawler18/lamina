@@ -88,7 +88,7 @@ function Hero() {
             className="reveal reveal-1 mb-6 inline-flex items-center gap-2 rounded-full border border-border/60 bg-card/30 px-3.5 py-1.5 text-xs text-muted-foreground transition-colors hover:border-violet/40 hover:text-foreground"
           >
             <img src="/chains/hedera.png" alt="Hedera" className="h-3.5 w-3.5" />
-            Backed by Hedera — 3rd place, Hello Future: APEX Hackathon
+            Backed by Hedera - 3rd place, Hello Future: APEX Hackathon
           </a>
 
           <h1 className="reveal reveal-2 text-6xl font-extralight leading-[1.02] tracking-tight sm:text-7xl lg:text-[5rem]">
@@ -103,7 +103,7 @@ function Hero() {
             Laminaa is the lifecycle layer for tokenized securities. Issue an{" "}
             <span className="text-foreground">ERC-3643</span> permissioned token, and the agent
             enforces KYC and OFAC SDN screening on every transfer, distributes USDC coupons, updates
-            NAV, and settles redemption at maturity — on any EVM network, Hedera, Solana, or Sui,
+            NAV, and settles redemption at maturity - on any EVM network, Hedera, Solana, or Sui,
             with an access-controlled on-chain audit trail.
           </p>
 
@@ -208,7 +208,7 @@ function Lifecycle() {
   const steps = [
     { n: "01", t: "Issue", d: "Deploy an ERC-3643 permissioned token and a dedicated audit topic in a single factory transaction." },
     { n: "02", t: "Onboard", d: "Grant on-chain KYC after automated OFAC SDN screening of investor names and wallet addresses." },
-    { n: "03", t: "Enforce", d: "Validate every transfer in the token's transfer hook — KYC, jurisdiction (Reg D / Reg S), lock-ups, holder caps." },
+    { n: "03", t: "Enforce", d: "Validate every transfer in the token's transfer hook - KYC, jurisdiction (Reg D / Reg S), lock-ups, holder caps." },
     { n: "04", t: "Distribute", d: "Pay coupons and dividends to holders pro-rata in USDC (ERC-20)." },
     { n: "05", t: "Revalue", d: "Update net asset value from a treasury-yield oracle." },
     { n: "06", t: "Settle", d: "At maturity, claw back holdings via forceBurn, return principal in USDC, and retire supply." },
@@ -235,7 +235,7 @@ function Lifecycle() {
 /* Chain-agnostic: text left, technical architecture diagram (SVG) right. */
 function MultiChain() {
   const bullets: [string, string][] = [
-    ["Issue where your investors are", "Launch the same asset on the network your buyers and partners already use — the KYC/OFAC and lifecycle logic is identical on every chain."],
+    ["Issue where your investors are", "Launch the same asset on the network your buyers and partners already use - the KYC/OFAC and lifecycle logic is identical on every chain."],
     ["No lock-in, no rebuild", "Move to or add a chain without re-engineering; your operations, reporting and audit trail stay exactly the same."],
     ["One USDC settlement rail", "Coupons and principal paid in Circle USDC on every network, from one workflow."],
   ];
@@ -250,7 +250,7 @@ function MultiChain() {
             <span className="text-iris font-light">Every network.</span>
           </h2>
           <p className="mt-7 text-lg leading-relaxed text-muted-foreground">
-            Your investors and partners aren&apos;t all on one chain — and you shouldn&apos;t have to
+            Your investors and partners aren&apos;t all on one chain - and you shouldn&apos;t have to
             rebuild for each. Laminaa issues and services the same compliant asset on whichever network
             you choose, with one workflow and one audit trail, settling in USDC everywhere.
           </p>
@@ -279,7 +279,7 @@ function ArchitectureSVG() {
   const solana = CHAINS.filter((c) => c.family === "solana")[0];
   const sui = CHAINS.filter((c) => c.family === "sui")[0];
 
-  // Excalidraw-style monochrome "pen" — colour comes only from the logos.
+  // Excalidraw-style monochrome "pen" - colour comes only from the logos.
   const PEN = "hsl(233 14% 70%)";
   const TXT = "hsl(233 22% 90%)";
   const MUT = "hsl(235 10% 58%)";
@@ -299,7 +299,7 @@ function ArchitectureSVG() {
 
   // clean straight arrowhead (open chevron), tip at (x,y) pointing right
   const head = (x: number, y: number) => `M${x - 11} ${y - 7} L${x} ${y} L${x - 11} ${y + 7}`;
-  const MID = 257; // arrow height — vertical middle of the interface frame
+  const MID = 257; // arrow height - vertical middle of the interface frame
 
   return (
     <div className="on-scroll">
@@ -428,7 +428,7 @@ function Surfaces() {
 
 function Trust() {
   const items: [string, string][] = [
-    ["Permissioned transfers", "ERC-3643 (T-REX) on EVM networks; native Hedera Token Service KYC/freeze/wipe keys on Hedera; Solana Token-2022 with frozen-by-default accounts, permanent-delegate and freeze authority; a Sui Move closed-loop Token gated by a TokenPolicy + allowlist (KYC) rule — the correct primitive on each chain."],
+    ["Permissioned transfers", "ERC-3643 (T-REX) on EVM networks; native Hedera Token Service KYC/freeze/wipe keys on Hedera; Solana Token-2022 with frozen-by-default accounts, permanent-delegate and freeze authority; a Sui Move closed-loop Token gated by a TokenPolicy + allowlist (KYC) rule - the correct primitive on each chain."],
     ["OFAC SDN screening", "Investor names and digital-currency addresses checked against the U.S. Treasury Specially Designated Nationals list before any whitelist or transfer."],
     ["Immutable audit trail", "Access-controlled on-chain AuditLog on EVM; Hedera Consensus Service (HCS) on Hedera; on-chain SPL memo log on Solana; an on-chain AuditLog object with emitted events on Sui. Every agent action is recorded on the network it ran on."],
     ["Verified & tested", "EVM contracts source-verified on each block explorer with a 19-case Foundry suite; Solana Token-2022 lifecycle verified end-to-end on devnet; the Sui Move package unit-tested with the full lifecycle verified on testnet."],
