@@ -53,6 +53,17 @@
     "has_dividends": true,
     "dividend_frequency": "monthly",
     "default_decimals": 2,
-    "nav_update_frequency": "monthly"
+    "nav_update_frequency": "monthly",
+    "required_metadata": ["address", "lat", "lng"]
+  },
+  "carbon_credits": {
+    "name": "Carbon Credits",
+    "description": "Tokenized voluntary or compliance carbon credits, retired on use",
+    "has_coupon": false,
+    "has_maturity": false,
+    "has_dividends": false,
+    "default_decimals": 0,
+    "nav_update_frequency": "manual",
+    "required_metadata": ["registry", "vintage_year", "serial_number"]
   }
 }

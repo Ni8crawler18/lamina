@@ -46,6 +46,7 @@ export const getAssets = (chain?: string, owner?: string) => {
 export const getAsset = (id: number) => fetchAPI(`/api/assets/${id}`);
 export const createAsset = (data: Record<string, unknown>) =>
   fetchAPI("/api/assets", { method: "POST", body: JSON.stringify(data) });
+export const getAssetTypes = () => fetchAPI("/api/assets/types");
 
 // Holders
 export const getHolders = (assetId: number) =>
@@ -66,6 +67,8 @@ export const updateNav = (assetId: number, nav: number) =>
   fetchAPI(`/api/assets/${assetId}/update-nav?nav=${nav}`, { method: "POST" });
 export const matureAsset = (assetId: number) =>
   fetchAPI(`/api/assets/${assetId}/mature`, { method: "POST" });
+export const retireCredits = (assetId: number, holderRef: string, amount: number) =>
+  fetchAPI(`/api/assets/${assetId}/retire?holder_ref=${encodeURIComponent(holderRef)}&amount=${amount}`, { method: "POST" });
 
 // Events
 export const getEvents = (assetId: number) =>

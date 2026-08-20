@@ -41,9 +41,23 @@ TOOLS = [
                 "maturity_date": {"type": "string", "description": "ISO date"},
                 "jurisdiction": {"type": "string"},
                 "investor_type": {"type": "string"},
-                "asset_type": {"type": "string"},
+                "asset_type": {"type": "string", "description": "bond | equity | fund | real_estate | carbon_credits"},
+                "metadata": {"type": "object", "description": "Type-specific fields: address/lat/lng for real_estate; registry/vintage_year/serial_number for carbon_credits"},
             },
             "required": ["chain", "name", "symbol", "total_supply"],
+        },
+    },
+    {
+        "name": "retire_credits",
+        "description": "Retire (permanently burn) a specific amount of a holder's carbon credits, on demand. No principal is returned — this is not a redemption.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "asset_id": {"type": "integer"},
+                "holder_ref": {"type": "string", "description": "account/wallet holding the credits"},
+                "amount": {"type": "integer"},
+            },
+            "required": ["asset_id", "holder_ref", "amount"],
         },
     },
     {
@@ -229,6 +243,11 @@ async def execute_tool(session, name: str, args: dict) -> dict:
 
     if name == "execute_maturity":
         res = await LifecycleService(session).execute_maturity(args["asset_id"])
+        return {**res, "explorer_url": _explorer(res.get("chain", ""))}
+
+    if name == "retire_credits":
+        res = await LifecycleService(session).retire_credits(
+            args["asset_id"], args["holder_ref"], args["amount"])
         return {**res, "explorer_url": _explorer(res.get("chain", ""))}
 
     if name == "generate_report":

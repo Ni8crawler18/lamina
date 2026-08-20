@@ -20,6 +20,7 @@ class AssetCreate(BaseModel):
     maturity_date: str | None = None
     jurisdiction: str = "US"
     investor_type: str = "accredited"
+    metadata: dict | None = Field(default=None, description="Asset-type-specific fields, e.g. GIS address/lat/lng for real_estate or registry/vintage_year/serial_number for carbon_credits")
 
 
 class AssetOut(BaseModel):
@@ -42,4 +43,5 @@ class AssetOut(BaseModel):
     status: str
     jurisdiction: str
     investor_type: str
+    metadata_json: str | None
     created_at: datetime

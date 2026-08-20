@@ -48,6 +48,7 @@ class Asset(Base):
     status: Mapped[str] = mapped_column(String(32), default="active")
     jurisdiction: Mapped[str] = mapped_column(String(8), default="US")
     investor_type: Mapped[str] = mapped_column(String(32), default="accredited")
+    metadata_json: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON — asset-type-specific fields (GIS, registry, etc.)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     holders: Mapped[list["Holder"]] = relationship(back_populates="asset")

@@ -3,12 +3,21 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.constants.jurisdictions import ASSET_TYPES
 from app.database import get_session
 from app.models.asset import AssetCreate, AssetOut
 from app.repositories.assets import AssetRepository
 from app.services.issuance_service import IssuanceService
 
 router = APIRouter(prefix="/api/assets", tags=["assets"])
+
+
+@router.get("/types")
+async def list_asset_types():
+    """Asset-type metadata (has_coupon/has_maturity/required_metadata/...) driving
+    which fields the create-asset form shows for each type. Single source of truth,
+    shared with the backend validation in IssuanceService."""
+    return ASSET_TYPES
 
 
 @router.get("", response_model=list[AssetOut])

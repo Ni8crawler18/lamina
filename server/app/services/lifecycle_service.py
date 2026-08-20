@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 
 from app.chains.registry import get_registry
-from app.integrations.oracle.treasury_rates import get_yield_for_duration
+from app.integrations.oracle.valuation import get_valuation_source
 from app.repositories.assets import AssetRepository
 from app.repositories.holders import HolderRepository
 from app.services.audit_service import AuditService
@@ -43,13 +43,7 @@ class LifecycleService:
         asset = await self.assets.get(asset_id)
         if not asset:
             raise LifecycleError("Asset not found")
-        face_value = asset.total_supply / (10 ** asset.decimals)
-        current_yield = await get_yield_for_duration(5)
-        if current_yield > 0 and asset.coupon_rate > 0:
-            price_factor = min(max(asset.coupon_rate / (current_yield / 100), 0.8), 1.2)
-            new_nav = face_value * price_factor
-        else:
-            new_nav = face_value
+        new_nav = await get_valuation_source(asset.asset_type).revalue(asset)
         return await self.update_nav(asset_id, round(new_nav, 2))
 
     async def execute_maturity(self, asset_id: int) -> dict:
@@ -107,4 +101,39 @@ class LifecycleService:
             "asset_id": asset_id, "chain": asset.chain, "token_id": asset.token_id,
             "status": "matured", "tokens_wiped": total_wiped, "tokens_burned": burned,
             "burn_result": burn_result, "redemptions": redemptions,
+        }
+
+    async def retire_credits(self, asset_id: int, holder_ref: str, amount: int) -> dict:
+        """On-demand, per-holder carbon-credit retirement — a permanent burn with no
+        principal returned, distinct from bond/equity maturity redemption. A holder
+        can retire any part of their balance at any time; the asset only becomes
+        fully 'retired' once every credit ever issued has been retired by someone."""
+        asset = await self.assets.get(asset_id)
+        if not asset:
+            raise LifecycleError("Asset not found")
+        if asset.asset_type != "carbon_credits":
+            raise LifecycleError("retire_credits only applies to carbon_credits assets")
+        if asset.status != "active":
+            raise LifecycleError(f"Asset is already {asset.status}")
+
+        holder = await self.holders.get(holder_ref, asset_id)
+        if not holder or holder.balance < amount:
+            raise LifecycleError("Insufficient balance to retire")
+
+        adapter = get_registry().adapter(asset.chain)
+        await run_chain(adapter.force_redeem, asset.token_id, holder_ref, amount)
+        holder.balance -= amount
+
+        remaining = sum(h.balance for h in await self.holders.list_for_asset(asset_id))
+        if remaining <= 0:
+            await self.assets.set_status(asset_id, "retired")
+
+        await self.audit.record(
+            adapter, asset.topic_id, asset.id, "lifecycle", "credits_retired",
+            {"holder": holder_ref, "amount": amount, "remaining_supply": remaining},
+        )
+        return {
+            "asset_id": asset_id, "chain": asset.chain, "holder": holder_ref,
+            "amount_retired": amount, "remaining_supply": remaining,
+            "status": "retired" if remaining <= 0 else "active",
         }

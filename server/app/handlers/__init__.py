@@ -20,8 +20,24 @@ class FundHandler(_RateHandler):
     periods_per_year = 4  # quarterly distributions
 
 
+class RealEstateHandler(_RateHandler):
+    asset_type = "real_estate"
+    periods_per_year = 12  # monthly rental distributions
+
+
+class CarbonCreditHandler(AssetTypeHandler):
+    """Carbon credits carry no periodic income — they are held, then retired on use."""
+
+    asset_type = "carbon_credits"
+    periods_per_year = 0
+
+    def period_payout_units(self, balance: int, token_decimals: int, annual_rate: float) -> int:
+        return 0
+
+
 _HANDLERS: dict[str, AssetTypeHandler] = {
-    h.asset_type: h for h in (BondHandler(), EquityHandler(), FundHandler())
+    h.asset_type: h
+    for h in (BondHandler(), EquityHandler(), FundHandler(), RealEstateHandler(), CarbonCreditHandler())
 }
 
 _DEFAULT = BondHandler()

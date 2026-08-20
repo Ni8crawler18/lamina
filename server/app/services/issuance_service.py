@@ -6,10 +6,13 @@ lifecycle events, whitelists the treasury, and writes the audit trail.
 
 from __future__ import annotations
 
+import json
 import logging
 from datetime import datetime, timedelta
 
 from app.chains.registry import get_registry
+from app.constants.jurisdictions import ASSET_TYPES
+from app.handlers import get_handler
 from app.models.orm import Asset
 from app.repositories.assets import AssetRepository
 from app.repositories.events import EventRepository
@@ -19,7 +22,12 @@ from app.utils.aio import run_chain
 
 logger = logging.getLogger(__name__)
 
-_COUPON_INTERVAL_DAYS = 182  # semi-annual
+
+def _coupon_interval_days(asset_type: str) -> int:
+    """Scheduling cadence derived from the asset-type handler's periods_per_year,
+    instead of one hardcoded interval for every type."""
+    periods = get_handler(asset_type).periods_per_year
+    return 365 // periods if periods else 365
 
 
 class IssuanceService:
@@ -34,9 +42,18 @@ class IssuanceService:
         self, *, chain: str, name: str, symbol: str, total_supply: int,
         decimals: int = 2, coupon_rate: float = 0.0, maturity_date: str | None = None,
         jurisdiction: str = "US", investor_type: str = "accredited", asset_type: str = "bond",
-        owner: str | None = None, issuer_name: str | None = None,
+        owner: str | None = None, issuer_name: str | None = None, metadata: dict | None = None,
     ) -> Asset:
         adapter = get_registry().adapter(chain)  # raises if chain unknown/disabled
+
+        type_rules = ASSET_TYPES.get(asset_type, {})
+        if not type_rules.get("has_coupon", True) and coupon_rate:
+            raise ValueError(f"asset_type '{asset_type}' does not support a coupon_rate")
+        if not type_rules.get("has_maturity", True) and maturity_date:
+            raise ValueError(f"asset_type '{asset_type}' does not support a maturity_date")
+        missing = [k for k in type_rules.get("required_metadata", []) if not (metadata or {}).get(k)]
+        if missing:
+            raise ValueError(f"asset_type '{asset_type}' requires metadata field(s): {', '.join(missing)}")
 
         # Canonical coupon_rate is a fraction (0.04 == 4%). The UI form already
         # divides by 100; normalise other callers (AI agent / API) that pass a
@@ -57,6 +74,7 @@ class IssuanceService:
             asset_type=asset_type, total_supply=total_supply, decimals=decimals,
             coupon_rate=coupon_rate, maturity_date=maturity_date, nav=nav,
             status="active", jurisdiction=jurisdiction, investor_type=investor_type,
+            metadata_json=json.dumps(metadata) if metadata else None,
         )
 
         # 3. Audit (on-chain + DB)
@@ -73,7 +91,7 @@ class IssuanceService:
         )
 
         # 4. Schedule lifecycle events
-        await self._schedule_coupons(asset.id, coupon_rate, maturity_date)
+        await self._schedule_coupons(asset.id, asset_type, coupon_rate, maturity_date)
         if maturity_date:
             await self.events.create(
                 asset_id=asset.id, event_type="maturity",
@@ -114,14 +132,17 @@ class IssuanceService:
         return {"asset_id": asset_id, "chain": asset.chain, "buyer": buyer,
                 "amount": amount, "tx": tx, "status": "completed"}
 
-    async def _schedule_coupons(self, asset_id: int, coupon_rate: float, maturity_date: str | None) -> None:
+    async def _schedule_coupons(
+        self, asset_id: int, asset_type: str, coupon_rate: float, maturity_date: str | None
+    ) -> None:
         if coupon_rate <= 0:
             return
+        interval_days = _coupon_interval_days(asset_type)
         now = datetime.utcnow()
         end = datetime.fromisoformat(maturity_date) if maturity_date else now + timedelta(days=365 * 5)
-        nxt = now + timedelta(days=_COUPON_INTERVAL_DAYS)
+        nxt = now + timedelta(days=interval_days)
         while nxt < end:
             await self.events.create(
                 asset_id=asset_id, event_type="coupon_payment", scheduled_at=nxt
             )
-            nxt += timedelta(days=_COUPON_INTERVAL_DAYS)
+            nxt += timedelta(days=interval_days)

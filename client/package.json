@@ -17,10 +17,12 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "hashconnect": "^3.0.14",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.575.0",
     "next": "^16.1.6",
     "react": "^18",
     "react-dom": "^18",
+    "react-leaflet": "^5.0.0",
     "react-markdown": "^10.1.0",
     "recharts": "^3.7.0",
     "remark-gfm": "^4.0.1",
@@ -28,6 +30,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@types/leaflet": "^1.9.22",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

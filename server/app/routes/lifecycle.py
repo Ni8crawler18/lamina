@@ -28,3 +28,13 @@ async def mature(asset_id: int, session: AsyncSession = Depends(get_session)):
         return await LifecycleService(session).execute_maturity(asset_id)
     except LifecycleError as e:
         raise HTTPException(400, str(e))
+
+
+@router.post("/retire")
+async def retire(
+    asset_id: int, holder_ref: str, amount: int, session: AsyncSession = Depends(get_session)
+):
+    try:
+        return await LifecycleService(session).retire_credits(asset_id, holder_ref, amount)
+    except LifecycleError as e:
+        raise HTTPException(400, str(e))

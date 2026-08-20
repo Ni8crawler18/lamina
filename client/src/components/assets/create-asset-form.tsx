@@ -1,9 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import { createAsset } from "@/lib/api";
+import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import { createAsset, getAssetTypes } from "@/lib/api";
 import { useChain } from "@/contexts/chain-context";
 import { useWallet } from "@/contexts/wallet-context";
+import type { LocationValue } from "./location-picker";
+
+// Leaflet touches `window` at import time — must load client-only, no SSR.
+const LocationPicker = dynamic(() => import("./location-picker"), { ssr: false });
+
+interface AssetTypeConfig {
+  name: string;
+  has_coupon?: boolean;
+  has_maturity?: boolean;
+  required_metadata?: string[];
+}
 
 interface CreateAssetFormProps {
   onSuccess: () => void;
@@ -15,8 +27,13 @@ export default function CreateAssetForm({ onSuccess, onClose }: CreateAssetFormP
   const [error, setError] = useState("");
   const { active } = useChain();
   const { ownerId } = useWallet();
-  // Default maturity: 5 years from today
-  const defaultMaturity = new Date(Date.now() + 5 * 365.25 * 86400000).toISOString().split("T")[0];
+
+  const [assetTypes, setAssetTypes] = useState<Record<string, AssetTypeConfig>>({});
+  useEffect(() => {
+    getAssetTypes()
+      .then(setAssetTypes)
+      .catch(() => setAssetTypes({}));
+  }, []);
 
   const [form, setForm] = useState({
     name: "",
@@ -31,23 +48,40 @@ export default function CreateAssetForm({ onSuccess, onClose }: CreateAssetFormP
     investor_type: "accredited",
   });
 
+  const [location, setLocation] = useState<LocationValue>({ address: "", lat: null, lng: null });
+  const [registry, setRegistry] = useState({ registry: "", vintage_year: "", serial_number: "" });
+
   const update = (field: string, value: string | number) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
+
+  // Falls open (true) for a type not yet loaded from the config endpoint, so the
+  // form still works before the fetch resolves.
+  const typeConfig = assetTypes[form.asset_type];
+  const showCoupon = typeConfig?.has_coupon !== false;
+  const showMaturity = typeConfig?.has_maturity !== false;
+  const isRealEstate = form.asset_type === "real_estate";
+  const isCarbonCredits = form.asset_type === "carbon_credits";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
+      const metadata = isRealEstate
+        ? { address: location.address, lat: location.lat, lng: location.lng }
+        : isCarbonCredits
+          ? registry
+          : undefined;
       await createAsset({
         ...form,
         chain: active.slug,
         owner: ownerId || undefined,
         issuer_name: form.issuer_name || null,
         total_supply: Number(form.total_supply) * Math.pow(10, form.decimals),
-        coupon_rate: Number(form.coupon_rate) / 100,
-        maturity_date: form.maturity_date || null,
+        coupon_rate: showCoupon && form.coupon_rate ? Number(form.coupon_rate) / 100 : 0,
+        maturity_date: showMaturity ? form.maturity_date || null : null,
+        metadata,
       });
       onSuccess();
     } catch (err) {
@@ -103,6 +137,8 @@ export default function CreateAssetForm({ onSuccess, onClose }: CreateAssetFormP
             <option value="bond">Bond</option>
             <option value="equity">Equity</option>
             <option value="fund">Fund</option>
+            <option value="real_estate">Real Estate</option>
+            <option value="carbon_credits">Carbon Credits</option>
           </select>
         </div>
         <div>
@@ -128,27 +164,75 @@ export default function CreateAssetForm({ onSuccess, onClose }: CreateAssetFormP
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="text-[11px] text-muted-foreground uppercase tracking-wider block mb-1.5">Coupon Rate (%)</label>
-          <input
-            type="number"
-            step="0.01"
-            value={form.coupon_rate}
-            onChange={(e) => update("coupon_rate", e.target.value)}
-            className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/40"
-          />
+      {(showCoupon || showMaturity) && (
+        <div className="grid grid-cols-2 gap-4">
+          {showCoupon && (
+            <div>
+              <label className="text-[11px] text-muted-foreground uppercase tracking-wider block mb-1.5">Coupon Rate (%)</label>
+              <input
+                type="number"
+                step="0.01"
+                value={form.coupon_rate}
+                onChange={(e) => update("coupon_rate", e.target.value)}
+                className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/40"
+              />
+            </div>
+          )}
+          {showMaturity && (
+            <div>
+              <label className="text-[11px] text-muted-foreground uppercase tracking-wider block mb-1.5">Maturity Date</label>
+              <input
+                type="date"
+                value={form.maturity_date}
+                onChange={(e) => update("maturity_date", e.target.value)}
+                className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/40"
+              />
+            </div>
+          )}
         </div>
+      )}
+
+      {isRealEstate && (
         <div>
-          <label className="text-[11px] text-muted-foreground uppercase tracking-wider block mb-1.5">Maturity Date</label>
-          <input
-            type="date"
-            value={form.maturity_date}
-            onChange={(e) => update("maturity_date", e.target.value)}
-            className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/40"
-          />
+          <label className="text-[11px] text-muted-foreground uppercase tracking-wider block mb-1.5">Property Location</label>
+          <LocationPicker value={location} onChange={setLocation} />
         </div>
-      </div>
+      )}
+
+      {isCarbonCredits && (
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <label className="text-[11px] text-muted-foreground uppercase tracking-wider block mb-1.5">Registry</label>
+            <input
+              required
+              value={registry.registry}
+              onChange={(e) => setRegistry((p) => ({ ...p, registry: e.target.value }))}
+              placeholder="Verra, Gold Standard, ..."
+              className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/40"
+            />
+          </div>
+          <div>
+            <label className="text-[11px] text-muted-foreground uppercase tracking-wider block mb-1.5">Vintage Year</label>
+            <input
+              required
+              value={registry.vintage_year}
+              onChange={(e) => setRegistry((p) => ({ ...p, vintage_year: e.target.value }))}
+              placeholder="2026"
+              className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/40"
+            />
+          </div>
+          <div>
+            <label className="text-[11px] text-muted-foreground uppercase tracking-wider block mb-1.5">Serial Number</label>
+            <input
+              required
+              value={registry.serial_number}
+              onChange={(e) => setRegistry((p) => ({ ...p, serial_number: e.target.value }))}
+              placeholder="Batch/serial ID"
+              className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/40"
+            />
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-4">
         <div>

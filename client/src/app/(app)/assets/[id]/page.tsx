@@ -18,6 +18,7 @@ import {
   distributeCoupon,
   matureAsset,
   generateReport,
+  retireCredits,
 } from "@/lib/api";
 import { chainBySlug, explorerTokenUrl } from "@/lib/chains";
 
@@ -36,7 +37,17 @@ interface Asset {
   status: string;
   jurisdiction: string;
   investor_type: string;
+  metadata_json: string | null;
   created_at: string;
+}
+
+function parseMetadata(metadataJson: string | null): Record<string, unknown> {
+  if (!metadataJson) return {};
+  try {
+    return JSON.parse(metadataJson);
+  } catch {
+    return {};
+  }
 }
 
 export default function AssetDetail() {
@@ -50,6 +61,8 @@ export default function AssetDetail() {
   const [events, setEvents] = useState<Record<string, unknown>[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [retireHolder, setRetireHolder] = useState("");
+  const [retireAmount, setRetireAmount] = useState("");
 
   const loadData = useCallback(async () => {
     try {
@@ -90,6 +103,20 @@ export default function AssetDetail() {
     }
   };
 
+  const handleRetire = async () => {
+    if (!retireHolder || !retireAmount) return;
+    setActionLoading("retire");
+    try {
+      await retireCredits(assetId, retireHolder, Number(retireAmount));
+      setRetireAmount("");
+      await loadData();
+    } catch (err) {
+      console.error("Retire failed:", err);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-3.5rem)]">
@@ -113,9 +140,17 @@ export default function AssetDetail() {
   const statusColor = {
     active: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
     matured: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    retired: "bg-blue-500/10 text-blue-400 border-blue-500/20",
   }[asset.status] || "bg-muted text-muted-foreground";
 
   const allLogs = (auditLog?.entries || []) as Record<string, unknown>[];
+  const metadata = parseMetadata(asset.metadata_json);
+  const isRealEstate = asset.asset_type === "real_estate";
+  const isCarbonCredits = asset.asset_type === "carbon_credits";
+  const osmUrl =
+    isRealEstate && metadata.lat != null && metadata.lng != null
+      ? `https://www.openstreetmap.org/?mlat=${metadata.lat}&mlon=${metadata.lng}#map=16/${metadata.lat}/${metadata.lng}`
+      : null;
 
   return (
     <div className="p-8">
@@ -189,25 +224,29 @@ export default function AssetDetail() {
         </div>
         {asset.status === "active" && (
           <div className="flex gap-2">
-            <ActionButton
-              label="Coupon"
-              loading={actionLoading === "coupon"}
-              disabled={actionLoading !== null}
-              onClick={() => handleAction("coupon")}
-            />
+            {!isCarbonCredits && (
+              <ActionButton
+                label="Coupon"
+                loading={actionLoading === "coupon"}
+                disabled={actionLoading !== null}
+                onClick={() => handleAction("coupon")}
+              />
+            )}
             <ActionButton
               label="Report"
               loading={actionLoading === "report"}
               disabled={actionLoading !== null}
               onClick={() => handleAction("report")}
             />
-            <ActionButton
-              label="Mature"
-              loading={actionLoading === "mature"}
-              disabled={actionLoading !== null}
-              onClick={() => handleAction("mature")}
-              destructive
-            />
+            {!isCarbonCredits && (
+              <ActionButton
+                label="Mature"
+                loading={actionLoading === "mature"}
+                disabled={actionLoading !== null}
+                onClick={() => handleAction("mature")}
+                destructive
+              />
+            )}
           </div>
         )}
       </div>
@@ -216,9 +255,74 @@ export default function AssetDetail() {
       <div className="grid grid-cols-4 gap-3 mb-8">
         <MetricCard label="Face Value" value={`$${faceValue.toLocaleString()}`} />
         <MetricCard label="NAV" value={`$${(asset.nav).toLocaleString()}`} />
-        <MetricCard label="Coupon" value={`${((asset.coupon_rate) * 100).toFixed(2)}%`} />
+        {asset.coupon_rate > 0 ? (
+          <MetricCard label="Coupon" value={`${((asset.coupon_rate) * 100).toFixed(2)}%`} />
+        ) : (
+          <MetricCard label="Asset Type" value={asset.asset_type.replace("_", " ")} />
+        )}
         <MetricCard label="Jurisdiction" value={asset.jurisdiction} />
       </div>
+
+      {/* Type-specific metadata */}
+      {isRealEstate && (metadata.address || osmUrl) && (
+        <div className="rounded-xl border border-border/50 bg-card/30 px-5 py-4 mb-8">
+          <p className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1.5">Property Location</p>
+          <p className="text-sm">{(metadata.address as string) || "—"}</p>
+          {osmUrl && (
+            <a href={osmUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-primary/70 hover:text-primary mt-1 inline-block">
+              View on OpenStreetMap ↗
+            </a>
+          )}
+        </div>
+      )}
+
+      {isCarbonCredits && (
+        <div className="rounded-xl border border-border/50 bg-card/30 px-5 py-4 mb-8">
+          <p className="text-[11px] text-muted-foreground uppercase tracking-wider mb-2">Credit Details</p>
+          <div className="grid grid-cols-3 gap-4 text-sm mb-4">
+            <div><span className="text-muted-foreground text-xs block">Registry</span>{(metadata.registry as string) || "—"}</div>
+            <div><span className="text-muted-foreground text-xs block">Vintage</span>{(metadata.vintage_year as string) || "—"}</div>
+            <div><span className="text-muted-foreground text-xs block">Serial</span>{(metadata.serial_number as string) || "—"}</div>
+          </div>
+          {asset.status === "active" && (
+            <div className="flex items-end gap-2 pt-3 border-t border-border/40">
+              <div className="flex-1">
+                <label className="text-[11px] text-muted-foreground uppercase tracking-wider block mb-1.5">Holder</label>
+                <select
+                  value={retireHolder}
+                  onChange={(e) => setRetireHolder(e.target.value)}
+                  className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/40"
+                >
+                  <option value="">Select holder...</option>
+                  {(holders as { account_id: string; balance: number }[])
+                    .filter((h) => h.balance > 0)
+                    .map((h) => (
+                      <option key={h.account_id} value={h.account_id}>
+                        {h.account_id} ({h.balance})
+                      </option>
+                    ))}
+                </select>
+              </div>
+              <div className="w-32">
+                <label className="text-[11px] text-muted-foreground uppercase tracking-wider block mb-1.5">Amount</label>
+                <input
+                  type="number"
+                  value={retireAmount}
+                  onChange={(e) => setRetireAmount(e.target.value)}
+                  className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/40"
+                />
+              </div>
+              <ActionButton
+                label="Retire"
+                loading={actionLoading === "retire"}
+                disabled={actionLoading !== null || !retireHolder || !retireAmount}
+                onClick={handleRetire}
+                destructive
+              />
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Maturity Progress */}
       {asset.maturity_date && (
