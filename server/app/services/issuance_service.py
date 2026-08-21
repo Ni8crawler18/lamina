@@ -47,7 +47,10 @@ class IssuanceService:
         adapter = get_registry().adapter(chain)  # raises if chain unknown/disabled
 
         type_rules = ASSET_TYPES.get(asset_type, {})
-        if not type_rules.get("has_coupon", True) and coupon_rate:
+        # coupon_rate is the shared periodic-payout rate field: a bond's coupon and an
+        # equity/fund/real_estate's dividend are the same underlying mechanism.
+        pays_periodically = type_rules.get("has_coupon", True) or type_rules.get("has_dividends", False)
+        if not pays_periodically and coupon_rate:
             raise ValueError(f"asset_type '{asset_type}' does not support a coupon_rate")
         if not type_rules.get("has_maturity", True) and maturity_date:
             raise ValueError(f"asset_type '{asset_type}' does not support a maturity_date")
