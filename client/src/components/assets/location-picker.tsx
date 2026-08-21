@@ -1,9 +1,9 @@
 "use client";
 
 import "leaflet/dist/leaflet.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import L from "leaflet";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
 
 // Leaflet's default marker icons resolve relative to the webpack bundle path and
 // 404 under Next.js unless pointed at real URLs explicitly.
@@ -39,6 +39,16 @@ function ClickToPlace({ onPick }: { onPick: (lat: number, lng: number) => void }
       onPick(e.latlng.lat, e.latlng.lng);
     },
   });
+  return null;
+}
+
+// react-leaflet's `center` prop only applies on mount — typing coordinates or
+// picking a search result otherwise never moves the already-rendered map.
+function RecenterMap({ lat, lng }: { lat: number; lng: number }) {
+  const map = useMap();
+  useEffect(() => {
+    map.setView([lat, lng], Math.max(map.getZoom(), 14));
+  }, [lat, lng, map]);
   return null;
 }
 
@@ -110,6 +120,36 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
         </ul>
       )}
 
+      {/* Coordinates are the value of record — address is a convenience for
+          finding them. Editable directly for surveys/deeds that already give
+          precise lat/lng, rather than relying only on geocoded search. */}
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className="text-[11px] text-muted-foreground uppercase tracking-wider block mb-1">Latitude</label>
+          <input
+            type="number"
+            step="any"
+            required
+            value={value.lat ?? ""}
+            onChange={(e) => onChange({ ...value, lat: e.target.value === "" ? null : Number(e.target.value) })}
+            placeholder="25.20480"
+            className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:border-primary/40"
+          />
+        </div>
+        <div>
+          <label className="text-[11px] text-muted-foreground uppercase tracking-wider block mb-1">Longitude</label>
+          <input
+            type="number"
+            step="any"
+            required
+            value={value.lng ?? ""}
+            onChange={(e) => onChange({ ...value, lng: e.target.value === "" ? null : Number(e.target.value) })}
+            placeholder="55.27080"
+            className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:border-primary/40"
+          />
+        </div>
+      </div>
+
       <div className="rounded-lg overflow-hidden border border-border/50 h-56">
         <MapContainer center={center} zoom={hasPin ? 15 : 2} className="h-full w-full" scrollWheelZoom>
           <TileLayer
@@ -117,13 +157,14 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           {hasPin && <Marker position={center} />}
+          {hasPin && <RecenterMap lat={value.lat as number} lng={value.lng as number} />}
           <ClickToPlace onPick={(lat, lng) => pick(lat, lng)} />
         </MapContainer>
       </div>
       <p className="text-[11px] text-muted-foreground">
         {hasPin
-          ? `Pinned at ${(value.lat as number).toFixed(5)}, ${(value.lng as number).toFixed(5)}`
-          : "Search an address or click the map to drop a pin."}
+          ? "Search, click the map, or type coordinates directly — all three stay in sync."
+          : "Search an address, click the map, or enter coordinates to drop a pin."}
       </p>
     </div>
   );

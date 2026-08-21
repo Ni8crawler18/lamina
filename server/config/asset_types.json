@@ -54,7 +54,7 @@
     "dividend_frequency": "monthly",
     "default_decimals": 2,
     "nav_update_frequency": "monthly",
-    "required_metadata": ["address", "lat", "lng"]
+    "required_metadata": ["address", "lat", "lng", "title_number"]
   },
   "carbon_credits": {
     "name": "Carbon Credits",

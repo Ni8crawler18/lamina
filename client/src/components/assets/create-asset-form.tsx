@@ -49,6 +49,7 @@ export default function CreateAssetForm({ onSuccess, onClose }: CreateAssetFormP
   });
 
   const [location, setLocation] = useState<LocationValue>({ address: "", lat: null, lng: null });
+  const [titleNumber, setTitleNumber] = useState("");
   const [registry, setRegistry] = useState({ registry: "", vintage_year: "", serial_number: "" });
 
   const update = (field: string, value: string | number) => {
@@ -69,7 +70,7 @@ export default function CreateAssetForm({ onSuccess, onClose }: CreateAssetFormP
     setError("");
     try {
       const metadata = isRealEstate
-        ? { address: location.address, lat: location.lat, lng: location.lng }
+        ? { address: location.address, lat: location.lat, lng: location.lng, title_number: titleNumber }
         : isCarbonCredits
           ? registry
           : undefined;
@@ -193,9 +194,23 @@ export default function CreateAssetForm({ onSuccess, onClose }: CreateAssetFormP
       )}
 
       {isRealEstate && (
-        <div>
-          <label className="text-[11px] text-muted-foreground uppercase tracking-wider block mb-1.5">Property Location</label>
-          <LocationPicker value={location} onChange={setLocation} />
+        <div className="space-y-4">
+          <div>
+            <label className="text-[11px] text-muted-foreground uppercase tracking-wider block mb-1.5">
+              Title / Parcel Number <span className="text-muted-foreground/60 normal-case">(APN, land registry title no., survey/khata no., DLD plot no. — the public record reference for this property)</span>
+            </label>
+            <input
+              required
+              value={titleNumber}
+              onChange={(e) => setTitleNumber(e.target.value)}
+              placeholder="e.g. APN 123-456-789"
+              className="w-full bg-secondary/50 border border-border/50 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/40"
+            />
+          </div>
+          <div>
+            <label className="text-[11px] text-muted-foreground uppercase tracking-wider block mb-1.5">Property Location</label>
+            <LocationPicker value={location} onChange={setLocation} />
+          </div>
         </div>
       )}
 

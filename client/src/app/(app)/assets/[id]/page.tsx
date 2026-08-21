@@ -264,15 +264,25 @@ export default function AssetDetail() {
       </div>
 
       {/* Type-specific metadata */}
-      {isRealEstate && (metadata.address || osmUrl) && (
+      {isRealEstate && Boolean(metadata.address || osmUrl || metadata.title_number) && (
         <div className="rounded-xl border border-border/50 bg-card/30 px-5 py-4 mb-8">
-          <p className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1.5">Property Location</p>
-          <p className="text-sm">{(metadata.address as string) || "—"}</p>
-          {osmUrl && (
-            <a href={osmUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-primary/70 hover:text-primary mt-1 inline-block">
-              View on OpenStreetMap ↗
-            </a>
-          )}
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1.5">Property Location</p>
+              <p className="text-sm">{(metadata.address as string) || "—"}</p>
+              {osmUrl && (
+                <a href={osmUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-primary/70 hover:text-primary mt-1 inline-block">
+                  View on OpenStreetMap ↗
+                </a>
+              )}
+            </div>
+            {metadata.title_number ? (
+              <div className="text-right">
+                <p className="text-[11px] text-muted-foreground uppercase tracking-wider mb-1.5">Title / Parcel No.</p>
+                <p className="text-sm font-mono">{metadata.title_number as string}</p>
+              </div>
+            ) : null}
+          </div>
         </div>
       )}
 
