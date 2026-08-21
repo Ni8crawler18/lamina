@@ -514,6 +514,7 @@ function Footer() {
             <a href="https://www.crunchbase.com/organization/laminaa" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">Crunchbase</a>
             <a href="https://x.com/laminaalabs" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">X</a>
           </div>
+          <a href="mailto:info@laminaa.com" className="mt-3 inline-block text-sm text-muted-foreground transition-colors hover:text-foreground">info@laminaa.com</a>
         </div>
         {cols.map(([h, items]) => (
           <div key={h}>
