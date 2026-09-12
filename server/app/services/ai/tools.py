@@ -138,6 +138,17 @@ TOOLS = [
         "input_schema": {"type": "object",
                          "properties": {"name": {"type": "string"}, "address": {"type": "string"}}},
     },
+    {
+        "name": "query_lifecycle_history",
+        "description": "Get an asset's full on-chain lifecycle history (issuance, KYC grants, "
+                        "transfers, audit trail) from the Laminaa subgraph on The Graph — a live, "
+                        "independently verifiable view sourced directly from contract events "
+                        "rather than our own database.",
+        "input_schema": {"type": "object",
+                         "properties": {"token_address": {"type": "string",
+                                                            "description": "EVM token contract address"}},
+                         "required": ["token_address"]},
+    },
 ]
 
 
@@ -187,7 +198,8 @@ def _asset_dict(a) -> dict:
 
 
 # Read-only tools (data exposure only); everything else moves value/state.
-READ_TOOLS = {"list_chains", "list_assets", "show_holders", "show_compliance", "screen_ofac"}
+READ_TOOLS = {"list_chains", "list_assets", "show_holders", "show_compliance", "screen_ofac",
+              "query_lifecycle_history"}
 
 # When set, write tools are NOT executed — they return a confirmation stub instead.
 # Channels (Telegram/WhatsApp) use this to require an explicit "YES" before moving value.
@@ -276,5 +288,9 @@ async def execute_tool(session, name: str, args: dict) -> dict:
 
     if name == "screen_ofac":
         return OFACScreener.get_instance().screen(name=args.get("name"), address=args.get("address"))
+
+    if name == "query_lifecycle_history":
+        from app.integrations.thegraph.client import get_asset_history
+        return await get_asset_history(args["token_address"])
 
     return {"error": f"unknown tool '{name}'"}

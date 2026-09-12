@@ -34,6 +34,11 @@ class Settings(BaseSettings):
     hedera_operator_key: str = ""
     hedera_network: str = "testnet"
 
+    # The Graph — Subgraph Studio query endpoint for the Laminaa subgraph
+    # (see /subgraph). Empty until deployed; the query_lifecycle_history
+    # tool no-ops with a clear message if unset.
+    thegraph_subgraph_url: str = ""
+
     # Solana (non-EVM family) — operator keypair for Token-2022 RWA tokens.
     # Provide ONE of these (path takes precedence): a solana-keygen json file, or
     # a base58-encoded 64-byte secret key.

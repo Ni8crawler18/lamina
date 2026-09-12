@@ -1,0 +1,86 @@
+# Laminaa subgraph - Base Sepolia instance.
+#
+# The same schema.graphql + src/mapping.ts are chain-agnostic and can be
+# redeployed as-is for any other EVM chain Laminaa runs on: just swap
+# `network` and each dataSource's `address` (see README.md in this folder
+# for the full per-chain address table, sourced from deployment_contract.txt).
+# LaminaRWAToken is a template because a new one is deployed per asset by
+# LaminaFactory - it's indexed dynamically via the `AssetDeployed` handler
+# below (`template.create`), not listed as a static dataSource.
+specVersion: 0.0.4
+description: Laminaa - on-chain RWA lifecycle audit trail (issuance, KYC, transfers, redemption), indexed directly from contract events.
+repository: https://github.com/Ni8crawler18/lamina
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: LaminaFactory
+    network: base-sepolia
+    source:
+      address: "0x45a36ea47577A4415cAc75256F78ccD66bC29E2c"
+      abi: LaminaFactory
+      startBlock: 0 # TODO: set to the factory's actual deploy block (check basescan) before deploying, to avoid a full historical resync
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Asset
+      abis:
+        - name: LaminaFactory
+          file: ./abis/LaminaFactory.json
+        - name: LaminaRWAToken
+          file: ./abis/LaminaRWAToken.json
+      eventHandlers:
+        - event: AssetDeployed(indexed address,indexed bytes32,string,string,indexed address)
+          handler: handleAssetDeployed
+      file: ./src/mapping.ts
+  - kind: ethereum
+    name: AuditLog
+    network: base-sepolia
+    source:
+      address: "0xca7f1c8BC559F0E20c3F12085A7Fa426397977f7"
+      abi: AuditLog
+      startBlock: 0 # TODO: same as above
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - AuditEntry
+      abis:
+        - name: AuditLog
+          file: ./abis/AuditLog.json
+      eventHandlers:
+        - event: ActionLogged(indexed bytes32,indexed uint256,string,string,uint256)
+          handler: handleActionLogged
+      file: ./src/mapping.ts
+templates:
+  - kind: ethereum
+    name: LaminaRWAToken
+    network: base-sepolia
+    source:
+      abi: LaminaRWAToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - KycEvent
+        - FreezeEvent
+        - Transfer
+      abis:
+        - name: LaminaRWAToken
+          file: ./abis/LaminaRWAToken.json
+      eventHandlers:
+        - event: KYCGranted(indexed address)
+          handler: handleKYCGranted
+        - event: KYCRevoked(indexed address)
+          handler: handleKYCRevoked
+        - event: AccountFrozen(indexed address)
+          handler: handleAccountFrozen
+        - event: AccountUnfrozen(indexed address)
+          handler: handleAccountUnfrozen
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/mapping.ts

@@ -1,0 +1,72 @@
+"""
+One tokenized real-world asset deployed via LaminaFactory. Indexed straight
+from on-chain events, no dependency on Laminaa's own backend/Postgres.
+"""
+type Asset @entity(immutable: false) {
+  id: ID!                       # tokenAddress
+  topicId: Bytes!
+  name: String!
+  symbol: String!
+  deployer: Bytes!
+  deployedAt: BigInt!
+  deployedAtTx: Bytes!
+  kycEvents: [KycEvent!]! @derivedFrom(field: "asset")
+  freezeEvents: [FreezeEvent!]! @derivedFrom(field: "asset")
+  transfers: [Transfer!]! @derivedFrom(field: "asset")
+  auditEntries: [AuditEntry!]! @derivedFrom(field: "asset")
+}
+
+"""
+One entry from AuditLog.ActionLogged - the immutable, on-chain compliance
+trail (issuance, KYC grant, transfer approval, coupon distribution, NAV
+update, redemption) for a given asset's topic.
+"""
+type AuditEntry @entity(immutable: true) {
+  id: ID!                       # topicId-sequenceNumber
+  asset: Asset
+  topicId: Bytes!
+  sequenceNumber: BigInt!
+  agent: String!
+  action: String!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+type KycEvent @entity(immutable: true) {
+  id: ID!
+  asset: Asset!
+  account: Bytes!
+  granted: Boolean!             # true = KYCGranted, false = KYCRevoked
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+"""
+Internal helper: maps an AuditLog topicId back to the Asset it belongs to.
+ActionLogged only carries the topicId, not the asset's token address, so
+this index (populated in handleAssetDeployed) is what lets AuditEntry.asset
+actually resolve instead of staying null.
+"""
+type TopicIndex @entity(immutable: true) {
+  id: ID!                       # topicId as hex string
+  asset: Asset!
+}
+
+type FreezeEvent @entity(immutable: true) {
+  id: ID!
+  asset: Asset!
+  account: Bytes!
+  frozen: Boolean!              # true = AccountFrozen, false = AccountUnfrozen
+  timestamp: BigInt!
+  txHash: Bytes!
+}
+
+type Transfer @entity(immutable: true) {
+  id: ID!
+  asset: Asset!
+  from: Bytes!
+  to: Bytes!
+  amount: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+}
