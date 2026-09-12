@@ -506,8 +506,7 @@ function Footer() {
             <span className="text-lg font-medium">Laminaa</span>
           </div>
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted-foreground">
-            The autonomous lifecycle layer for tokenized real-world assets. Compliant by construction,
-            across every network.
+            The autonomous lifecycle layer for tokenized real-world assets.
           </p>
           <div className="mt-5 flex items-center gap-4 text-sm text-muted-foreground">
             <a href="https://www.linkedin.com/company/laminaa/" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-foreground">LinkedIn</a>
