@@ -77,8 +77,8 @@ export default function AppSidebar() {
         <p className="font-mono text-[11px] text-muted-foreground/60 mt-1 truncate">
           {address || email || "—"}
         </p>
-        {mode && (
-          <p className="text-[9px] text-amber-400/70 mt-0.5">{mode === "demo" ? "demo mode" : mode}</p>
+        {mode && mode !== "demo" && (
+          <p className="text-[9px] text-amber-400/70 mt-0.5">{mode}</p>
         )}
       </div>
     </aside>

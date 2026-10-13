@@ -102,7 +102,7 @@ export default function LoginScreen() {
               className="flex w-full items-center justify-center gap-2 rounded-xl border border-border/50 px-4 py-3 text-sm font-medium text-muted-foreground transition-all hover:border-border hover:text-foreground disabled:opacity-50"
             >
               {pending === "demo" ? <Spinner /> : <Zap className="h-4 w-4" />}
-              {pending === "demo" ? "Connecting…" : "Explore in demo mode"}
+              {pending === "demo" ? "Connecting…" : "Explore without a wallet"}
             </button>
 
             {error && (

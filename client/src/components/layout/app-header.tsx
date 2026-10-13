@@ -71,7 +71,7 @@ export default function AppHeader() {
             ) : (
               <span className="text-xs text-muted-foreground">{email ?? "Signed in"}</span>
             )}
-            {mode && (
+            {mode && mode !== "demo" && (
               <span className="rounded bg-background px-1.5 py-0.5 text-[9px] uppercase tracking-wide text-muted-foreground/70">{mode}</span>
             )}
           </div>

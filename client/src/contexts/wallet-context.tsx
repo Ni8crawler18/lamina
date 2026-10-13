@@ -255,7 +255,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     try {
       const hc = await getHashConnect();
       if (!hc) {
-        setError("HashPack unavailable. Install the HashPack extension or use Demo mode.");
+        setError("HashPack unavailable. Install the HashPack extension or explore without a wallet.");
         setIsConnecting(false);
         return;
       }
