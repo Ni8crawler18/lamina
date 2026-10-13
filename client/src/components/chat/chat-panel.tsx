@@ -21,13 +21,12 @@ interface Message {
 }
 
 const SUGGESTIONS = [
-  "What assets are you managing right now, and which chains are they on?",
-  "Show me the holders and KYC status for Meridian Growth Equity on Robinhood Chain.",
-  'Screen "Ashford Wealth Advisors" against the OFAC sanctions list.',
-  "What's the full audit trail for that asset - every action since issuance?",
-  "Generate a compliance report for it.",
-  "What's the dividend history across my assets?",
-  "What makes you different from platforms like Securitize or Ondo?",
+  "Tokenize a $10M 5-year US Treasury bond",
+  "List all assets",
+  "Show holders for asset 1",
+  "Distribute coupon for asset 1",
+  "Generate compliance report",
+  "Purchase 500 tokens for asset 1",
 ];
 
 export default function ChatPanel() {
@@ -85,14 +84,13 @@ export default function ChatPanel() {
     }
   };
 
-  const showSuggestions = true;
-  const isEmptyState = messages.length <= 2;
+  const showSuggestions = messages.length <= 2;
 
   return (
     <div className="flex flex-col h-full">
       {/* Messages — anchored to bottom */}
       <div className="flex-1 overflow-y-auto" ref={scrollRef}>
-        <div className={`flex flex-col min-h-full px-6 py-6 ${isEmptyState ? "justify-end" : ""}`}>
+        <div className={`flex flex-col min-h-full px-6 py-6 ${showSuggestions ? "justify-end" : ""}`}>
           <div className="max-w-2xl mx-auto w-full space-y-5">
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -179,19 +177,15 @@ export default function ChatPanel() {
         </div>
       </div>
 
-      {/* Suggestions — horizontal slider, always available so you can click through
-          one at a time mid-conversation (e.g. during a demo recording), not just on
-          the empty-chat screen. */}
+      {/* Suggestions */}
       {showSuggestions && (
         <div className="px-6 pb-3">
-          <div
-            className="flex flex-nowrap gap-1.5 max-w-2xl mx-auto overflow-x-auto scroll-smooth snap-x snap-mandatory [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5"
-          >
+          <div className="flex flex-wrap gap-1.5 max-w-2xl mx-auto justify-center">
             {SUGGESTIONS.map((s, i) => (
               <button
                 key={i}
                 onClick={() => handleSend(s)}
-                className="shrink-0 snap-start whitespace-nowrap text-[11px] px-3 py-1.5 rounded-full border border-border/50 text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-primary/5 transition-all duration-150"
+                className="text-[11px] px-3 py-1.5 rounded-full border border-border/50 text-muted-foreground hover:text-foreground hover:border-primary/30 hover:bg-primary/5 transition-all duration-150"
               >
                 {s}
               </button>
