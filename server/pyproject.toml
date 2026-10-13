@@ -35,8 +35,9 @@ dependencies = [
 
 [project.optional-dependencies]
 solana = [
-    "solana>=0.34.0",   # RPC client + spl.token (Token-2022) instructions
-    "solders>=0.21.0",  # keypairs, pubkeys, instruction/transaction primitives
+    "solana==0.36.12",  # RPC client + spl.token (Token-2022) instructions. Pinned: >=0.34.0
+                        # let Render resolve a version missing InitializeMint2Params.
+    "solders==0.27.1",  # keypairs, pubkeys, instruction/transaction primitives
 ]
 hedera = [
     "hiero-sdk-python>=0.2.0",
