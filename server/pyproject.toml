@@ -31,19 +31,26 @@ dependencies = [
     # reporting
     "reportlab>=4.0.0",
     "jinja2>=3.1.0",
+    # pinned here (not just left to solana/sui's own ranges) so the combined
+    # `.[solana,hedera,sui]` install always lands in the one overlapping window both need
+    "httpx>=0.28.1,<0.29",
 ]
 
 [project.optional-dependencies]
+# solana's InitializeMint2Params (needed by chains/solana/adapter.py) only exists from
+# 0.36.11 on, and every version carrying it requires httpx>=0.28.0. pysui<0.90.0 requires
+# httpx<0.28, which conflicts outright - pysui>=0.90.0 moved to httpx>=0.28.1,<0.29, which
+# overlaps. Pin solana/solders/pysui/httpx together so Render's one combined
+# `pip install .[solana,hedera,sui]` resolves instead of hitting ResolutionImpossible.
 solana = [
-    "solana==0.36.12",  # RPC client + spl.token (Token-2022) instructions. Pinned: >=0.34.0
-                        # let Render resolve a version missing InitializeMint2Params.
-    "solders==0.27.1",  # keypairs, pubkeys, instruction/transaction primitives
+    "solana==0.36.12",
+    "solders==0.27.1",
 ]
 hedera = [
     "hiero-sdk-python>=0.2.0",
 ]
 sui = [
-    "pysui==0.84.0",
+    "pysui==0.90.0",
 ]
 dev = [
     "ruff>=0.6.0",
