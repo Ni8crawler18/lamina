@@ -57,11 +57,17 @@ def test_hedera_adapter_conforms():
     assert isinstance(adapter, ChainAdapter)
 
 
-def test_disabled_chain_not_resolvable():
-    reg = _registry()
-    # arc-testnet is configured but not enabled → adapter() must refuse
+def test_disabled_chain_not_resolvable(tmp_path):
+    # A configured-but-disabled chain → adapter() must refuse
+    (tmp_path / "off.toml").write_text(
+        'name = "Off"\nslug = "off-testnet"\nfamily = "evm"\nchain_id = 1\n'
+        'enabled = false\nnative_symbol = "ETH"\nrpc_url = "http://localhost"\n'
+        'explorer_url = "http://localhost"\n[contracts]\n'
+    )
+    reg = ChainRegistry()
+    reg.load(tmp_path)
     try:
-        reg.adapter("arc-testnet")
+        reg.adapter("off-testnet")
         assert False, "expected ValueError for disabled chain"
     except ValueError:
         pass

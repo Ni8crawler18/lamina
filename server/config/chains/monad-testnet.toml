@@ -1,0 +1,17 @@
+# Monad Testnet — high-throughput parallel-execution EVM L1.
+# Laminaa contracts deployed 2026-10-13; Circle official USDC.
+name          = "Monad Testnet"
+slug          = "monad-testnet"
+family        = "evm"
+chain_id      = 10143
+enabled       = true
+native_symbol = "MON"
+
+rpc_url       = "https://testnet-rpc.monad.xyz"
+rpc_url_env   = "RPC_URL_MONAD_TESTNET"
+explorer_url  = "https://testnet.monadexplorer.com"
+
+[contracts]
+factory   = "0x45a36ea47577A4415cAc75256F78ccD66bC29E2c"
+audit_log = "0xca7f1c8BC559F0E20c3F12085A7Fa426397977f7"
+usdc      = "0x534b2f3A21130d7a60830c2Df862319e593943A3"  # Circle official Monad testnet USDC

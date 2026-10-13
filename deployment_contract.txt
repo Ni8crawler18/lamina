@@ -1,10 +1,10 @@
-Laminaa — Deployed Contracts (all 10 networks)
+Laminaa — Deployed Contracts (all 11 networks)
 ==============================================
-Last updated: 2026-06-16
+Last updated: 2026-10-13
 
-Lamina is live on 10 testnets across 4 chain families:
-  7 EVM   — Arbitrum Sepolia, Robinhood Chain, Base Sepolia, Arc, Avalanche Fuji,
-            Ethereum Sepolia, Polygon Amoy
+Lamina is live on 11 testnets across 4 chain families:
+  8 EVM   — Arbitrum Sepolia, Robinhood Chain, Base Sepolia, Arc, Avalanche Fuji,
+            Ethereum Sepolia, Polygon Amoy, Monad Testnet
   1 Hedera — Hedera Testnet (native HTS/HCS)
   1 Solana — Solana Devnet (Token-2022)
   1 Sui    — Sui Testnet (Move closed-loop token)
@@ -178,6 +178,18 @@ TreasuryCap<RWA>            : 0x748034279e0377a2578d4c3928e6055472e20386d5e4e09e
 OperatorCap                : 0xda1088347a96448ee3f322229456c3c1881a14da340fe0c3f79e5fa6e35d94df
 UpgradeCap                 : 0x30fd0cdbd404aa5016d845b81bde041076a8dc45bebd3e43016627db1382ef07
 USDC (Circle testnet)      : 0xa1ec7fc00a6f40db9693ad1415d0c193ad3906494428cf252621037bd7117e29::usdc::USDC (6 dec)
+
+
+========================================================================
+11) MONAD TESTNET   (chainId 10143)   — parallel-execution EVM L1
+   explorer: https://testnet.monadexplorer.com
+========================================================================
+LaminaFactory : 0x45a36ea47577A4415cAc75256F78ccD66bC29E2c
+  https://testnet.monadexplorer.com/address/0x45a36ea47577A4415cAc75256F78ccD66bC29E2c
+AuditLog      : 0xca7f1c8BC559F0E20c3F12085A7Fa426397977f7
+  https://testnet.monadexplorer.com/address/0xca7f1c8BC559F0E20c3F12085A7Fa426397977f7
+USDC (Circle) : 0x534b2f3A21130d7a60830c2Df862319e593943A3
+  https://testnet.monadexplorer.com/address/0x534b2f3A21130d7a60830c2Df862319e593943A3
 
 
 Source of truth: server/config/chains/*.toml
