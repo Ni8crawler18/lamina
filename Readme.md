@@ -60,11 +60,6 @@ You operate it in plain English, or through code:
 
 All four share one tool layer, so a capability added once appears everywhere.
 
-<p align="center">
-  <img src="docs/images/agent-ofac.png" alt="Agent blocking a sanctioned entity" width="49%" />
-  <img src="docs/images/dashboard.png" alt="Cross-chain dashboard" width="49%" />
-</p>
-
 ## See it live
 
 Everything below is a real transaction on **Monad Testnet**, the newest network added to Laminaa:
@@ -87,7 +82,7 @@ Live on **11 testnets** across 4 chain families. One engine; a thin adapter per 
 | --- | ---: | --- | --- | --- |
 | Monad Testnet | 10143 | EVM | ERC-3643 | USDC |
 | Arbitrum Sepolia *(source-verified)* | 421614 | EVM | ERC-3643 | USDC |
-| Robinhood Chain (Arbitrum Orbit) | 46630 | EVM | ERC-3643 | USDC (mock) |
+| Robinhood Chain (Arbitrum Orbit) | 46630 | EVM | ERC-3643 | USDG (Paxos) |
 | Base Sepolia | 84532 | EVM | ERC-3643 | USDC |
 | Arc (Circle L1, USDC as gas) | 5042002 | EVM | ERC-3643 | USDC + EURC |
 | Avalanche Fuji | 43113 | EVM | ERC-3643 | USDC |
@@ -97,7 +92,7 @@ Live on **11 testnets** across 4 chain families. One engine; a thin adapter per 
 | Solana Devnet | — | Solana | Token-2022 | USDC |
 | Sui Testnet | — | Sui (Move) | Closed-loop token | USDC |
 
-USDC is Circle's official token everywhere except Robinhood Chain, where Circle doesn't issue, so a public-mint mock is used. Addresses and explorer links: [`deployment_contract.txt`](./deployment_contract.txt). Per-chain guide: [`docs/DEPLOYMENTS.md`](./docs/DEPLOYMENTS.md).
+Payouts settle in Circle's official USDC everywhere except Robinhood Chain, where Circle doesn't issue, so they settle in Paxos's regulated Global Dollar (USDG). Addresses and explorer links: [`deployment_contract.txt`](./deployment_contract.txt). Per-chain guide: [`docs/DEPLOYMENTS.md`](./docs/DEPLOYMENTS.md).
 
 ## Architecture
 

@@ -16,7 +16,7 @@ _Last updated: 2026-06-16._
 | # | Network | Chain ID | Family | Token model | Settlement | Status |
 |--:|---------|---------:|--------|-------------|-----------|--------|
 | 1 | Arbitrum Sepolia | 421614 | EVM | ERC-3643 | USDC (Circle) | ✅ live · source-verified |
-| 2 | Robinhood Chain (Orbit) | 46630 | EVM | ERC-3643 | USDC (Mock) | ✅ live |
+| 2 | Robinhood Chain (Orbit) | 46630 | EVM | ERC-3643 | USDG (Paxos) | ✅ live |
 | 3 | Base Sepolia | 84532 | EVM | ERC-3643 | USDC (Circle) | ✅ live |
 | 4 | Arc Testnet | 5042002 | EVM | ERC-3643 | USDC (native gas) + EURC | ✅ live |
 | 5 | Avalanche Fuji | 43113 | EVM | ERC-3643 | USDC (Circle) | ✅ live |
@@ -26,8 +26,8 @@ _Last updated: 2026-06-16._
 | 9 | Solana Devnet | 103 | Solana | Token-2022 | USDC (Circle) | ✅ live |
 | 10 | Sui Testnet | — | Sui (Move) | Closed-loop token | USDC (Circle) | ✅ live |
 
-> USDC settles on **9 of 10** chains with genuine Circle USDC; Robinhood (an Arbitrum
-> Orbit demo chain) uses a public-mint **Mock USDC** since Circle does not issue there.
+> Payouts settle in genuine Circle USDC on every chain except Robinhood Chain, where Circle
+> does not issue; there they settle in Paxos's regulated **Global Dollar (USDG)**.
 
 ### What "deployed" means per family
 
@@ -77,7 +77,7 @@ Explorer: https://explorer.testnet.chain.robinhood.com
 |----------|---------|
 | LaminaFactory | [`0xd556c46758B2C4B62f929256dc3FA53fbd375A3A`](https://explorer.testnet.chain.robinhood.com/address/0xd556c46758B2C4B62f929256dc3FA53fbd375A3A) |
 | AuditLog | [`0x153786D589c1d3bddEa68f232269d47Cb110D6Cd`](https://explorer.testnet.chain.robinhood.com/address/0x153786D589c1d3bddEa68f232269d47Cb110D6Cd) |
-| USDC (Mock, public mint) | [`0x5B6C7cAF7F99f99154fD8375ec935Fcf03F326f5`](https://explorer.testnet.chain.robinhood.com/address/0x5B6C7cAF7F99f99154fD8375ec935Fcf03F326f5) |
+| USDG (Paxos Global Dollar) | [`0x7E955252E15c84f5768B83c41a71F9eba181802F`](https://explorer.testnet.chain.robinhood.com/address/0x7E955252E15c84f5768B83c41a71F9eba181802F) |
 
 > The Robinhood explorer occasionally returns 5xx (their infra); the RPC stays live.
 

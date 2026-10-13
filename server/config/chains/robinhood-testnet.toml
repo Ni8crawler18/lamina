@@ -1,5 +1,5 @@
 # Robinhood Chain Testnet — Arbitrum Orbit L2 (RWA-focused).
-# Fully deployed: Laminaa contracts + Mock USDC live here.
+# Fully deployed: Laminaa contracts live here. Settlement in Paxos USDG (Circle doesn't issue USDC here).
 name          = "Robinhood Chain Testnet"
 slug          = "robinhood-testnet"
 family        = "evm"
@@ -15,4 +15,4 @@ explorer_url  = "https://explorer.testnet.chain.robinhood.com"
 [contracts]
 factory   = "0xd556c46758B2C4B62f929256dc3FA53fbd375A3A"  # hardened (v1.1) 2026-06-03
 audit_log = "0x153786D589c1d3bddEa68f232269d47Cb110D6Cd"  # access-controlled AuditLog
-usdc      = "0x5B6C7cAF7F99f99154fD8375ec935Fcf03F326f5"  # Mock USDC, 6 dec, public mint
+usdc      = "0x7E955252E15c84f5768B83c41a71F9eba181802F"  # Paxos USDG (Global Dollar), 6 dec; was Mock USDC 0x5B6C7cAF7F99f99154fD8375ec935Fcf03F326f5

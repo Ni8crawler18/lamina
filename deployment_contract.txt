@@ -57,8 +57,8 @@ LaminaFactory : 0xd556c46758B2C4B62f929256dc3FA53fbd375A3A
   https://explorer.testnet.chain.robinhood.com/address/0xd556c46758B2C4B62f929256dc3FA53fbd375A3A
 AuditLog      : 0x153786D589c1d3bddEa68f232269d47Cb110D6Cd
   https://explorer.testnet.chain.robinhood.com/address/0x153786D589c1d3bddEa68f232269d47Cb110D6Cd
-USDC (Mock,   : 0x5B6C7cAF7F99f99154fD8375ec935Fcf03F326f5
- public mint)   https://explorer.testnet.chain.robinhood.com/address/0x5B6C7cAF7F99f99154fD8375ec935Fcf03F326f5
+USDG (Paxos)  : 0x7E955252E15c84f5768B83c41a71F9eba181802F
+  https://explorer.testnet.chain.robinhood.com/address/0x7E955252E15c84f5768B83c41a71F9eba181802F
 (note: the Robinhood explorer occasionally returns 5xx — their infra; the RPC is live.)
 
 
